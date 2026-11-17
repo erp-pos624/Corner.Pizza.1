@@ -47,3 +47,5 @@ Thumbs.db
 
 # prisma
 apps/server/prisma/migrations/dev.db*
+.vercel
+.env*
