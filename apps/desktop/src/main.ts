@@ -21,7 +21,7 @@ declare const MAIN_WINDOW_VITE_NAME: string;
 
 // Packaged terminals talk to the deployed Vercel API; `pnpm dev` keeps using
 // the local server. FORNO_API_URL still overrides both (LAN deployments).
-const PRODUCTION_API_URL = 'https://erp-pos624-corner-pizza.vercel.app';
+const PRODUCTION_API_URL = 'https://corner-pizza-1.vercel.app';
 const API_BASE_URL =
   process.env.FORNO_API_URL ?? (app.isPackaged ? PRODUCTION_API_URL : 'http://127.0.0.1:4000');
 

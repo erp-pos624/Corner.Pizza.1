@@ -131,7 +131,7 @@ To make it permanent:
 ## 3. Desktop app — installers
 
 Packaged builds talk to the deployed API at
-`https://erp-pos624-corner-pizza.vercel.app`. `pnpm dev` still uses
+`https://corner-pizza-1.vercel.app`. `pnpm dev` still uses
 `http://127.0.0.1:4000`, and `FORNO_API_URL` overrides both — it is read when
 the app starts, so set it on the terminal (not the build machine) only for a
 LAN or self-hosted server.
