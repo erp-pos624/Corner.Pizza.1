@@ -1,11 +1,11 @@
 import { config as loadDotenv } from 'dotenv';
 import { existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { z } from 'zod';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const packageRoot = resolve(__dirname, '..');
+// The package is started from its own directory in dev and tests; Vercel has
+// no .env file and injects the configuration directly.
+const packageRoot = process.cwd();
 
 // Load .env from the package root, then any already-present environment wins.
 const envFile = resolve(packageRoot, '.env');

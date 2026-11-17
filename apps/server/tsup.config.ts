@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: ['src/index.ts', 'src/vercel.ts'],
   outDir: 'dist',
-  format: ['esm'],
+  format: ['cjs'],
   target: 'node20',
   platform: 'node',
   sourcemap: true,

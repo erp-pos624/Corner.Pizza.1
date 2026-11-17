@@ -6,6 +6,9 @@ import { env, isProduction, isTest } from './env.js';
  * Pretty output in development, newline-delimited JSON in production so that
  * logs can be shipped/rotated by the installer. Silent during unit tests.
  */
+// pino-pretty is a devDependency and is not installed in the Vercel function.
+const prettyTransport = !isProduction && !process.env.VERCEL;
+
 export const logger = pino({
   level: isTest ? 'silent' : env.LOG_LEVEL,
   base: undefined,
@@ -14,12 +17,12 @@ export const logger = pino({
     paths: ['req.headers.authorization', 'password', '*.password', '*.passwordHash', '*.token'],
     censor: '[redacted]',
   },
-  transport: isProduction
-    ? undefined
-    : {
+  transport: prettyTransport
+    ? {
         target: 'pino-pretty',
         options: { colorize: true, translateTime: 'SYS:HH:MM:ss', ignore: 'pid,hostname' },
-      },
+      }
+    : undefined,
 });
 
 export type Logger = typeof logger;

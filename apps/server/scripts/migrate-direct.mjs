@@ -1,7 +1,15 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { config } from 'dotenv';
 
 config();
+
+// `vercel link` / Marketplace integrations pull Supabase into the repo root.
+const rootEnv = resolve(process.cwd(), '../../.env.local');
+if (existsSync(rootEnv)) {
+  config({ path: rootEnv });
+}
 
 const directUrl = process.env.DIRECT_URL ?? process.env.POSTGRES_URL_NON_POOLING;
 if (!directUrl) {

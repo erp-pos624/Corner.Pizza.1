@@ -2,7 +2,6 @@
   "name": "@posshope/server",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "description": "Corner Pizza restaurant POS API server (modular monolith)",
   "main": "dist/index.js",
   "scripts": {
