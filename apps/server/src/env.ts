@@ -1,0 +1,79 @@
+import { config as loadDotenv } from 'dotenv';
+import { existsSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { z } from 'zod';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const packageRoot = resolve(__dirname, '..');
+
+// Load .env from the package root, then any already-present environment wins.
+const envFile = resolve(packageRoot, '.env');
+if (existsSync(envFile)) {
+  loadDotenv({ path: envFile });
+}
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  HOST: z.string().default('127.0.0.1'),
+  PORT: z.coerce.number().int().min(1).max(65535).default(4000),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required (PostgreSQL connection string)'),
+  /** Secret used to sign access tokens. MUST be overridden in production. */
+  JWT_SECRET: z.string().min(16).default('dev-only-insecure-secret-change-me-please'),
+  ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().min(60).default(15 * 60),
+  REFRESH_TOKEN_TTL_SECONDS: z.coerce.number().int().min(300).default(12 * 60 * 60),
+  /** Failed logins before the account is temporarily locked. */
+  MAX_LOGIN_ATTEMPTS: z.coerce.number().int().min(1).default(5),
+  LOGIN_LOCK_MINUTES: z.coerce.number().int().min(1).default(15),
+  /**
+   * Comma-separated browser origins trusted to call the API with credentials.
+   * `*` only grants credential-less access in production (see `lib/origin.ts`).
+   */
+  CORS_ORIGINS: z.string().default('*'),
+  /**
+   * Whether the web refresh cookie is `Secure`. Defaults to true in production.
+   * Set to `false` only for a plain-HTTP LAN deployment without TLS.
+   */
+  WEB_COOKIE_SECURE: z.enum(['true', 'false']).optional(),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  /** Business timezone used for report boundary calculations. */
+  BUSINESS_TIMEZONE: z.string().default('Africa/Cairo'),
+  /** Basata payment gateway. All values are optional until the merchant account is live. */
+  BASATA_BASE_URL: z.string().trim().optional(),
+  BASATA_API_KEY: z.string().trim().optional(),
+  BASATA_MERCHANT_ID: z.string().trim().optional(),
+  BASATA_WEBHOOK_SECRET: z.string().trim().optional(),
+  BASATA_CHECKOUT_RETURN_URL: z.string().trim().optional(),
+  /** Explicit override; defaults to enabled outside production when keys are missing. */
+  BASATA_ALLOW_SIMULATION: z.enum(['true', 'false']).optional(),
+  /** Optional Nominatim-compatible geocoder used for address-only delivery checks. */
+  GEOCODER_URL: z.string().trim().optional(),
+  /** Cloudinary image hosting. Required for menu image uploads. */
+  CLOUDINARY_CLOUD_NAME: z.string().trim().optional(),
+  CLOUDINARY_API_KEY: z.string().trim().optional(),
+  CLOUDINARY_API_SECRET: z.string().trim().optional(),
+  CLOUDINARY_UPLOAD_FOLDER: z.string().trim().default('corner-pizza'),
+});
+
+export type Env = z.infer<typeof envSchema>;
+
+function parseEnv(): Env {
+  const parsed = envSchema.safeParse(process.env);
+  if (!parsed.success) {
+    const issues = parsed.error.issues
+      .map((i) => `  - ${i.path.join('.') || '(root)'}: ${i.message}`)
+      .join('\n');
+    throw new Error(`Invalid server environment configuration:\n${issues}`);
+  }
+  const env = parsed.data;
+  if (env.NODE_ENV === 'production' && env.JWT_SECRET.startsWith('dev-only')) {
+    throw new Error('JWT_SECRET must be set to a strong, unique value in production');
+  }
+  return env;
+}
+
+export const env: Env = parseEnv();
+
+export const isProduction = env.NODE_ENV === 'production';
+export const isTest = env.NODE_ENV === 'test';
+export const packageRootDir = packageRoot;

@@ -1,0 +1,308 @@
+@import '@fontsource/anton/latin-400.css';
+@import '@fontsource/ibm-plex-sans/latin-400.css';
+@import '@fontsource/ibm-plex-sans/latin-500.css';
+@import '@fontsource/ibm-plex-sans/latin-600.css';
+@import 'leaflet/dist/leaflet.css';
+
+/*
+ * IBM Plex Sans Arabic — bundled subset for the Arabic storefront. The
+ * unicode-range keeps these faces away from Latin glyphs, so English keeps
+ * the Latin stack unchanged.
+ */
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/IBMPlexSansArabic-Regular.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
+    U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E,
+    U+10EC2-10EC7, U+10EC9-10EEE, U+10EF0-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22,
+    U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49,
+    U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F,
+    U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E,
+    U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./assets/fonts/IBMPlexSansArabic-Medium.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
+    U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E,
+    U+10EC2-10EC7, U+10EC9-10EEE, U+10EF0-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22,
+    U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49,
+    U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F,
+    U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E,
+    U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./assets/fonts/IBMPlexSansArabic-SemiBold.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
+    U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E,
+    U+10EC2-10EC7, U+10EC9-10EEE, U+10EF0-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22,
+    U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49,
+    U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F,
+    U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E,
+    U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./assets/fonts/IBMPlexSansArabic-Bold.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
+    U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E,
+    U+10EC2-10EC7, U+10EC9-10EEE, U+10EF0-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22,
+    U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49,
+    U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F,
+    U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E,
+    U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Both the customer site and the staff dashboard ship in this one build. The
+ * staff stylesheet owns the document; every base rule here is scoped to
+ * `.storefront` so the oven theme never leaks into the dashboard.
+ */
+@layer base {
+  /*
+   * Theme channels. The dark oven canvas is the brand default; the light
+   * daylight canvas swaps the same tokens so utilities such as
+   * `bg-forest-2` and `text-cream` invert without touching components.
+   */
+  .storefront {
+    --sf-bg: 13 31 20;
+    --sf-bg-2: 21 48 31;
+    --sf-bg-3: 31 58 41;
+    --sf-line: 47 74 57;
+    --sf-text: 245 241 230;
+    --sf-text-dim: 201 196 180;
+    --sf-text-faint: 147 160 148;
+    --sf-brick: 163 32 38;
+    --sf-brick-deep: 127 21 25;
+    --sf-gold: 201 169 97;
+    --sf-gold-soft: 232 213 165;
+    --sf-tomato: 239 140 128;
+    --sf-basil: 143 211 164;
+    color-scheme: dark;
+    background-color: rgb(var(--sf-bg));
+    color: rgb(var(--sf-text));
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    caret-color: rgb(var(--sf-gold));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html[data-storefront-theme='light'] .storefront {
+    --sf-bg: 254 253 249;
+    --sf-bg-2: 245 241 230;
+    --sf-bg-3: 234 228 213;
+    --sf-line: 219 210 191;
+    --sf-text: 21 48 31;
+    --sf-text-dim: 71 87 76;
+    --sf-text-faint: 118 129 121;
+    --sf-brick: 163 32 38;
+    --sf-brick-deep: 127 21 25;
+    --sf-gold: 138 106 43;
+    --sf-gold-soft: 122 92 34;
+    --sf-tomato: 176 42 47;
+    --sf-basil: 32 112 62;
+    color-scheme: light;
+  }
+
+  .storefront *,
+  .storefront ::before,
+  .storefront ::after {
+    border-color: rgb(var(--sf-line));
+  }
+
+  .storefront :where(h1, h2, h3) {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    text-transform: none;
+    letter-spacing: normal;
+    text-wrap: balance;
+  }
+
+  .storefront a,
+  .storefront button,
+  .storefront input,
+  .storefront select,
+  .storefront textarea,
+  .storefront [tabindex] {
+    outline: none;
+  }
+
+  .storefront :focus-visible {
+    outline: 2px solid rgb(var(--sf-gold));
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  .storefront ::selection {
+    background: rgb(var(--sf-gold));
+    color: #0d1f14;
+  }
+
+  .storefront input::placeholder,
+  .storefront textarea::placeholder {
+    color: rgb(var(--sf-text-faint));
+  }
+
+  .storefront ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .storefront ::-webkit-scrollbar-track {
+    background: rgb(var(--sf-bg));
+  }
+  .storefront ::-webkit-scrollbar-thumb {
+    background: rgb(var(--sf-line));
+    border-radius: 999px;
+    border: 2px solid rgb(var(--sf-bg));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .storefront *,
+    .storefront *::before,
+    .storefront *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .page {
+    @apply mx-auto w-full max-w-page px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Display voice: condensed, upper-case, tight leading. */
+  .display {
+    font-family: 'Anton', 'Arial Narrow', sans-serif;
+    text-transform: uppercase;
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+  }
+
+  .price {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-[15px] font-semibold transition duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-brick text-onmedia hover:bg-brick-deep active:bg-brick-deep;
+  }
+  .btn-ghost {
+    @apply btn border border-line text-cream hover:border-cream-faint hover:bg-forest-3;
+  }
+  .btn-quiet {
+    @apply btn px-3 text-cream-dim hover:bg-forest-3 hover:text-cream;
+  }
+
+  .field {
+    @apply block w-full rounded-xl border border-line bg-forest-2 px-4 py-3 text-[15px] text-cream transition duration-200 ease-out hover:border-cream-faint focus:border-gold;
+  }
+  .field[aria-invalid='true'] {
+    @apply border-tomato;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-cream-dim;
+  }
+
+  .panel {
+    @apply rounded-card border border-line bg-forest-2;
+  }
+
+  .link {
+    @apply text-gold-soft underline decoration-gold/50 underline-offset-4 hover:decoration-gold-soft;
+  }
+
+  .skeleton {
+    @apply animate-shimmer rounded-lg;
+    background: linear-gradient(
+      90deg,
+      rgb(var(--sf-bg-2)) 25%,
+      rgb(var(--sf-bg-3)) 50%,
+      rgb(var(--sf-bg-2)) 75%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* Cart drawer slides in from the inline-end edge, which flips with the page. */
+  .cart-drawer {
+    transform: translateX(100%);
+  }
+  [dir='rtl'] .cart-drawer {
+    transform: translateX(-100%);
+  }
+  .cart-drawer[data-state='open'],
+  [dir='rtl'] .cart-drawer[data-state='open'] {
+    transform: translateX(0);
+  }
+}
+
+/*
+ * Arabic is a connected script: letter-spacing, forced uppercase and the
+ * condensed Latin display face all break it. Arabic documents get the bundled
+ * geometric family, neutral tracking and real weights.
+ */
+html[lang='ar'] .storefront {
+  font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+  line-height: 1.65;
+}
+
+html[lang='ar'] .storefront :where(h1, h2, h3, .display) {
+  font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+html[lang='ar'] .storefront [class*='uppercase'] {
+  text-transform: none;
+}
+
+html[lang='ar'] .storefront [class*='tracking-'] {
+  letter-spacing: 0;
+}
+
+/* Map tiles sit in a light world of their own; frame them to match. */
+.storefront .leaflet-container {
+  background: rgb(var(--sf-bg-2));
+  font-family: inherit;
+  border-radius: 14px;
+}
+.storefront .leaflet-container .leaflet-tile-pane {
+  filter: none;
+}
+.storefront .leaflet-control-attribution {
+  background: rgb(var(--sf-bg) / 0.8) !important;
+  color: rgb(var(--sf-text-dim)) !important;
+}
+.storefront .leaflet-control-attribution a {
+  color: rgb(var(--sf-gold)) !important;
+}

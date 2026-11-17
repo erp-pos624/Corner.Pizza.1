@@ -1,0 +1,72 @@
+{
+  "identity": {
+    "title": "Restaurant identity",
+    "description": "Shown on the register, receipts and printed invoices.",
+    "nameEn": "Restaurant name (English)",
+    "nameAr": "Restaurant name (Arabic)",
+    "namePlaceholderEn": "Corner Pizza",
+    "namePlaceholderAr": "كورنر بيتزا",
+    "nameRequired": "Restaurant name is required in both English and Arabic",
+    "taglineEn": "Tagline (English)",
+    "taglineAr": "Tagline (Arabic)",
+    "taglinePlaceholderEn": "Wood-fired pizza, fast.",
+    "taglinePlaceholderAr": "بيتزا على الحطب، بسرعة.",
+    "phone": "Phone",
+    "phonePlaceholder": "+20 100 000 0000",
+    "email": "Email",
+    "emailPlaceholder": "hello@eatcornerpizza.com",
+    "addressEn": "Address (English)",
+    "addressAr": "Address (Arabic)",
+    "addressPlaceholderEn": "Street, district, city",
+    "addressPlaceholderAr": "الشارع، الحي، المدينة",
+    "currency": "Currency code",
+    "currencyHint": "Used for display and reporting. Amounts are stored with two decimals."
+  },
+  "charges": {
+    "title": "Tax & service charges",
+    "description": "Applied by the server to every new order at checkout.",
+    "tax": "Sales tax rate (%)",
+    "taxHint": "Charged on the subtotal after discounts. Current: {rate}%.",
+    "delivery": "Delivery fee",
+    "deliveryHint": "Fixed fee added to delivery orders only.",
+    "discount": "Cashier discount limit (%)",
+    "discountHint": "Cashiers cannot apply a percentage discount above this value. Fixed discounts are capped at the order subtotal. Administrators are not limited."
+  },
+  "stock": {
+    "title": "Inventory stock policy",
+    "description": "Controls what happens when a sale would take an ingredient below zero.",
+    "label": "When stock runs out",
+    "block": "Block the sale (recommended)",
+    "warn": "Allow negative stock and warn",
+    "hint": "Blocked sales stop at checkout with the missing ingredient listed. Warning mode completes the sale, allows the negative balance and raises an out-of-stock alert for replenishment."
+  },
+  "receipt": {
+    "title": "Receipt footer",
+    "description": "Closing message printed on receipts and invoices.",
+    "footerEn": "Footer (English)",
+    "footerAr": "Footer (Arabic)",
+    "placeholderEn": "Thank you for dining at Corner Pizza. Fresh from the oven, made to be shared.",
+    "placeholderAr": "شكرًا لتناولك الطعام في كورنر بيتزا. بيتزا طازجة من الفرن، صُنعت لتُشارَك.",
+    "ariaEn": "Receipt footer (English)",
+    "ariaAr": "Receipt footer (Arabic)",
+    "updated": "Last updated {date}"
+  },
+  "errors": {
+    "load": "Could not load restaurant settings",
+    "save": "Could not save settings",
+    "taxRequired": "Tax rate is required",
+    "discountRequired": "Cashier discount limit is required",
+    "percentRange": "{label} must be between 0 and 100",
+    "deliveryRequired": "Delivery fee is required",
+    "deliveryInvalid": "Delivery fee must be a positive amount with up to 2 decimals",
+    "currencyRequired": "Currency code is required",
+    "check": "Check the restaurant settings"
+  },
+  "toast": {
+    "saved": "Settings saved",
+    "savedMessage": "New taxes and fees apply to the next order."
+  },
+  "discard": "Discard",
+  "save": "Save settings",
+  "footer": "Changes affect new orders only. Existing invoices keep the values they were issued with."
+}

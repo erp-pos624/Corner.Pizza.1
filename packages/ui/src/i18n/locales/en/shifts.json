@@ -1,0 +1,118 @@
+{
+  "loading": "Loading cash drawer…",
+  "current": {
+    "title": "Current shift",
+    "closedTitle": "Drawer is closed",
+    "closedMessage": "Open a shift to start taking cash orders on this terminal.",
+    "openAction": "Open shift",
+    "openTitle": "Open shift",
+    "openDescription": "Count the cash already in the drawer and start the shift.",
+    "openingFloat": "Opening float",
+    "notes": "Notes",
+    "notesPlaceholder": "Optional handover notes",
+    "openedToast": "Shift opened",
+    "openedLine": "Opened {when} by {name}",
+    "terminal": "Terminal",
+    "operator": "Operator",
+    "shift": "Shift",
+    "cashIn": "Cash in",
+    "cashOut": "Cash out",
+    "close": "Close shift",
+    "movementsTitle": "Cash movements",
+    "noMovements": "No cash movements recorded on this shift yet."
+  },
+  "totals": {
+    "orders": "Orders",
+    "grossSales": "Gross sales",
+    "cashPayments": "Cash sales",
+    "cardPayments": "Card sales",
+    "walletPayments": "Wallet sales",
+    "cashIn": "Cash in",
+    "cashOut": "Cash out",
+    "cashRefunds": "Cash refunds",
+    "refunds": "Refunds",
+    "discounts": "Discounts",
+    "tax": "Tax",
+    "deliveryFees": "Delivery fees",
+    "openingFloat": "Opening float",
+    "expectedCash": "Expected in drawer",
+    "countedCash": "Counted cash",
+    "variance": "Variance"
+  },
+  "movement": {
+    "title": "Record cash movement",
+    "description": "Cash drops and pay-ins must always carry a reason.",
+    "type": "Movement type",
+    "in": "Cash in",
+    "out": "Cash out",
+    "amount": "Amount",
+    "reason": "Reason",
+    "reasonPlaceholder": "e.g. Change from the safe, supplier payment",
+    "save": "Record movement",
+    "savedToast": "Cash movement recorded"
+  },
+  "close": {
+    "title": "Close shift",
+    "description": "Count the drawer, confirm the variance and lock the Z-report.",
+    "countedCash": "Counted cash",
+    "expected": "Expected in drawer",
+    "variance": "Variance",
+    "varianceHint": "Positive means the drawer is over, negative means it is short.",
+    "balanced": "Balanced",
+    "over": "Over",
+    "short": "Short",
+    "notes": "Closing notes",
+    "notesPlaceholder": "Explain any variance or handover details",
+    "confirm": "Close & lock Z-report",
+    "closedToast": "Shift closed",
+    "zReportToast": "Z-report locked"
+  },
+  "history": {
+    "title": "Shift history",
+    "loading": "Loading shift history…",
+    "emptyTitle": "No shifts yet",
+    "emptyMessage": "Closed shifts and their Z-reports will appear here.",
+    "filteredEmpty": "No shifts match these filters"
+  },
+  "columns": {
+    "shift": "Shift",
+    "terminal": "Terminal",
+    "operator": "Operator",
+    "opened": "Opened",
+    "closed": "Closed",
+    "status": "Status",
+    "drawer": "Drawer",
+    "actions": "Actions"
+  },
+  "status": {
+    "OPEN": "Open",
+    "CLOSED": "Closed"
+  },
+  "zReports": {
+    "title": "Z-reports",
+    "description": "Locked end-of-shift summaries for each business day.",
+    "date": "Business date",
+    "emptyTitle": "No Z-reports for this date",
+    "emptyMessage": "A Z-report is created automatically when a shift is closed.",
+    "number": "Report",
+    "shift": "Shift",
+    "terminal": "Terminal",
+    "lockedAt": "Locked",
+    "view": "View report",
+    "detailTitle": "Z-report {number}",
+    "detailDescription": "Locked totals for {date} on terminal {terminal}.",
+    "viewAction": "Open Z-report"
+  },
+  "detail": {
+    "title": "Shift {number}",
+    "description": "Totals, drawer state and cash movements for this shift.",
+    "noZReport": "This shift has no Z-report."
+  },
+  "errors": {
+    "load": "Could not load shifts",
+    "open": "Could not open the shift",
+    "movement": "Could not record the cash movement",
+    "close": "Could not close the shift",
+    "loadZReports": "Could not load Z-reports"
+  }
+}

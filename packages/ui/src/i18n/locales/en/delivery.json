@@ -1,0 +1,164 @@
+{
+  "loading": "Loading deliveries…",
+  "tabs": {
+    "dispatch": "Dispatch board",
+    "settlements": "Driver settlements",
+    "zones": "Delivery zones"
+  },
+  "filters": {
+    "statusAria": "Filter deliveries by status",
+    "all": "All",
+    "driverAria": "Filter by driver",
+    "allDrivers": "All drivers"
+  },
+  "status": {
+    "PENDING": "Unassigned",
+    "ASSIGNED": "Assigned",
+    "PICKED_UP": "Out for delivery",
+    "DELIVERED": "Delivered",
+    "FAILED": "Failed",
+    "CANCELLED": "Cancelled"
+  },
+  "payment": {
+    "cod": "COD",
+    "prepaid": "Prepaid",
+    "unpaid": "Unpaid"
+  },
+  "order": {
+    "items": "{count} items",
+    "noDriver": "No driver yet",
+    "assign": "Assign",
+    "pickedUp": "Out for delivery",
+    "delivered": "Delivered",
+    "failed": "Failed",
+    "cancel": "Cancel",
+    "emptyTitle": "No deliveries yet",
+    "emptyMessage": "Delivery orders will appear here as soon as they are placed.",
+    "filteredEmpty": "No deliveries match this filter"
+  },
+  "assign": {
+    "title": "Assign driver",
+    "description": "Choose the driver for order {number}.",
+    "driver": "Driver",
+    "confirm": "Assign driver",
+    "success": "Driver assigned",
+    "noDrivers": "No active driver accounts found"
+  },
+  "cancel": {
+    "title": "Cancel delivery",
+    "message": "Cancel the delivery for order {number}? The order remains open so it can be refunded or cancelled separately.",
+    "confirm": "Cancel delivery",
+    "success": "Delivery cancelled"
+  },
+  "toasts": {
+    "statusUpdated": "Delivery updated"
+  },
+  "settlements": {
+    "title": "Driver settlements",
+    "new": "New settlement",
+    "status": {
+      "OPEN": "Open",
+      "SETTLED": "Settled"
+    },
+    "period": "{start} – {end}",
+    "orders": "{count} orders",
+    "columns": {
+      "settlement": "Settlement",
+      "driver": "Driver",
+      "period": "Period",
+      "orders": "Orders",
+      "cash": "Cash collected",
+      "gross": "Gross sales",
+      "card": "Card collected",
+      "handed": "Handed over",
+      "variance": "Variance",
+      "status": "Status",
+      "settledAt": "Settled at",
+      "actions": "Actions"
+    },
+    "emptyTitle": "No settlements yet",
+    "emptyMessage": "Create a settlement at the end of a driver's shift to reconcile the cash they collected.",
+    "filteredEmpty": "No settlements match this filter",
+    "settleAction": "Settle",
+    "create": {
+      "title": "New driver settlement",
+      "description": "Totals are calculated from delivered orders in the selected period.",
+      "driver": "Driver",
+      "start": "Period start",
+      "end": "Period end",
+      "confirm": "Create settlement",
+      "success": "Settlement created",
+      "noDrivers": "No active driver accounts found"
+    },
+    "settleDialog": {
+      "title": "Settle {number}",
+      "description": "Enter the cash the driver handed over.",
+      "cashCollected": "Cash collected",
+      "amount": "Amount handed over",
+      "variance": "Variance",
+      "notes": "Notes",
+      "notesPlaceholder": "Optional note stored on the settlement",
+      "confirm": "Mark settled",
+      "success": "Settlement closed"
+    }
+  },
+  "errors": {
+    "load": "Could not load deliveries",
+    "loadSettlements": "Could not load settlements",
+    "loadDrivers": "Could not load drivers",
+    "assign": "Could not assign the driver",
+    "status": "Could not update the delivery",
+    "createSettlement": "Could not create the settlement",
+    "settle": "Could not settle the driver"
+  },
+  "zones": {
+    "title": "Delivery zones",
+    "count": "{count} zones",
+    "branch": "Branch",
+    "new": "Draw zone",
+    "mapAria": "Delivery zone map",
+    "flatFeeHint": "No zones yet — deliveries use the flat fee of {fee}.",
+    "emptyTitle": "No delivery zones for this branch",
+    "emptyMessage": "Draw circular zones on the map to charge fees by distance. Until then the flat delivery fee applies.",
+    "card": {
+      "radius": "{radius} m radius",
+      "minOrder": "Min order {amount}",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "form": {
+      "createTitle": "Draw a delivery zone",
+      "editTitle": "Edit zone",
+      "untitled": "New zone",
+      "name": "Zone name",
+      "namePlaceholder": "e.g. Downtown core",
+      "lat": "Centre latitude",
+      "lng": "Centre longitude",
+      "radius": "Radius (metres)",
+      "fee": "Delivery fee",
+      "minOrder": "Minimum order",
+      "active": "Zone is active",
+      "activeHint": "Inactive zones keep their settings but are ignored at checkout.",
+      "pickHint": "Tip: click the map to move the centre of this zone.",
+      "save": "Save zone",
+      "create": "Create zone",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "title": "Delete delivery zone",
+      "message": "Delete “{name}”? Orders already placed keep their snapshot.",
+      "confirm": "Delete zone",
+      "success": "Delivery zone deleted"
+    },
+    "toasts": {
+      "created": "Delivery zone created",
+      "updated": "Delivery zone updated"
+    },
+    "errors": {
+      "load": "Could not load delivery zones",
+      "loadBranches": "Could not load branches",
+      "save": "Could not save the delivery zone",
+      "delete": "Could not delete the delivery zone"
+    }
+  }
+}

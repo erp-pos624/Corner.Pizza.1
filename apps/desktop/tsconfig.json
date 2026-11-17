@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "jsx": "react-jsx",
+    "plugins": [
+      {
+        "name": "typescript/react",
+        "length": 1
+      }
+    ],
+    "types": ["vite/client"]
+  },
+  "include": ["src/**/*", "src/**/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

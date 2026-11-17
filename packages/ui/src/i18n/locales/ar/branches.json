@@ -1,0 +1,145 @@
+{
+  "allBranches": "كل الفروع",
+  "switcherAria": "نطاق الفرع الحالي",
+  "switcherHint": "التقارير تشمل كل الفروع، أما صفحات التشغيل فتستخدم الفرع المسند إليك.",
+  "tabs": {
+    "branches": "الفروع",
+    "transfers": "تحويلات المخزون"
+  },
+  "count": "{count} فرع",
+  "new": "فرع جديد",
+  "loading": "جارٍ تحميل الفروع",
+  "empty": {
+    "title": "لا توجد فروع بعد",
+    "message": "أنشئ فرعًا لكل موقع يعمل بمخزونه ودرج نقديته ووردياته الخاصة."
+  },
+  "columns": {
+    "branch": "الفرع",
+    "contact": "بيانات التواصل",
+    "status": "الحالة",
+    "created": "تاريخ الإنشاء"
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط"
+  },
+  "actions": {
+    "edit": "تعديل الفرع"
+  },
+  "createTitle": "فرع جديد",
+  "createDescription": "افتح موقعًا جديدًا بمخزون ودرج نقدية وورديات وتقارير مستقلة.",
+  "editTitle": "تعديل {name}",
+  "editDescription": "حدّث بيانات الموقع وما إذا كان قادرًا على العمل.",
+  "form": {
+    "code": "رمز الفرع",
+    "codePlaceholder": "مثال: MAADI",
+    "codeHint": "من 2 إلى 12 حرفًا، يظهر في التحويلات والتقارير.",
+    "name": "الاسم (بالإنجليزية)",
+    "namePlaceholder": "مثال: Maadi",
+    "nameAr": "الاسم (بالعربية)",
+    "nameArPlaceholder": "مثال: المعادي",
+    "address": "العنوان",
+    "addressPlaceholder": "الشارع، الحي، المدينة",
+    "phone": "الهاتف",
+    "phonePlaceholder": "+20 2 0000 0000",
+    "latitude": "خط العرض",
+    "longitude": "خط الطول",
+    "coordinatesHint": "اختياري. يُستخدم لتوسيط خرائط مناطق التوصيل لهذا الفرع.",
+    "active": "الفرع نشط",
+    "activeHint": "الفروع غير النشطة لا يمكنها فتح ورديات أو استقبال طلبات أو تحويلات.",
+    "codeError": "أدخل رمز فرع من 2 إلى 12 حرفًا.",
+    "nameError": "أدخل اسم الفرع."
+  },
+  "submit": "حفظ الفرع",
+  "submitting": "جارٍ الحفظ…",
+  "toasts": {
+    "created": "تم إنشاء الفرع",
+    "updated": "تم تحديث الفرع"
+  },
+  "errors": {
+    "load": "تعذر تحميل الفروع",
+    "save": "تعذر حفظ الفرع"
+  },
+  "transfers": {
+    "new": "تحويل جديد",
+    "loading": "جارٍ تحميل التحويلات",
+    "filterAria": "تصفية التحويلات حسب الحالة",
+    "allStatuses": "كل الحالات",
+    "empty": {
+      "title": "لا توجد تحويلات بعد",
+      "message": "انقل المكوّنات بين الفروع عبر تحويل موثّق."
+    },
+    "filteredEmpty": "لا توجد تحويلات مطابقة لهذا الفلتر",
+    "columns": {
+      "reference": "المرجع",
+      "route": "المسار",
+      "status": "الحالة",
+      "items": "الأصناف",
+      "createdBy": "أنشأه",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+    "status": {
+      "DRAFT": "مسودة",
+      "IN_TRANSIT": "قيد النقل",
+      "RECEIVED": "تم الاستلام",
+      "CANCELLED": "ملغي"
+    },
+    "items": "{count} صنف",
+    "viewAria": "عرض تفاصيل التحويل",
+    "detail": {
+      "title": "تحويل {reference}",
+      "description": "من {from} إلى {to}",
+      "ingredient": "المكوّن",
+      "quantity": "الكمية",
+      "receivedAt": "تاريخ الاستلام",
+      "notes": "ملاحظات",
+      "close": "إغلاق"
+    },
+    "send": "إرسال",
+    "receive": "استلام",
+    "cancel": "إلغاء",
+    "sendTitle": "إرسال هذا التحويل؟",
+    "sendDescription": "يخرج المخزون من {from} فورًا ولا يصل إلى {to} إلا عند استلامه هناك.",
+    "receiveTitle": "استلام هذا التحويل؟",
+    "receiveDescription": "ستُضاف الكميات المحوّلة إلى مخزون {to}.",
+    "cancelTitle": "إلغاء هذه المسودة؟",
+    "cancelDescription": "سيتم إلغاء التحويل. لم يتحرك أي مخزون بعد.",
+    "sendLabel": "إرسال التحويل",
+    "receiveLabel": "استلام التحويل",
+    "cancelLabel": "إلغاء التحويل",
+    "sendToast": "تم إرسال التحويل",
+    "receiveToast": "تم استلام التحويل",
+    "cancelToast": "تم إلغاء التحويل",
+    "errors": {
+      "load": "تعذر تحميل التحويلات",
+      "update": "تعذر تحديث التحويل"
+    },
+    "create": {
+      "title": "تحويل مخزون جديد",
+      "description": "أرسل مكوّنات من فرع إلى آخر. يتحرك المخزون عند إرسال التحويل واستلامه.",
+      "from": "من فرع",
+      "to": "إلى فرع",
+      "branchPlaceholder": "اختر فرعًا",
+      "notes": "ملاحظات",
+      "notesPlaceholder": "ملاحظة اختيارية تُحفظ على التحويل",
+      "ingredients": "المكوّنات",
+      "addItem": "إضافة مكوّن",
+      "ingredient": "المكوّن",
+      "quantity": "الكمية",
+      "selectIngredient": "اختر مكوّنًا",
+      "available": "المتاح {quantity} {unit}",
+      "removeAria": "إزالة هذا المكوّن",
+      "noIngredients": "لا توجد مكوّنات في الفرع المُرسِل",
+      "submit": "إنشاء التحويل",
+      "submitting": "جارٍ الإنشاء…",
+      "success": "تم إنشاء التحويل",
+      "errors": {
+        "branches": "اختر فرعين مختلفين.",
+        "items": "أضف مكوّنًا واحدًا على الأقل بكمية.",
+        "quantity": "أدخل كمية أكبر من صفر.",
+        "duplicate": "هذا المكوّن موجود بالفعل في القائمة."
+      }
+    }
+  }
+}

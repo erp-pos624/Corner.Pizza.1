@@ -1,0 +1,145 @@
+{
+  "allBranches": "All branches",
+  "switcherAria": "Active branch scope",
+  "switcherHint": "Reports consolidate all branches; operational pages use your assigned branch.",
+  "tabs": {
+    "branches": "Branches",
+    "transfers": "Stock transfers"
+  },
+  "count": "{count} branches",
+  "new": "New branch",
+  "loading": "Loading branches",
+  "empty": {
+    "title": "No branches yet",
+    "message": "Create a branch for every location that runs its own stock, cash drawer and shifts."
+  },
+  "columns": {
+    "branch": "Branch",
+    "contact": "Contact",
+    "status": "Status",
+    "created": "Created"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "actions": {
+    "edit": "Edit branch"
+  },
+  "createTitle": "New branch",
+  "createDescription": "Open a new location with isolated stock, drawers, shifts and reports.",
+  "editTitle": "Edit {name}",
+  "editDescription": "Update the location details and whether it can operate.",
+  "form": {
+    "code": "Branch code",
+    "codePlaceholder": "e.g. MAADI",
+    "codeHint": "2–12 characters, shown on transfers and reports.",
+    "name": "Name (English)",
+    "namePlaceholder": "e.g. Maadi",
+    "nameAr": "Name (Arabic)",
+    "nameArPlaceholder": "مثال: المعادي",
+    "address": "Address",
+    "addressPlaceholder": "Street, district, city",
+    "phone": "Phone",
+    "phonePlaceholder": "+20 2 0000 0000",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "coordinatesHint": "Optional. Used to centre delivery-zone maps for this branch.",
+    "active": "Branch is active",
+    "activeHint": "Inactive branches cannot open shifts, take orders or receive transfers.",
+    "codeError": "Enter a branch code between 2 and 12 characters.",
+    "nameError": "Enter a branch name."
+  },
+  "submit": "Save branch",
+  "submitting": "Saving…",
+  "toasts": {
+    "created": "Branch created",
+    "updated": "Branch updated"
+  },
+  "errors": {
+    "load": "Could not load branches",
+    "save": "Could not save the branch"
+  },
+  "transfers": {
+    "new": "New transfer",
+    "loading": "Loading transfers",
+    "filterAria": "Filter transfers by status",
+    "allStatuses": "All statuses",
+    "empty": {
+      "title": "No transfers yet",
+      "message": "Move ingredients between branches with a tracked transfer."
+    },
+    "filteredEmpty": "No transfers match this filter",
+    "columns": {
+      "reference": "Reference",
+      "route": "Route",
+      "status": "Status",
+      "items": "Items",
+      "createdBy": "Created by",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "IN_TRANSIT": "In transit",
+      "RECEIVED": "Received",
+      "CANCELLED": "Cancelled"
+    },
+    "items": "{count} items",
+    "viewAria": "View transfer details",
+    "detail": {
+      "title": "Transfer {reference}",
+      "description": "From {from} to {to}",
+      "ingredient": "Ingredient",
+      "quantity": "Quantity",
+      "receivedAt": "Received",
+      "notes": "Notes",
+      "close": "Close"
+    },
+    "send": "Dispatch",
+    "receive": "Receive",
+    "cancel": "Cancel",
+    "sendTitle": "Dispatch this transfer?",
+    "sendDescription": "Stock leaves {from} immediately and reaches {to} only when it is received there.",
+    "receiveTitle": "Receive this transfer?",
+    "receiveDescription": "The transferred quantities will be added to {to} stock levels.",
+    "cancelTitle": "Cancel this draft?",
+    "cancelDescription": "The transfer will be cancelled. No stock has moved yet.",
+    "sendLabel": "Dispatch transfer",
+    "receiveLabel": "Receive transfer",
+    "cancelLabel": "Cancel transfer",
+    "sendToast": "Transfer dispatched",
+    "receiveToast": "Transfer received",
+    "cancelToast": "Transfer cancelled",
+    "errors": {
+      "load": "Could not load transfers",
+      "update": "Could not update the transfer"
+    },
+    "create": {
+      "title": "New stock transfer",
+      "description": "Send ingredients from one branch to another. Stock moves when the transfer is dispatched and received.",
+      "from": "From branch",
+      "to": "To branch",
+      "branchPlaceholder": "Select a branch",
+      "notes": "Notes",
+      "notesPlaceholder": "Optional note stored on the transfer",
+      "ingredients": "Ingredients",
+      "addItem": "Add ingredient",
+      "ingredient": "Ingredient",
+      "quantity": "Quantity",
+      "selectIngredient": "Select an ingredient",
+      "available": "{quantity} {unit} available",
+      "removeAria": "Remove this ingredient",
+      "noIngredients": "No ingredients found at the sending branch",
+      "submit": "Create transfer",
+      "submitting": "Creating…",
+      "success": "Transfer created",
+      "errors": {
+        "branches": "Choose two different branches.",
+        "items": "Add at least one ingredient with a quantity.",
+        "quantity": "Enter a quantity greater than zero.",
+        "duplicate": "This ingredient is already in the list."
+      }
+    }
+  }
+}

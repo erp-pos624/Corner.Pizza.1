@@ -1,0 +1,1420 @@
+// Prisma schema — Forno Pizza Restaurant POS & Management System
+// Target: PostgreSQL 14+ (NUMERIC for money, strict FKs, indexes).
+
+generator client {
+  provider      = "prisma-client-js"
+  // `native` covers local development; the RHEL engine is what Vercel's
+  // Amazon Linux Node runtime loads at request time.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CASHIER
+  KITCHEN_STAFF
+  DRIVER
+}
+
+enum ShiftStatus {
+  OPEN
+  CLOSED
+}
+
+enum CashMovementType {
+  CASH_IN
+  CASH_OUT
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  NEEDS_CLEANING
+}
+
+enum DeliveryStatus {
+  PENDING
+  ASSIGNED
+  PICKED_UP
+  DELIVERED
+  FAILED
+  CANCELLED
+}
+
+enum SettlementStatus {
+  OPEN
+  SETTLED
+}
+
+enum StocktakeStatus {
+  DRAFT
+  COMPLETED
+  CANCELLED
+}
+
+enum TransferStatus {
+  DRAFT
+  IN_TRANSIT
+  RECEIVED
+  CANCELLED
+}
+
+enum PurchaseOrderStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CANCELLED
+}
+
+enum StockAlertType {
+  LOW
+  OUT
+}
+
+enum StockAlertStatus {
+  OPEN
+  RESOLVED
+}
+
+enum StockPolicy {
+  BLOCK
+  WARN
+}
+
+enum MenuKind {
+  PIZZA
+  SIDE
+  APPETIZER
+  DESSERT
+  DRINK
+  SAUCE
+}
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+  DELIVERY
+}
+
+enum OrderChannel {
+  POS
+  ONLINE
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  WALLET
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  PARTIALLY_REFUNDED
+  REFUNDED
+  PENDING_PAYMENT
+  PAID_ONLINE
+  PAYMENT_FAILED
+}
+
+enum OnlinePaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+
+enum IngredientUnit {
+  KG
+  G
+  L
+  ML
+  PIECE
+  PACK
+}
+
+enum MovementType {
+  PURCHASE
+  SALE_DEDUCTION
+  ADJUSTMENT
+  WASTE
+  RETURN
+  CANCELLATION_RETURN
+  TRANSFER_IN
+  TRANSFER_OUT
+  STOCKTAKE
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED
+}
+
+// ---------------------------------------------------------------------------
+// HR & payroll
+// ---------------------------------------------------------------------------
+
+enum EmploymentStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum SalaryType {
+  MONTHLY
+  DAILY
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  DAY_OFF
+}
+
+enum AdjustmentCategory {
+  LATE_ARRIVAL
+  ABSENCE
+  OTHER_DEDUCTION
+  PERFORMANCE_BONUS
+  OVERTIME
+  OTHER_BONUS
+}
+
+enum PayrollStatus {
+  DRAFT
+  CLOSED
+}
+
+enum PayrollPaymentStatus {
+  UNPAID
+  PAID
+}
+
+model Branch {
+  id                    String   @id @default(cuid())
+  code                  String   @unique
+  name                  String
+  nameAr                String?
+  address               String?
+  phone                 String?
+  latitude              Float?
+  longitude             Float?
+  isActive              Boolean  @default(true)
+  onlineOrderingEnabled Boolean  @default(false)
+  /**
+   * Local branch time "HH:mm" (24h); null means always open while enabled.
+   */
+  onlineOpenTime        String?
+  onlineCloseTime       String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  users              User[]
+  orders             Order[]
+  deliveryZones      DeliveryZone[]
+  ingredientStocks   IngredientStock[]
+  shifts             Shift[]
+  tables             DiningTable[]
+  refunds            Refund[]
+  zReports           ZReport[]
+  driverSettlements  DriverSettlement[]
+  stocktakes         Stocktake[]
+  transfersFrom      StockTransfer[]     @relation("TransferFromBranch")
+  transfersTo        StockTransfer[]     @relation("TransferToBranch")
+  employees          Employee[]
+  inventoryMovements InventoryMovement[]
+  purchaseOrders     PurchaseOrder[]
+  purchaseReceipts   PurchaseReceipt[]
+  stockAlerts        StockAlert[]
+
+  @@index([isActive])
+  @@map("branches")
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  username            String    @unique
+  email               String?   @unique
+  fullName            String
+  passwordHash        String
+  role                Role      @default(CASHIER)
+  branchId            String?
+  isActive            Boolean   @default(true)
+  mustChangePassword  Boolean   @default(false)
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  branch                 Branch?             @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  sessions               Session[]
+  auditLogs              AuditLog[]
+  orders                 Order[]             @relation("OrderCashier")
+  deliveryOrders         Order[]             @relation("OrderDriver")
+  inventoryMovements     InventoryMovement[]
+  refundsHandled         Refund[]            @relation("RefundActor")
+  shiftsOpened           Shift[]             @relation("ShiftOpenedBy")
+  shiftsClosed           Shift[]             @relation("ShiftClosedBy")
+  cashMovements          CashMovement[]
+  driverSettlements      DriverSettlement[]  @relation("DriverSettlementDriver")
+  settlementsHandled     DriverSettlement[]  @relation("DriverSettlementSettledBy")
+  stocktakesCreated      Stocktake[]         @relation("StocktakeCreatedBy")
+  stocktakesCompleted    Stocktake[]         @relation("StocktakeCompletedBy")
+  transfersCreated       StockTransfer[]     @relation("TransferCreatedBy")
+  transfersReceived      StockTransfer[]     @relation("TransferReceivedBy")
+  purchaseOrdersCreated  PurchaseOrder[]     @relation("PurchaseOrderCreatedBy")
+  purchaseOrdersApproved PurchaseOrder[]     @relation("PurchaseOrderApprovedBy")
+  purchaseReceipts       PurchaseReceipt[]   @relation("PurchaseReceiptReceivedBy")
+
+  @@index([role])
+  @@index([isActive])
+  @@index([branchId])
+  @@map("users")
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  ip         String?
+  userAgent  String?
+  terminalId String?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String
+  entityId   String?
+  before     Json?
+  after      Json?
+  ip         String?
+  userAgent  String?
+  terminalId String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+// ---------------------------------------------------------------------------
+// Menu
+// ---------------------------------------------------------------------------
+
+model Category {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  nameAr        String?
+  description   String?
+  descriptionAr String?
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items MenuItem[]
+
+  @@index([sortOrder])
+  @@map("categories")
+}
+
+model MenuItem {
+  id            String   @id @default(cuid())
+  sku           String   @unique
+  name          String
+  nameAr        String?
+  description   String?
+  descriptionAr String?
+  imageUrl      String?
+  categoryId    String
+  kind          MenuKind @default(PIZZA)
+  basePrice     Decimal  @db.Decimal(14, 2)
+  costPrice     Decimal  @default(0) @db.Decimal(14, 2)
+  prepMinutes   Int      @default(15)
+  isAvailable   Boolean  @default(true)
+  isFeatured    Boolean  @default(false)
+  hasSizes      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category   Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  sizes      MenuItemSize[]
+  recipes    Recipe[]
+  orderItems OrderItem[]
+
+  @@index([categoryId])
+  @@index([kind])
+  @@index([isAvailable])
+  @@index([isFeatured])
+  @@index([name])
+  @@map("menu_items")
+}
+
+model MenuItemSize {
+  id                   String  @id @default(cuid())
+  menuItemId           String
+  name                 String
+  nameAr               String?
+  price                Decimal @db.Decimal(14, 2)
+  ingredientMultiplier Decimal @default(1) @db.Decimal(6, 3)
+  isDefault            Boolean @default(false)
+  sortOrder            Int     @default(0)
+
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  recipes  Recipe[]
+
+  @@unique([menuItemId, name])
+  @@index([menuItemId])
+  @@map("menu_item_sizes")
+}
+
+model Topping {
+  id                 String   @id @default(cuid())
+  name               String   @unique
+  nameAr             String?
+  price              Decimal  @db.Decimal(14, 2)
+  ingredientId       String?
+  ingredientQuantity Decimal  @default(0) @db.Decimal(12, 3)
+  isAvailable        Boolean  @default(true)
+  sortOrder          Int      @default(0)
+  createdAt          DateTime @default(now())
+
+  ingredient        Ingredient?        @relation(fields: [ingredientId], references: [id], onDelete: SetNull)
+  orderItemToppings OrderItemTopping[]
+
+  @@index([isAvailable])
+  @@index([sortOrder])
+  @@map("toppings")
+}
+
+// ---------------------------------------------------------------------------
+// Inventory & recipes
+// ---------------------------------------------------------------------------
+
+model Supplier {
+  id        String   @id @default(cuid())
+  name      String
+  nameAr    String?
+  phone     String?
+  email     String?
+  address   String?
+  notes     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ingredients    Ingredient[]
+  purchaseOrders PurchaseOrder[]
+
+  @@index([name])
+  @@map("suppliers")
+}
+
+model Ingredient {
+  id              String         @id @default(cuid())
+  sku             String         @unique
+  name            String
+  nameAr          String?
+  unit            IngredientUnit
+  categoryId      String?
+  storageLocation String?
+  expiryDate      DateTime?
+  costPerUnit     Decimal        @default(0) @db.Decimal(12, 2)
+  /**
+   * Moving weighted average purchase cost; recipe costing uses this.
+   */
+  averageCost     Decimal        @default(0) @db.Decimal(12, 3)
+  supplierId      String?
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  category           IngredientCategory?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  supplier           Supplier?             @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  movements          InventoryMovement[]
+  recipeItems        RecipeItem[]
+  toppings           Topping[]
+  stocks             IngredientStock[]
+  stocktakeItems     StocktakeItem[]
+  transferItems      StockTransferItem[]
+  purchaseOrderItems PurchaseOrderItem[]
+  receiptItems       PurchaseReceiptItem[]
+  alerts             StockAlert[]
+
+  @@index([name])
+  @@index([isActive])
+  @@index([supplierId])
+  @@index([categoryId])
+  @@map("ingredients")
+}
+
+model IngredientCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  nameAr    String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ingredients Ingredient[]
+
+  @@index([sortOrder])
+  @@map("ingredient_categories")
+}
+
+/**
+ * Per-branch stock levels; the ingredient master data itself is central.
+ */
+model IngredientStock {
+  id           String   @id @default(cuid())
+  ingredientId String
+  branchId     String
+  currentStock Decimal  @default(0) @db.Decimal(12, 3)
+  minStock     Decimal  @default(0) @db.Decimal(12, 3)
+  reorderPoint Decimal  @default(0) @db.Decimal(12, 3)
+  /**
+   * Desired level after replenishment; drives the suggested order quantity.
+   */
+  maxStock     Decimal  @default(0) @db.Decimal(12, 3)
+  updatedAt    DateTime @updatedAt
+
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  branch     Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([ingredientId, branchId])
+  @@index([branchId])
+  @@index([branchId, currentStock])
+  @@map("ingredient_stocks")
+}
+
+/**
+ * Recipes are versioned. A recipe with `sizeId = null` is the base recipe and
+ * is scaled by `MenuItemSize.ingredientMultiplier`; a size-specific recipe
+ * overrides it entirely. Editing writes a new version and closes the previous
+ * one, so historic costing stays reproducible.
+ */
+model Recipe {
+  id            String    @id @default(cuid())
+  menuItemId    String
+  sizeId        String?
+  version       Int       @default(1)
+  isActive      Boolean   @default(true)
+  effectiveFrom DateTime  @default(now())
+  effectiveTo   DateTime?
+  /**
+   * Ingredient cost of one portion at the time this version was saved.
+   */
+  costPerUnit   Decimal   @default(0) @db.Decimal(12, 3)
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  menuItem MenuItem      @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  size     MenuItemSize? @relation(fields: [sizeId], references: [id], onDelete: Cascade)
+  items    RecipeItem[]
+
+  @@unique([menuItemId, sizeId, version])
+  @@index([menuItemId, isActive])
+  @@index([sizeId])
+  @@map("recipes")
+}
+
+model RecipeItem {
+  id           String  @id @default(cuid())
+  recipeId     String
+  ingredientId String
+  quantity     Decimal @db.Decimal(12, 3)
+
+  recipe     Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@unique([recipeId, ingredientId])
+  @@index([ingredientId])
+  @@map("recipe_items")
+}
+
+model InventoryMovement {
+  id           String       @id @default(cuid())
+  ingredientId String
+  branchId     String?
+  orderId      String?
+  stocktakeId  String?
+  transferId   String?
+  type         MovementType
+  quantity     Decimal      @db.Decimal(12, 3)
+  unitCost     Decimal?     @db.Decimal(12, 2)
+  reference    String?
+  note         String?
+  userId       String?
+  createdAt    DateTime     @default(now())
+
+  ingredient Ingredient     @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+  branch     Branch?        @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  order      Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  stocktake  Stocktake?     @relation(fields: [stocktakeId], references: [id], onDelete: SetNull)
+  transfer   StockTransfer? @relation(fields: [transferId], references: [id], onDelete: SetNull)
+  user       User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([ingredientId, createdAt])
+  @@index([branchId, createdAt])
+  @@index([orderId])
+  @@index([stocktakeId])
+  @@index([transferId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("inventory_movements")
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?  @unique
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Website account. All null/zero for customers who only exist as POS guest
+  // profiles; `passwordHash` is what makes a row a sign-in account.
+  email               String?   @unique
+  passwordHash        String?
+  /// When the website account was created. The account area only shows orders
+  /// placed from this moment on, so claiming a phone number never reveals
+  /// history recorded by staff before the owner registered.
+  registeredAt        DateTime?
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+
+  orders    Order[]
+  sessions  CustomerSession[]
+  addresses CustomerAddress[]
+
+  @@index([name])
+  @@index([phone])
+  @@map("customers")
+}
+
+/// Refresh sessions for website customers. Deliberately separate from staff
+/// `Session` rows so a customer credential can never authenticate a staff API.
+model CustomerSession {
+  id         String    @id @default(cuid())
+  customerId String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([expiresAt])
+  @@map("customer_sessions")
+}
+
+model CustomerAddress {
+  id         String   @id @default(cuid())
+  customerId String
+  label      String
+  address    String
+  latitude   Float?
+  longitude  Float?
+  notes      String?
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@map("customer_addresses")
+}
+
+model Discount {
+  id        String       @id @default(cuid())
+  name      String
+  nameAr    String?
+  type      DiscountType
+  value     Decimal      @db.Decimal(10, 2)
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  orders Order[]
+
+  @@index([isActive])
+  @@map("discounts")
+}
+
+// ---------------------------------------------------------------------------
+// Orders, payments & invoices
+// ---------------------------------------------------------------------------
+
+model Order {
+  id                String          @id @default(cuid())
+  orderNumber       String          @unique
+  idempotencyKey    String?         @unique
+  type              OrderType
+  channel           OrderChannel    @default(POS)
+  status            OrderStatus     @default(PENDING)
+  branchId          String
+  customerId        String?
+  customerName      String?
+  customerPhone     String?
+  customerAddress   String?
+  customerLat       Float?
+  customerLng       Float?
+  deliveryZoneId    String?
+  tableId           String?
+  tableNumber       String?
+  cashierId         String
+  shiftId           String?
+  deliveryDriverId  String?
+  deliveryStatus    DeliveryStatus?
+  subtotal          Decimal         @db.Decimal(14, 2)
+  discount          Decimal         @default(0) @db.Decimal(14, 2)
+  discountLabel     String?
+  discountLabelAr   String?
+  discountId        String?
+  tax               Decimal         @default(0) @db.Decimal(14, 2)
+  deliveryFee       Decimal         @default(0) @db.Decimal(14, 2)
+  total             Decimal         @db.Decimal(14, 2)
+  amountPaid        Decimal         @default(0) @db.Decimal(14, 2)
+  changeDue         Decimal         @default(0) @db.Decimal(14, 2)
+  paymentMethod     PaymentMethod
+  paymentStatus     PaymentStatus   @default(PAID)
+  /**
+   * Cash-on-delivery orders are collected by the driver, not at the register.
+   */
+  isCod             Boolean         @default(false)
+  notes             String?
+  inventoryDeducted Boolean         @default(false)
+  inventoryRestored Boolean         @default(false)
+  /**
+   * Requisition snapshot for orders that deduct stock when payment lands.
+   */
+  stockPlan         Json?
+  completedAt       DateTime?
+  dispatchedAt      DateTime?
+  deliveredAt       DateTime?
+  settledAt         DateTime?
+  paidOnlineAt      DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  branch             Branch              @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  customer           Customer?           @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  discountRel        Discount?           @relation(fields: [discountId], references: [id], onDelete: SetNull)
+  cashier            User                @relation("OrderCashier", fields: [cashierId], references: [id], onDelete: Restrict)
+  shift              Shift?              @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  table              DiningTable?        @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  deliveryDriver     User?               @relation("OrderDriver", fields: [deliveryDriverId], references: [id], onDelete: SetNull)
+  deliveryZone       DeliveryZone?       @relation(fields: [deliveryZoneId], references: [id], onDelete: SetNull)
+  items              OrderItem[]
+  payments           Payment[]
+  invoice            Invoice?
+  refunds            Refund[]
+  creditNotes        CreditNote[]
+  inventoryMovements InventoryMovement[]
+  onlinePayment      OnlinePayment?
+
+  @@index([orderNumber])
+  @@index([status, createdAt])
+  @@index([type])
+  @@index([channel, createdAt])
+  @@index([branchId, createdAt])
+  @@index([branchId, status])
+  @@index([cashierId])
+  @@index([customerId])
+  @@index([tableId])
+  @@index([shiftId])
+  @@index([deliveryDriverId])
+  @@index([deliveryZoneId])
+  @@index([createdAt])
+  @@index([paymentMethod])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                  String   @id @default(cuid())
+  orderId             String
+  menuItemId          String
+  menuItemName        String
+  menuItemNameAr      String?
+  imageUrl            String?
+  sizeId              String?
+  sizeName            String?
+  sizeNameAr          String?
+  quantity            Int
+  unitPrice           Decimal  @db.Decimal(14, 2)
+  toppingsTotal       Decimal  @default(0) @db.Decimal(14, 2)
+  lineTotal           Decimal  @db.Decimal(14, 2)
+  unitCost            Decimal  @default(0) @db.Decimal(14, 2)
+  specialInstructions String?
+  createdAt           DateTime @default(now())
+
+  order    Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem           @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+  toppings OrderItemTopping[]
+
+  @@index([orderId])
+  @@index([menuItemId])
+  @@map("order_items")
+}
+
+model OrderItemTopping {
+  id          String  @id @default(cuid())
+  orderItemId String
+  toppingId   String?
+  name        String
+  nameAr      String?
+  price       Decimal @db.Decimal(14, 2)
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  topping   Topping?  @relation(fields: [toppingId], references: [id], onDelete: SetNull)
+
+  @@index([orderItemId])
+  @@index([toppingId])
+  @@map("order_item_toppings")
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  orderId   String
+  shiftId   String?
+  method    PaymentMethod
+  amount    Decimal       @db.Decimal(14, 2)
+  reference String?
+  createdAt DateTime      @default(now())
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  shift   Shift?   @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  refunds Refund[]
+
+  @@index([orderId])
+  @@index([shiftId])
+  @@index([method])
+  @@map("payments")
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  invoiceNumber String   @unique
+  orderId       String   @unique
+  issuedAt      DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([issuedAt])
+  @@map("invoices")
+}
+
+/**
+ * Payment intent for online (storefront) card payments. Kept separate from the
+ * Payment ledger so gateway state changes never touch accounting rows.
+ */
+model OnlinePayment {
+  id            String              @id @default(cuid())
+  orderId       String              @unique
+  provider      String              @default("BASATA")
+  reference     String              @unique
+  providerRef   String?             @unique
+  status        OnlinePaymentStatus @default(PENDING)
+  amount        Decimal             @db.Decimal(14, 2)
+  currency      String              @default("EGP")
+  checkoutUrl   String?
+  failureReason String?
+  rawPayload    Json?
+  paidAt        DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("online_payments")
+}
+
+// ---------------------------------------------------------------------------
+// Cash drawer, shifts & Z-reports
+// ---------------------------------------------------------------------------
+
+model Shift {
+  id           String      @id @default(cuid())
+  shiftNumber  String      @unique
+  branchId     String
+  terminalId   String
+  openedById   String
+  closedById   String?
+  openingFloat Decimal     @db.Decimal(14, 2)
+  countedCash  Decimal?    @db.Decimal(14, 2)
+  expectedCash Decimal?    @db.Decimal(14, 2)
+  variance     Decimal?    @db.Decimal(14, 2)
+  status       ShiftStatus @default(OPEN)
+  notes        String?
+  openedAt     DateTime    @default(now())
+  closedAt     DateTime?
+
+  branch        Branch         @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  openedBy      User           @relation("ShiftOpenedBy", fields: [openedById], references: [id], onDelete: Restrict)
+  closedBy      User?          @relation("ShiftClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
+  orders        Order[]
+  payments      Payment[]
+  refunds       Refund[]
+  cashMovements CashMovement[]
+  zReport       ZReport?
+
+  @@index([branchId, status])
+  @@index([terminalId, status])
+  @@index([openedAt])
+  @@map("shifts")
+}
+
+model CashMovement {
+  id        String           @id @default(cuid())
+  shiftId   String
+  type      CashMovementType
+  amount    Decimal          @db.Decimal(14, 2)
+  reason    String
+  userId    String
+  createdAt DateTime         @default(now())
+
+  shift Shift @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([shiftId, createdAt])
+  @@map("cash_movements")
+}
+
+model ZReport {
+  id           String   @id @default(cuid())
+  reportNumber String   @unique
+  shiftId      String   @unique
+  branchId     String
+  businessDate String
+  terminalId   String
+  totals       Json
+  lockedAt     DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  shift  Shift  @relation(fields: [shiftId], references: [id], onDelete: Restrict)
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Restrict)
+
+  @@index([branchId, businessDate])
+  @@map("z_reports")
+}
+
+// ---------------------------------------------------------------------------
+// Refund ledger & credit notes
+// ---------------------------------------------------------------------------
+
+model Refund {
+  id           String        @id @default(cuid())
+  refundNumber String        @unique
+  orderId      String
+  paymentId    String?
+  branchId     String
+  shiftId      String?
+  method       PaymentMethod
+  amount       Decimal       @db.Decimal(14, 2)
+  reason       String
+  actorId      String
+  createdAt    DateTime      @default(now())
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  branch  Branch   @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  shift   Shift?   @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  actor   User     @relation("RefundActor", fields: [actorId], references: [id], onDelete: Restrict)
+
+  creditNote CreditNote?
+
+  @@index([orderId])
+  @@index([branchId, createdAt])
+  @@index([shiftId])
+  @@map("refunds")
+}
+
+model CreditNote {
+  id               String   @id @default(cuid())
+  creditNoteNumber String   @unique
+  refundId         String   @unique
+  orderId          String
+  amount           Decimal  @db.Decimal(14, 2)
+  reason           String
+  issuedAt         DateTime @default(now())
+
+  refund Refund @relation(fields: [refundId], references: [id], onDelete: Cascade)
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@map("credit_notes")
+}
+
+// ---------------------------------------------------------------------------
+// Dining tables & delivery
+// ---------------------------------------------------------------------------
+
+model DiningTable {
+  id        String      @id @default(cuid())
+  branchId  String
+  name      String
+  seats     Int         @default(4)
+  status    TableStatus @default(AVAILABLE)
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  branch Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@unique([branchId, name])
+  @@index([branchId, status])
+  @@map("dining_tables")
+}
+
+model DeliveryZone {
+  id             String   @id @default(cuid())
+  name           String
+  branchId       String
+  centerLat      Float
+  centerLng      Float
+  radiusInMeters Int
+  deliveryFee    Decimal  @db.Decimal(14, 2)
+  minOrderAmount Decimal  @default(0) @db.Decimal(14, 2)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  branch Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@index([branchId, isActive])
+  @@map("delivery_zones")
+}
+
+model DriverSettlement {
+  id               String           @id @default(cuid())
+  settlementNumber String           @unique
+  driverId         String
+  branchId         String
+  periodStart      DateTime
+  periodEnd        DateTime
+  ordersCount      Int
+  grossSales       Decimal          @db.Decimal(14, 2)
+  cashCollected    Decimal          @db.Decimal(14, 2)
+  cardCollected    Decimal          @db.Decimal(14, 2)
+  deliveryFees     Decimal          @db.Decimal(14, 2)
+  amountHandedOver Decimal          @default(0) @db.Decimal(14, 2)
+  variance         Decimal          @default(0) @db.Decimal(14, 2)
+  status           SettlementStatus @default(OPEN)
+  settledAt        DateTime?
+  settledById      String?
+  notes            String?
+  createdAt        DateTime         @default(now())
+
+  driver    User   @relation("DriverSettlementDriver", fields: [driverId], references: [id], onDelete: Restrict)
+  branch    Branch @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  settledBy User?  @relation("DriverSettlementSettledBy", fields: [settledById], references: [id], onDelete: SetNull)
+
+  @@index([driverId, status])
+  @@index([branchId, createdAt])
+  @@map("driver_settlements")
+}
+
+// ---------------------------------------------------------------------------
+// Stocktakes & inter-branch transfers
+// ---------------------------------------------------------------------------
+
+model Stocktake {
+  id            String          @id @default(cuid())
+  reference     String          @unique
+  branchId      String
+  status        StocktakeStatus @default(DRAFT)
+  notes         String?
+  createdById   String
+  completedById String?
+  createdAt     DateTime        @default(now())
+  completedAt   DateTime?
+
+  branch      Branch              @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  createdBy   User                @relation("StocktakeCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  completedBy User?               @relation("StocktakeCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
+  items       StocktakeItem[]
+  movements   InventoryMovement[]
+
+  @@index([branchId, status])
+  @@map("stocktakes")
+}
+
+model StocktakeItem {
+  id           String  @id @default(cuid())
+  stocktakeId  String
+  ingredientId String
+  expectedQty  Decimal @db.Decimal(12, 3)
+  countedQty   Decimal @db.Decimal(12, 3)
+  variance     Decimal @db.Decimal(12, 3)
+
+  stocktake  Stocktake  @relation(fields: [stocktakeId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@unique([stocktakeId, ingredientId])
+  @@index([ingredientId])
+  @@map("stocktake_items")
+}
+
+model StockTransfer {
+  id           String         @id @default(cuid())
+  reference    String         @unique
+  fromBranchId String
+  toBranchId   String
+  status       TransferStatus @default(DRAFT)
+  notes        String?
+  createdById  String
+  receivedById String?
+  createdAt    DateTime       @default(now())
+  receivedAt   DateTime?
+
+  fromBranch Branch              @relation("TransferFromBranch", fields: [fromBranchId], references: [id], onDelete: Restrict)
+  toBranch   Branch              @relation("TransferToBranch", fields: [toBranchId], references: [id], onDelete: Restrict)
+  createdBy  User                @relation("TransferCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  receivedBy User?               @relation("TransferReceivedBy", fields: [receivedById], references: [id], onDelete: SetNull)
+  items      StockTransferItem[]
+  movements  InventoryMovement[]
+
+  @@index([fromBranchId, status])
+  @@index([toBranchId, status])
+  @@map("stock_transfers")
+}
+
+model StockTransferItem {
+  id           String  @id @default(cuid())
+  transferId   String
+  ingredientId String
+  quantity     Decimal @db.Decimal(12, 3)
+
+  transfer   StockTransfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  ingredient Ingredient    @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@unique([transferId, ingredientId])
+  @@index([ingredientId])
+  @@map("stock_transfer_items")
+}
+
+// ---------------------------------------------------------------------------
+// Purchasing
+// ---------------------------------------------------------------------------
+
+model PurchaseOrder {
+  id           String              @id @default(cuid())
+  orderNumber  String              @unique
+  supplierId   String
+  branchId     String
+  status       PurchaseOrderStatus @default(DRAFT)
+  notes        String?
+  expectedAt   DateTime?
+  subtotal     Decimal             @default(0) @db.Decimal(14, 2)
+  discount     Decimal             @default(0) @db.Decimal(14, 2)
+  tax          Decimal             @default(0) @db.Decimal(14, 2)
+  total        Decimal             @default(0) @db.Decimal(14, 2)
+  createdById  String
+  approvedById String?
+  approvedAt   DateTime?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  supplier   Supplier            @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  branch     Branch              @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  createdBy  User                @relation("PurchaseOrderCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  approvedBy User?               @relation("PurchaseOrderApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull)
+  items      PurchaseOrderItem[]
+  receipts   PurchaseReceipt[]
+
+  @@index([supplierId, status])
+  @@index([branchId, status])
+  @@index([createdAt])
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id               String  @id @default(cuid())
+  purchaseOrderId  String
+  ingredientId     String
+  quantity         Decimal @db.Decimal(12, 3)
+  unitPrice        Decimal @db.Decimal(12, 2)
+  discount         Decimal @default(0) @db.Decimal(12, 2)
+  taxRate          Decimal @default(0) @db.Decimal(5, 2)
+  receivedQuantity Decimal @default(0) @db.Decimal(12, 3)
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  ingredient    Ingredient    @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@unique([purchaseOrderId, ingredientId])
+  @@index([ingredientId])
+  @@map("purchase_order_items")
+}
+
+model PurchaseReceipt {
+  id                String   @id @default(cuid())
+  receiptNumber     String   @unique
+  purchaseOrderId   String
+  branchId          String
+  supplierInvoiceNo String?
+  notes             String?
+  receivedById      String
+  receivedAt        DateTime @default(now())
+
+  purchaseOrder PurchaseOrder         @relation(fields: [purchaseOrderId], references: [id], onDelete: Restrict)
+  branch        Branch                @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  receivedBy    User                  @relation("PurchaseReceiptReceivedBy", fields: [receivedById], references: [id], onDelete: Restrict)
+  items         PurchaseReceiptItem[]
+
+  @@index([purchaseOrderId])
+  @@index([branchId, receivedAt])
+  @@map("purchase_receipts")
+}
+
+model PurchaseReceiptItem {
+  id           String  @id @default(cuid())
+  receiptId    String
+  ingredientId String
+  quantity     Decimal @db.Decimal(12, 3)
+  unitCost     Decimal @db.Decimal(12, 2)
+
+  receipt    PurchaseReceipt @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  ingredient Ingredient      @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@index([receiptId])
+  @@index([ingredientId])
+  @@map("purchase_receipt_items")
+}
+
+// ---------------------------------------------------------------------------
+// Stock alerts
+// ---------------------------------------------------------------------------
+
+/**
+ * One open alert per ingredient/store/type; resolved alerts stay for history.
+ */
+model StockAlert {
+  id           String           @id @default(cuid())
+  ingredientId String
+  branchId     String
+  type         StockAlertType
+  status       StockAlertStatus @default(OPEN)
+  currentStock Decimal          @db.Decimal(12, 3)
+  threshold    Decimal          @db.Decimal(12, 3)
+  message      String?
+  createdAt    DateTime         @default(now())
+  resolvedAt   DateTime?
+  resolvedById String?
+
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  branch     Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@index([status, type])
+  @@index([branchId, status])
+  @@index([ingredientId, status])
+  @@map("stock_alerts")
+}
+
+model RestaurantSettings {
+  id                    String      @id @default("default")
+  name                  String      @default("Corner Pizza")
+  nameAr                String?
+  tagline               String?
+  taglineAr             String?
+  address               String?
+  addressAr             String?
+  phone                 String?
+  email                 String?
+  taxRate               Decimal     @default(14) @db.Decimal(5, 2)
+  deliveryFee           Decimal     @default(25) @db.Decimal(14, 2)
+  maxCashierDiscountPct Decimal     @default(20) @db.Decimal(5, 2)
+  receiptFooter         String?
+  receiptFooterAr       String?
+  currency              String      @default("EGP")
+  /**
+   * BLOCK refuses a sale that would drive stock negative; WARN allows it and raises an alert.
+   */
+  stockPolicy           StockPolicy @default(BLOCK)
+  updatedAt             DateTime    @updatedAt
+
+  @@map("restaurant_settings")
+}
+
+// ---------------------------------------------------------------------------
+// HR & payroll
+// ---------------------------------------------------------------------------
+
+model Employee {
+  id           String           @id @default(cuid())
+  employeeCode String           @unique
+  fullName     String
+  phone        String?
+  jobTitle     String
+  branchId     String?
+  hireDate     DateTime         @db.Date
+  basicSalary  Decimal          @db.Decimal(12, 2)
+  salaryType   SalaryType       @default(MONTHLY)
+  status       EmploymentStatus @default(ACTIVE)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  branch      Branch?               @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  attendance  AttendanceRecord[]
+  adjustments EmployeeAdjustment[]
+  payroll     PayrollLine[]
+
+  @@index([status])
+  @@index([branchId])
+  @@index([fullName])
+  @@map("employees")
+}
+
+model AttendanceRecord {
+  id           String           @id @default(cuid())
+  employeeId   String
+  date         DateTime         @db.Date
+  checkIn      String?
+  checkOut     String?
+  status       AttendanceStatus
+  lateMinutes  Int              @default(0)
+  note         String?
+  createdById  String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, date])
+  @@index([date])
+  @@index([employeeId, date])
+  @@map("attendance_records")
+}
+
+model EmployeeAdjustment {
+  id           String             @id @default(cuid())
+  employeeId   String
+  category     AdjustmentCategory
+  amount       Decimal            @db.Decimal(12, 2)
+  date         DateTime           @db.Date
+  reason       String
+  payrollMonth String
+  createdById  String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, payrollMonth])
+  @@index([payrollMonth])
+  @@map("employee_adjustments")
+}
+
+model PayrollRun {
+  id              String        @id @default(cuid())
+  month           String        @unique
+  status          PayrollStatus @default(DRAFT)
+  employeeCount   Int
+  basicTotal      Decimal       @db.Decimal(12, 2)
+  bonusTotal      Decimal       @db.Decimal(12, 2)
+  deductionTotal  Decimal       @db.Decimal(12, 2)
+  netTotal        Decimal       @db.Decimal(12, 2)
+  paidTotal       Decimal       @db.Decimal(12, 2) @default(0)
+  notes           String?
+  closedAt        DateTime?
+  closedById      String?
+  closedByName    String?
+  reopenedAt      DateTime?
+  reopenReason    String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  lines PayrollLine[]
+
+  @@index([status])
+  @@map("payroll_runs")
+}
+
+model PayrollLine {
+  id                  String                @id @default(cuid())
+  payrollRunId        String
+  employeeId          String
+  employeeCode        String
+  employeeName        String
+  jobTitle            String
+  branchName          String?
+  salaryType          SalaryType
+  basicSalary         Decimal               @db.Decimal(12, 2)
+  payableDays         Decimal               @db.Decimal(8, 2)
+  presentDays         Int
+  absentDays          Int
+  lateMinutes         Int
+  attendanceDeduction Decimal               @db.Decimal(12, 2)
+  bonusTotal          Decimal               @db.Decimal(12, 2)
+  deductionTotal      Decimal               @db.Decimal(12, 2)
+  netSalary           Decimal               @db.Decimal(12, 2)
+  paymentStatus       PayrollPaymentStatus  @default(UNPAID)
+  paidAt              DateTime?
+  breakdown           Json
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+
+  payrollRun PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  employee   Employee   @relation(fields: [employeeId], references: [id], onDelete: Restrict)
+
+  @@unique([payrollRunId, employeeId])
+  @@index([employeeId])
+  @@map("payroll_lines")
+}
+
+model HrSettings {
+  id                        String   @id @default("default")
+  workStart                 String   @default("09:00")
+  workEnd                   String   @default("17:00")
+  graceMinutes              Int      @default(10)
+  lateDeductionPerMinute    Decimal  @default(5) @db.Decimal(10, 2)
+  absenceDeductionMultiplier Decimal @default(1) @db.Decimal(4, 2)
+  weeklyDaysOff             Int[]    @default([5, 6])
+  updatedAt                 DateTime @updatedAt
+
+  @@map("hr_settings")
+}

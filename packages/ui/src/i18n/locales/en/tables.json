@@ -1,0 +1,78 @@
+{
+  "loading": "Loading dining tables…",
+  "summary": {
+    "available": "{count} available",
+    "occupied": "{count} occupied",
+    "cleaning": "{count} to clean"
+  },
+  "filters": {
+    "all": "All tables",
+    "statusAria": "Filter tables by status"
+  },
+  "status": {
+    "AVAILABLE": "Available",
+    "OCCUPIED": "Occupied",
+    "NEEDS_CLEANING": "Needs cleaning"
+  },
+  "card": {
+    "seats": "{count} seats",
+    "inactive": "Inactive",
+    "tab": "Tab {number}",
+    "tabOpened": "Opened {when}",
+    "openTab": "Open tab",
+    "continueTab": "Continue tab",
+    "settle": "Settle",
+    "markCleaned": "Mark ready",
+    "edit": "Edit table",
+    "delete": "Delete table",
+    "emptyTitle": "No tables yet",
+    "emptyMessage": "Add your dining room tables to start opening tabs.",
+    "filteredEmpty": "No tables match this filter"
+  },
+  "new": "New table",
+  "create": {
+    "title": "New table",
+    "description": "Give the table a short name staff will recognise.",
+    "name": "Table name",
+    "namePlaceholder": "e.g. T1, Terrace 3",
+    "seats": "Seats",
+    "active": "Active"
+  },
+  "edit": {
+    "title": "Edit table",
+    "description": "Rename the table or adjust its seats and availability."
+  },
+  "delete": {
+    "title": "Delete table",
+    "message": "Remove {name} from the floor plan? Tables with past orders can only be deactivated.",
+    "confirm": "Delete table"
+  },
+  "settle": {
+    "title": "Settle tab {number}",
+    "description": "Take the final payment for this dine-in tab.",
+    "total": "Amount due",
+    "method": "Payment method",
+    "cash": "Cash",
+    "card": "Card",
+    "wallet": "Mobile wallet",
+    "received": "Amount received",
+    "change": "Change due",
+    "short": "The amount received is less than the tab total.",
+    "confirm": "Take payment",
+    "success": "Tab settled",
+    "loadOrder": "Could not load the open tab"
+  },
+  "toasts": {
+    "created": "Table created",
+    "updated": "Table updated",
+    "deleted": "Table removed",
+    "cleaned": "Table is ready for guests"
+  },
+  "errors": {
+    "load": "Could not load tables",
+    "create": "Could not create the table",
+    "update": "Could not update the table",
+    "delete": "Could not delete the table",
+    "settle": "Could not settle the tab"
+  }
+}

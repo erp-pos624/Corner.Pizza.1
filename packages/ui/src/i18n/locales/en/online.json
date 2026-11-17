@@ -1,0 +1,64 @@
+{
+  "title": "Online store",
+  "subtitle": "Storefront switch, online hours and website orders",
+  "selectBranch": "Choose a specific branch in the header to manage its storefront.",
+  "status": {
+    "accepting": "Accepting online orders",
+    "disabled": "Online ordering is off",
+    "outsideHours": "Outside online hours",
+    "inactive": "Branch is inactive",
+    "timezone": "Storefront timezone · {zone}"
+  },
+  "switch": {
+    "title": "Online ordering",
+    "description": "Turn the website menu and checkout on or off instantly for this branch.",
+    "label": "Accept online orders",
+    "on": "The website can take new orders right now.",
+    "off": "The website shows the menu but checkout stays closed."
+  },
+  "hours": {
+    "title": "Online opening hours",
+    "description": "Optional daily window when the website accepts orders. Leave it off to take online orders around the clock.",
+    "limit": "Limit online ordering to specific hours",
+    "open": "Opens",
+    "close": "Closes",
+    "overnight": "A closing time earlier than the opening time wraps past midnight.",
+    "error": "Set both times and make sure they differ."
+  },
+  "stats": {
+    "orders": "Online orders today",
+    "ordersHint": "Paid website orders",
+    "revenue": "Online revenue today",
+    "revenueHint": "{count} paid orders",
+    "pending": "Awaiting payment",
+    "pendingHint": "Card orders held until captured",
+    "pendingEmpty": "No payments pending"
+  },
+  "recent": {
+    "title": "Recent online orders",
+    "description": "Newest website orders · orders list and kitchen update automatically",
+    "empty": "No online orders yet",
+    "emptyMessage": "Orders placed on the website will appear here and on the kitchen board.",
+    "columns": {
+      "order": "Order",
+      "customer": "Customer",
+      "service": "Service",
+      "payment": "Payment",
+      "status": "Status",
+      "total": "Total",
+      "placed": "Placed"
+    }
+  },
+  "refresh": "Refresh storefront status",
+  "toast": {
+    "saved": "Storefront updated",
+    "savedMessage": "The website reflects this change immediately.",
+    "saveFailed": "Could not update the storefront"
+  },
+  "error": {
+    "title": "Online store unavailable",
+    "message": "Could not load the storefront settings."
+  },
+  "note": "Online orders are tagged in the orders list and the kitchen board. Card orders reach the kitchen only after the payment is captured.",
+  "footer": "Storefront API · {prefix}"
+}

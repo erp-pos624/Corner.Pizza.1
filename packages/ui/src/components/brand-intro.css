@@ -1,0 +1,180 @@
+/*
+ * Corner Pizza brand intro, shared by the storefront and the desktop app.
+ * The mark draws itself, fills, then the stage fades; reduced-motion users
+ * skip it entirely.
+ */
+html.brand-intro-lock {
+  overflow: hidden;
+}
+
+.brand-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 380ms ease;
+}
+
+.brand-intro.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.brand-intro__bg {
+  position: absolute;
+  inset: 0;
+  background: #f5f1e6;
+}
+
+.brand-intro__stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+}
+
+.brand-intro__mark {
+  width: clamp(112px, 22vw, 168px);
+  height: auto;
+  aspect-ratio: 1;
+  overflow: visible;
+  fill-rule: evenodd;
+  will-change: transform;
+}
+
+.brand-intro__name {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  font-size: clamp(26px, 5vw, 36px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: #15301f;
+  opacity: 0;
+  animation: corner-intro-name 0.5s ease 1.7s forwards;
+}
+
+.brand-intro .ip {
+  fill: transparent;
+  stroke-width: 90;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.brand-intro .ip-red {
+  stroke: #cf262b;
+}
+
+.brand-intro .ip-green {
+  stroke: #117b43;
+}
+
+.brand-intro .ip-white {
+  fill: #fffffc;
+  opacity: 0;
+}
+
+.brand-intro .ip-dot {
+  fill: #ed282e;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.brand-intro .ip-b1 {
+  animation:
+    corner-intro-draw 0.8s cubic-bezier(0.65, 0, 0.35, 1) 0.1s forwards,
+    corner-intro-fill-red 0.45s ease 0.8s forwards;
+}
+
+.brand-intro .ip-b2 {
+  animation:
+    corner-intro-draw 0.8s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards,
+    corner-intro-fill-red 0.45s ease 1s forwards;
+}
+
+.brand-intro .ip-green {
+  animation:
+    corner-intro-draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.6s forwards,
+    corner-intro-fill-green 0.45s ease 1.4s forwards;
+}
+
+.brand-intro .ip-white {
+  animation: corner-intro-show 0.4s ease 1.55s forwards;
+}
+
+.brand-intro .ip-d1 {
+  animation: corner-intro-pop 0.45s cubic-bezier(0.3, 1.4, 0.5, 1) 1.7s forwards;
+}
+
+.brand-intro .ip-d2 {
+  animation: corner-intro-pop 0.45s cubic-bezier(0.3, 1.4, 0.5, 1) 1.82s forwards;
+}
+
+.brand-intro .ip-d3 {
+  animation: corner-intro-pop 0.45s cubic-bezier(0.3, 1.4, 0.5, 1) 1.94s forwards;
+}
+
+@keyframes corner-intro-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes corner-intro-fill-red {
+  to {
+    fill: #cf262b;
+    stroke-opacity: 0;
+  }
+}
+
+@keyframes corner-intro-fill-green {
+  to {
+    fill: #117b43;
+    stroke-opacity: 0;
+  }
+}
+
+@keyframes corner-intro-show {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes corner-intro-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes corner-intro-name {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-intro {
+    display: none;
+  }
+}

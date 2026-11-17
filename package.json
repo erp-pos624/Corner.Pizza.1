@@ -1,0 +1,47 @@
+{
+  "name": "forno-restaurant-pos",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Corner Pizza — restaurant point-of-sale and management desktop application",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@9.7.0",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "db:start": "node scripts/pg-dev.mjs start",
+    "db:stop": "node scripts/pg-dev.mjs stop",
+    "db:status": "node scripts/pg-dev.mjs status",
+    "db:generate": "pnpm --filter @posshope/server db:generate",
+    "db:migrate": "pnpm --filter @posshope/server db:migrate",
+    "db:migrate:test": "pnpm --filter @posshope/server db:migrate:test",
+    "db:seed": "pnpm --filter @posshope/server db:seed",
+    "db:reset": "pnpm --filter @posshope/server db:reset",
+    "bootstrap": "node scripts/setup.mjs",
+    "dev:server": "pnpm --filter @posshope/server dev",
+    "dev:desktop": "pnpm --filter @posshope/desktop dev",
+    "dev:web": "pnpm --filter @posshope/web dev",
+    "dev": "concurrently -k -n server,desktop -c cyan,magenta \"pnpm dev:server\" \"pnpm dev:desktop\"",
+    "dev:all": "concurrently -k -n server,desktop,web -c cyan,magenta,green \"pnpm dev:server\" \"pnpm dev:desktop\" \"pnpm dev:web\"",
+    "build": "pnpm build:shared && pnpm --filter @posshope/server build && pnpm --filter @posshope/desktop build && pnpm --filter @posshope/web build",
+    "build:shared": "pnpm --filter @posshope/shared build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm build:shared && pnpm -r test",
+    "test:server": "pnpm --filter @posshope/server test",
+    "test:ui": "pnpm --filter @posshope/ui test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.19.0"
+  }
+}

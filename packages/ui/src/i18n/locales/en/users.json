@@ -1,0 +1,118 @@
+{
+  "searchPlaceholder": "Search by name, username or email",
+  "searchAria": "Search staff accounts",
+  "clearSearch": "Clear search",
+  "filterRoleAria": "Filter by role",
+  "filterStatusAria": "Filter by status",
+  "roles": {
+    "ADMIN": "Administrators",
+    "CASHIER": "Cashiers",
+    "KITCHEN_STAFF": "Kitchen staff",
+    "DRIVER": "Delivery drivers"
+  },
+  "allRoles": "All roles",
+  "allStatuses": "All statuses",
+  "activeOnly": "Active only",
+  "inactiveOnly": "Inactive only",
+  "count": "{count} accounts",
+  "new": "New account",
+  "loading": "Loading staff accounts",
+  "columns": {
+    "staff": "Staff member",
+    "email": "Email",
+    "role": "Role",
+    "branch": "Branch",
+    "status": "Status",
+    "lastSignIn": "Last sign-in",
+    "created": "Created"
+  },
+  "you": "You",
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "never": "Never",
+  "editAria": "Edit {name}",
+  "resetAria": "Reset password for {name}",
+  "resetAction": "Reset password",
+  "deactivateAria": "Deactivate {name}",
+  "deactivateAction": "Deactivate account",
+  "errors": {
+    "load": "Could not load staff accounts",
+    "create": "Could not create this account",
+    "update": "Could not update this account",
+    "reset": "Could not reset this password",
+    "deactivate": "Could not deactivate this account",
+    "details": "Check the account details",
+    "password": "Password does not meet the requirements",
+    "mismatch": "The two passwords do not match"
+  },
+  "empty": {
+    "filtered": "No accounts match these filters",
+    "title": "No staff accounts",
+    "message": "Create an administrator, cashier or kitchen staff account to give your team access."
+  },
+  "footer": "Administrators control the menu, inventory, reports, staff and settings. Cashiers are limited to the register, their own orders, invoices and customer profiles. Kitchen staff only see the live kitchen board.",
+  "toasts": {
+    "created": "Staff account created",
+    "updated": "Account updated",
+    "resetTitle": "Password reset",
+    "resetMessage": "{name} must sign in again with the new password.",
+    "resetDefaultName": "The staff member",
+    "deactivated": "Account deactivated"
+  },
+  "create": {
+    "title": "New staff account",
+    "description": "Create restaurant access for an administrator, cashier or kitchen staff member.",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "e.g. Salma Adel",
+    "username": "Username",
+    "usernamePlaceholder": "salma",
+    "email": "Email (optional)",
+    "emailPlaceholder": "salma@eatcornerpizza.com",
+    "role": "Role",
+    "roleOptions": {
+      "CASHIER": "Cashier — register, orders, invoices, customers",
+      "KITCHEN_STAFF": "Kitchen staff — live kitchen board only",
+      "DRIVER": "Delivery driver — dispatch queue and cash settlements",
+      "ADMIN": "Administrator — full access"
+    },
+    "branch": "Branch",
+    "branchPlaceholder": "No branch assigned",
+    "password": "Temporary password",
+    "passwordPlaceholder": "At least 8 characters with a letter and a number",
+    "passwordHint": "Share this password securely. The staff member can change it after signing in.",
+    "submit": "Create account",
+    "submitting": "Creating…"
+  },
+  "edit": {
+    "title": "Edit {name}",
+    "fallbackTitle": "Edit account",
+    "description": "Update profile details, role and account status.",
+    "fullName": "Full name",
+    "username": "Username",
+    "email": "Email",
+    "emailPlaceholder": "name@eatcornerpizza.com",
+    "role": "Role",
+    "branch": "Branch",
+    "branchPlaceholder": "No branch assigned",
+    "selfRoleHint": "You cannot change your own administrator role or branch.",
+    "active": "Account is active",
+    "activeHint": "Inactive staff cannot sign in or take orders.",
+    "submit": "Save changes"
+  },
+  "reset": {
+    "title": "Reset password",
+    "description": "Set a new temporary password for {name}. Their active sessions will be revoked.",
+    "newPassword": "New password",
+    "confirm": "Confirm password",
+    "hint": "Use at least 8 characters including a letter and a number.",
+    "submit": "Reset password",
+    "submitting": "Resetting…"
+  },
+  "deactivateDialog": {
+    "title": "Deactivate this account?",
+    "description": "will lose access immediately and their sessions will be revoked. Order and invoice history stays intact.",
+    "confirm": "Deactivate account"
+  }
+}

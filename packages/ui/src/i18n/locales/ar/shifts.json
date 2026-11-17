@@ -1,0 +1,118 @@
+{
+  "loading": "جارٍ تحميل درج النقدية…",
+  "current": {
+    "title": "الوردية الحالية",
+    "closedTitle": "الدرج مغلق",
+    "closedMessage": "افتح وردية لبدء استقبال الطلبات النقدية على هذا الجهاز.",
+    "openAction": "فتح وردية",
+    "openTitle": "فتح وردية",
+    "openDescription": "عُدّ النقدية الموجودة في الدرج وابدأ الوردية.",
+    "openingFloat": "الرصيد الافتتاحي",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "ملاحظات تسليم اختيارية",
+    "openedToast": "تم فتح الوردية",
+    "openedLine": "فُتحت {when} بواسطة {name}",
+    "terminal": "الجهاز",
+    "operator": "المشغّل",
+    "shift": "الوردية",
+    "cashIn": "إيداع نقدي",
+    "cashOut": "سحب نقدي",
+    "close": "إغلاق الوردية",
+    "movementsTitle": "حركات النقدية",
+    "noMovements": "لا توجد حركات نقدية مسجلة على هذه الوردية بعد."
+  },
+  "totals": {
+    "orders": "الطلبات",
+    "grossSales": "إجمالي المبيعات",
+    "cashPayments": "مبيعات نقدية",
+    "cardPayments": "مبيعات بالبطاقة",
+    "walletPayments": "مبيعات بالمحفظة",
+    "cashIn": "إيداع نقدي",
+    "cashOut": "سحب نقدي",
+    "cashRefunds": "استرداد نقدي",
+    "refunds": "المسترد",
+    "discounts": "الخصومات",
+    "tax": "الضريبة",
+    "deliveryFees": "رسوم التوصيل",
+    "openingFloat": "الرصيد الافتتاحي",
+    "expectedCash": "المتوقع في الدرج",
+    "countedCash": "النقدية المعدودة",
+    "variance": "الفرق"
+  },
+  "movement": {
+    "title": "تسجيل حركة نقدية",
+    "description": "يجب تسجيل سبب لكل إيداع أو سحب نقدي.",
+    "type": "نوع الحركة",
+    "in": "إيداع نقدي",
+    "out": "سحب نقدي",
+    "amount": "المبلغ",
+    "reason": "السبب",
+    "reasonPlaceholder": "مثال: فكة من الخزنة، دفعة لمورد",
+    "save": "تسجيل الحركة",
+    "savedToast": "تم تسجيل الحركة النقدية"
+  },
+  "close": {
+    "title": "إغلاق الوردية",
+    "description": "عُدّ الدرج وأكد الفرق ثم اقفل تقرير Z.",
+    "countedCash": "النقدية المعدودة",
+    "expected": "المتوقع في الدرج",
+    "variance": "الفرق",
+    "varianceHint": "القيمة الموجبة تعني زيادة في الدرج والسلبية تعني عجزًا.",
+    "balanced": "مطابق",
+    "over": "زيادة",
+    "short": "عجز",
+    "notes": "ملاحظات الإغلاق",
+    "notesPlaceholder": "اشرح أي فرق أو تفاصيل تسليم",
+    "confirm": "إغلاق وقفل تقرير Z",
+    "closedToast": "تم إغلاق الوردية",
+    "zReportToast": "تم قفل تقرير Z"
+  },
+  "history": {
+    "title": "سجل الورديات",
+    "loading": "جارٍ تحميل سجل الورديات…",
+    "emptyTitle": "لا توجد ورديات بعد",
+    "emptyMessage": "ستظهر هنا الورديات المغلقة وتقارير Z الخاصة بها.",
+    "filteredEmpty": "لا توجد ورديات مطابقة للتصفية الحالية"
+  },
+  "columns": {
+    "shift": "الوردية",
+    "terminal": "الجهاز",
+    "operator": "المشغّل",
+    "opened": "الفتح",
+    "closed": "الإغلاق",
+    "status": "الحالة",
+    "drawer": "الدرج",
+    "actions": "إجراءات"
+  },
+  "status": {
+    "OPEN": "مفتوحة",
+    "CLOSED": "مغلقة"
+  },
+  "zReports": {
+    "title": "تقارير Z",
+    "description": "ملخصات نهاية الوردية المقفلة لكل يوم عمل.",
+    "date": "يوم العمل",
+    "emptyTitle": "لا توجد تقارير Z لهذا التاريخ",
+    "emptyMessage": "يُنشأ تقرير Z تلقائيًا عند إغلاق الوردية.",
+    "number": "التقرير",
+    "shift": "الوردية",
+    "terminal": "الجهاز",
+    "lockedAt": "وقت القفل",
+    "view": "عرض التقرير",
+    "detailTitle": "تقرير Z {number}",
+    "detailDescription": "الإجماليات المقفلة ليوم {date} على الجهاز {terminal}.",
+    "viewAction": "فتح تقرير Z"
+  },
+  "detail": {
+    "title": "الوردية {number}",
+    "description": "الإجماليات وحالة الدرج والحركات النقدية لهذه الوردية.",
+    "noZReport": "لا يوجد تقرير Z لهذه الوردية."
+  },
+  "errors": {
+    "load": "تعذر تحميل الورديات",
+    "open": "تعذر فتح الوردية",
+    "movement": "تعذر تسجيل الحركة النقدية",
+    "close": "تعذر إغلاق الوردية",
+    "loadZReports": "تعذر تحميل تقارير Z"
+  }
+}

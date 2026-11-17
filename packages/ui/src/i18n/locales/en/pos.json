@@ -1,0 +1,169 @@
+{
+  "search": {
+    "placeholder": "Search the menu — name, SKU or description (F2)",
+    "aria": "Search menu",
+    "clear": "Clear search"
+  },
+  "allMenu": "All menu",
+  "empty": {
+    "title": "No menu items match",
+    "message": "Try another category or clear the search.",
+    "reset": "Reset filters"
+  },
+  "builder": {
+    "edit": "Edit item",
+    "customise": "Customise",
+    "build": "Build the order",
+    "pick": "Pick a menu item to begin",
+    "clearSelection": "Clear selection"
+  },
+  "start": {
+    "title": "Start with a menu item",
+    "message": "Choose a pizza, side or drink on the left. Sizes, toppings and kitchen notes are configured here.",
+    "featured": "Featured tonight"
+  },
+  "prepTime": "{minutes} min prep",
+  "chooseSize": "Choose a size",
+  "toppings": {
+    "title": "Extras & toppings",
+    "selected": "{count} selected"
+  },
+  "quantity": "Quantity",
+  "decreaseQuantity": "Decrease quantity",
+  "increaseQuantity": "Increase quantity",
+  "lineTotal": "Line total",
+  "kitchenNotes": "Kitchen notes",
+  "kitchenNotesPlaceholder": "e.g. extra crispy, no chilli, cut in squares",
+  "addToCart": "Add to cart",
+  "saveChanges": "Save changes",
+  "currentOrder": "Current order",
+  "orderSummary": "{count} items · {type}",
+  "clear": "Clear",
+  "table": "Table",
+  "tablePlaceholder": "e.g. 12",
+  "tableSelect": "Select a table",
+  "tableOpenHint": "Open tab {number} · {total}",
+  "continueTab": "Continue tab",
+  "payLater": "Pay after the meal",
+  "payLaterHint": "Keeps the tab open; settle it from the tables screen when the guests leave.",
+  "cod": "Cash on delivery",
+  "codHint": "The driver collects the cash and settles it at the end of the shift.",
+  "tabBanner": "Adding items to tab {number}",
+  "tabTotal": "Current tab total {total}",
+  "leaveTab": "Leave tab",
+  "addToTab": "Add {amount} to tab",
+  "addedToTab": "Items sent to the tab and kitchen",
+  "deferredNote": "No payment is taken now — this order is settled later.",
+  "confirmOrder": "Confirm order",
+  "guest": {
+    "title": "Guest",
+    "saved": "Saved guest",
+    "clear": "Clear",
+    "name": "Guest name",
+    "phone": "Phone",
+    "address": "Delivery address (required)"
+  },
+  "cartEmpty": {
+    "title": "The cart is empty",
+    "message": "Add a pizza or another item to start the ticket."
+  },
+  "zonePicker": {
+    "mapAria": "Delivery location map",
+    "pickHint": "Click the map to pin the delivery location.",
+    "checking": "Checking the delivery area…",
+    "fallback": "Flat delivery fee {fee} — this branch has no delivery zones.",
+    "matched": "{zone} · {fee} delivery",
+    "pinRequired": "Pin the delivery location on the map so we can match a delivery zone.",
+    "outOfRange": "This location is outside every delivery zone.",
+    "nearest": "Nearest zone: {zone} ({distance} away).",
+    "minOrder": "The minimum order for {zone} is {amount}."
+  },
+  "line": {
+    "decrease": "Decrease {name}",
+    "increase": "Increase {name}",
+    "edit": "Edit",
+    "remove": "Remove",
+    "each": "{price} ea"
+  },
+  "discount": {
+    "none": "No discount",
+    "limit": "Cashier discount limit: {percent}% ({amount})"
+  },
+  "orderNotes": "Order notes (optional)",
+  "summary": {
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "tax": "Tax ({rate}%)",
+    "delivery": "Delivery",
+    "total": "Total"
+  },
+  "payment": {
+    "line": "Payment {number}",
+    "cashReceived": "Cash received",
+    "amount": "Amount",
+    "exact": "Exact",
+    "shortfall": "Cash is short of the remaining amount.",
+    "changeDue": "Change due",
+    "remaining": "Remaining {amount}",
+    "reference": "Transaction ref.",
+    "referencePlaceholder": "e.g. TXN-4821",
+    "add": "Split payment",
+    "remove": "Remove payment"
+  },
+  "placeOrder": "Place order",
+  "placing": "Placing order…",
+  "charge": "Charge {amount}",
+  "viewKitchen": "View kitchen queue",
+  "validation": {
+    "cartEmpty": "Add at least one item to the order",
+    "address": "A delivery address is required",
+    "zoneChecking": "Checking the delivery zone — try again in a moment",
+    "zonePinRequired": "Pin the delivery location on the map to continue",
+    "zoneOutOfRange": "This delivery location is outside the delivery zones",
+    "zoneMinOrder": "This order is below the {amount} minimum for the delivery zone",
+    "table": "Choose a table before opening a tab",
+    "discountLimit": "This discount exceeds your {percent}% limit",
+    "cashShort": "Cash received is less than the remaining amount",
+    "paymentOver": "Card and wallet amounts exceed the total",
+    "cashUnused": "Remove the empty cash payment or lower the card and wallet amounts",
+    "paymentTotal": "Payments must add up to the total"
+  },
+  "guests": {
+    "title": "Saved guests",
+    "description": "Pick a guest profile to attach contact details and order history.",
+    "search": "Search by name or phone",
+    "loading": "Loading saved guests",
+    "loadError": "Could not load guests.",
+    "emptyTitle": "No saved guests",
+    "emptyMessage": "Type a name above or close this and enter the guest manually.",
+    "noPhone": "No phone",
+    "ordersCount": "{count} orders",
+    "new": "New guest",
+    "createTitle": "New guest",
+    "createDescription": "Save contact details so this guest's orders stay linked.",
+    "name": "Name",
+    "namePlaceholder": "Guest name",
+    "phone": "Phone",
+    "phonePlaceholder": "Phone number",
+    "address": "Address",
+    "addressPlaceholder": "Delivery address",
+    "save": "Save guest",
+    "created": "Guest saved",
+    "createError": "Could not save the guest",
+    "back": "Back to search"
+  },
+  "errors": {
+    "loadTitle": "The register could not load",
+    "loadHint": "Check the server connection and try again.",
+    "createFailed": "Could not create the order",
+    "chooseSize": "Choose a size for {name}",
+    "itemGone": "That menu item is no longer available",
+    "loadTab": "Could not load the open tab",
+    "printFailed": "Could not print the kitchen ticket"
+  },
+  "product": {
+    "featured": "Featured",
+    "soldOut": "Sold out",
+    "from": "from {price}"
+  }
+}
