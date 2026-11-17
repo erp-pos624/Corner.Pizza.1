@@ -3,6 +3,7 @@ import { Flame } from 'lucide-react';
 import { Suspense, lazy, useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import type { Permission, Role } from '@posshope/shared';
 import { AppShell, NAV_GROUPS, type PageKey } from './components/layout/AppShell';
+import { OfflineScreen } from './components/OfflineScreen';
 import { PizzaLoader } from './components/layout/PizzaLoader';
 import { Toaster } from './components/ui/toast';
 import { useI18n } from './i18n';
@@ -376,6 +377,7 @@ export function Root({ routing = 'memory' }: RootProps = {}): ReactElement {
       <BranchScopeSync />
       <Shell routing={routing} />
       <Toaster />
+      <OfflineScreen />
     </QueryClientProvider>
   );
 }

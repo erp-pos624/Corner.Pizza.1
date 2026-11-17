@@ -3,6 +3,7 @@ import { BrandIntro } from '@posshope/ui/brand-intro';
 import { useEffect, useRef, type ReactElement } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
+import { OfflineGuard } from './components/OfflineGuard';
 import { EmptyState } from './components/ui';
 import { applyCustomerLanguage, useI18n, useStorefrontLanguage } from './i18n';
 import {
@@ -115,6 +116,7 @@ export function StorefrontApp(): ReactElement {
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
+        <OfflineGuard />
       </div>
     </QueryClientProvider>
   );

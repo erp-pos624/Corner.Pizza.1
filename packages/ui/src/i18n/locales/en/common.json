@@ -7,6 +7,11 @@
     "tagline": "Fresh from the oven, made to be shared.",
     "loading": "Loading…"
   },
+  "offline": {
+    "title": "Oops — no internet",
+    "body": "We can't reach the server right now. Check your Wi-Fi or network cable — we'll reconnect automatically.",
+    "checking": "Checking…"
+  },
   "charts": {
     "trendAria": "Trend chart",
     "distributionAria": "Distribution chart",

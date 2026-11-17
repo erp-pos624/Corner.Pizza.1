@@ -68,6 +68,12 @@ export const en = {
   'notFound.body': 'That page does not exist. The menu does, though.',
   'notFound.seeMenu': 'See the menu',
 
+  'offline.title': 'Oops — no internet',
+  'offline.body':
+    "We can't reach the kitchen right now. Check your Wi-Fi or mobile data — we'll reconnect automatically.",
+  'offline.retry': 'Try again',
+  'offline.checking': 'Checking…',
+
   'home.checkingHours': 'Checking opening hours',
   'home.open': 'Open for orders',
   'home.closed': 'Closed for online orders',
@@ -497,6 +503,12 @@ const ar: Record<MessageKey, string> = {
   'notFound.title': 'لا يوجد شيء هنا',
   'notFound.body': 'هذه الصفحة غير موجودة، لكن القائمة موجودة.',
   'notFound.seeMenu': 'شاهد القائمة',
+
+  'offline.title': 'عذرًا — لا يوجد اتصال بالإنترنت',
+  'offline.body':
+    'تعذّر الوصول إلى المطعم حاليًا. تحقّق من شبكة Wi-Fi أو بيانات الهاتف — سنعيد الاتصال تلقائيًا.',
+  'offline.retry': 'إعادة المحاولة',
+  'offline.checking': 'جارٍ التحقق…',
 
   'home.checkingHours': 'جارٍ التحقق من مواعيد العمل',
   'home.open': 'مفتوح للطلبات',

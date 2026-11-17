@@ -11,6 +11,7 @@
     "./styles.css": "./src/index.css",
     "./tailwind-preset": "./tailwind.preset.cjs",
     "./postcss-config": "./postcss.config.cjs",
+    "./connection": "./src/lib/connection.ts",
     "./images": "./src/lib/images.ts"
   },
   "scripts": {
