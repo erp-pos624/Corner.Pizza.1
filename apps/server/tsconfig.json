@@ -4,10 +4,14 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "types": ["node"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "noEmit": true,
-    // The server is bundled by tsup and never ships .d.ts files. Emitting
-    // declarations under pnpm's nested node_modules layout makes tsc unable to
-    // name inferred Express types portably (TS2742).
     "declaration": false,
     "declarationMap": false
   },

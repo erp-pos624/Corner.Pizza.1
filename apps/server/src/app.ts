@@ -1,6 +1,6 @@
 import cors, { type CorsOptions, type CorsOptionsDelegate } from 'cors';
-import express, { type Express, type Request } from 'express';
-import helmet from 'helmet';
+import express, { type Express, type Request, type RequestHandler } from 'express';
+import helmetFactory, { type HelmetOptions } from 'helmet';
 import { env, isProduction } from './env.js';
 import { classifyOrigin, parseOrigins, requestOrigin } from './lib/origin.js';
 import { accessLog, requestContext } from './middleware/requestContext.js';
@@ -60,6 +60,12 @@ const corsDelegate: CorsOptionsDelegate<Request> = (req, callback) => {
         : { origin: false };
   callback(null, options);
 };
+
+// Helmet's declaration file ships an ESM-style default export; cast it so the
+// callable signature survives stricter module-resolution settings (Vercel).
+const helmet = helmetFactory as unknown as (
+  options?: Readonly<HelmetOptions>,
+) => RequestHandler;
 
 /** Builds the fully-wired Express application (no I/O side effects). */
 export function createApp(): Express {
