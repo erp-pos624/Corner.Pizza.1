@@ -13,6 +13,10 @@ if (existsSync(envFile)) {
   loadDotenv({ path: envFile });
 }
 
+// Vercel's Supabase Marketplace integration injects POSTGRES_* variables
+// instead of DATABASE_URL; accept them so the connection is not duplicated.
+process.env.DATABASE_URL ??= process.env.POSTGRES_PRISMA_URL;
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   HOST: z.string().default('127.0.0.1'),

@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 
 config();
 
-const directUrl = process.env.DIRECT_URL;
+const directUrl = process.env.DIRECT_URL ?? process.env.POSTGRES_URL_NON_POOLING;
 if (!directUrl) {
   console.error(
     '[db:deploy:direct] DIRECT_URL is not set. Use the Supabase session/direct connection (port 5432) for migrations.',
