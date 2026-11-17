@@ -4,17 +4,15 @@
     "web": {
       "root": "apps/web",
       "framework": "vite",
-      "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-      "buildCommand": "cd ../.. && pnpm --filter @posshope/shared build && pnpm --filter @posshope/web build",
+      "buildCommand": "pnpm --filter @posshope/shared build && pnpm --filter @posshope/web build",
       "outputDirectory": "dist",
       "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
     },
     "api": {
       "root": "apps/server",
       "framework": "express",
-      "entrypoint": "dist/vercel.js",
-      "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-      "buildCommand": "cd ../.. && pnpm --filter @posshope/shared build && pnpm --filter @posshope/server build"
+      "entrypoint": "src/vercel.ts",
+      "buildCommand": "pnpm --filter @posshope/shared build && pnpm --filter @posshope/server build"
     }
   },
   "rewrites": [
