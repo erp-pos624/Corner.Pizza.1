@@ -1,0 +1,80 @@
+name: Desktop release
+
+# Builds the Corner Pizza POS terminal for every supported OS. Run it by hand
+# from Actions, or push a tag like `desktop-v0.1.0`.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['desktop-v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.artifact }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: windows
+          - os: ubuntu-latest
+            artifact: linux
+          - os: macos-latest
+            artifact: macos
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # @posshope/shared is consumed from its build output.
+      - run: pnpm --filter @posshope/shared build
+
+      # macOS packaging needs a .icns; generate it from the 1024px master.
+      - name: Build macOS icon
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p apps/desktop/build/icon.iconset
+          sips -z 16 16 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_16x16.png
+          sips -z 32 32 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_16x16@2x.png
+          sips -z 32 32 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_32x32.png
+          sips -z 64 64 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_32x32@2x.png
+          sips -z 128 128 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_128x128.png
+          sips -z 256 256 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_128x128@2x.png
+          sips -z 256 256 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_256x256.png
+          sips -z 512 512 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_256x256@2x.png
+          sips -z 512 512 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_512x512.png
+          sips -z 1024 1024 apps/desktop/build/icon.png --out apps/desktop/build/icon.iconset/icon_512x512@2x.png
+          iconutil -c icns apps/desktop/build/icon.iconset -o apps/desktop/build/icon.icns
+          rm -rf apps/desktop/build/icon.iconset
+
+      # maker-rpm shells out to rpmbuild.
+      - name: Install rpm tooling
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y rpm
+
+      - name: Package
+        run: pnpm --filter @posshope/desktop make
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: corner-pos-${{ matrix.artifact }}
+          if-no-files-found: error
+          path: |
+            apps/desktop/out/make/**/*.exe
+            apps/desktop/out/make/**/*.nupkg
+            apps/desktop/out/make/**/*.zip
+            apps/desktop/out/make/**/*.deb
+            apps/desktop/out/make/**/*.rpm
+            apps/desktop/out/make/**/*.dmg

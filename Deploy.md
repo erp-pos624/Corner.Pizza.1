@@ -128,7 +128,15 @@ To make it permanent:
 
 - Give the server PC a fixed IP address (e.g. `192.168.1.10`).
 
-## 3. Desktop app — export the `.exe`
+## 3. Desktop app — installers
+
+Packaged builds talk to the deployed API at
+`https://corner-pizza.vercel.app`. `pnpm dev` still uses
+`http://127.0.0.1:4000`, and `FORNO_API_URL` overrides both — it is read when
+the app starts, so set it on the terminal (not the build machine) only for a
+LAN or self-hosted server.
+
+### Windows
 
 On a **Windows** build machine:
 
@@ -151,6 +159,27 @@ Only need the unpacked app, no installer? This is faster:
 pnpm --filter @posshope/desktop package
 ```
 
+A portable Linux ZIP can also be produced from Windows:
+
+```powershell
+pnpm --filter @posshope/desktop exec electron-forge make --platform=linux --arch=x64 --targets @electron-forge/maker-zip
+```
+
+→ `apps/desktop/out/make/zip/linux/x64/CornerPOS-linux-x64-0.1.0.zip`
+
+### Linux and macOS
+
+`.deb`/`.rpm` need Linux packaging tools and the `.dmg` needs macOS, so those
+build on their own OS. The **Desktop release** workflow does all three in one
+run: on GitHub open **Actions → Desktop release → Run workflow** (or push a tag
+such as `desktop-v0.1.0`), then download the artifacts:
+
+| Artifact            | Contains                                    |
+| ------------------- | ------------------------------------------- |
+| `corner-pos-windows` | `CornerPOS-Setup.exe`, portable ZIP        |
+| `corner-pos-linux`   | `.deb`, `.rpm`, portable ZIP               |
+| `corner-pos-macos`   | `.dmg`, portable ZIP                       |
+
 Notes:
 
 - `corner-pos.exe` cannot be copied on its own; it needs the DLLs and the
@@ -158,29 +187,26 @@ Notes:
 - To change the version, edit `version` in `apps/desktop/package.json` before
   running `make`.
 - To change the icon, replace `apps/desktop/build/icon.png` and `icon.ico`
-  (`pnpm --filter @posshope/desktop icons` regenerates them).
-- The build is not code-signed, so Windows SmartScreen shows "Windows protected
-  your PC" on first run. Choose **More info → Run anyway**, or buy a
-  code-signing certificate to remove the warning.
+  (`pnpm --filter @posshope/desktop icons` regenerates them); the macOS
+  workflow step derives `icon.icns` from `icon.png`.
+- The builds are not code-signed, so Windows SmartScreen shows "Windows
+  protected your PC" on first run (**More info → Run anyway**) and macOS
+  Gatekeeper blocks the first open (**right-click the app → Open**). Remove
+  that with a Windows/Apple code-signing certificate.
 
 ### Install on each terminal
 
 1. Copy `CornerPOS-Setup.exe` to the terminal and run it. It installs per-user
    into `%LocalAppData%\corner_pos\` and adds a Start-menu shortcut.
-2. Point the app at the server. The address is read from the `FORNO_API_URL`
-   environment variable **when the app starts** — it is not baked into the
-   `.exe`, so setting it on the build machine has no effect. In a terminal run
-   as Administrator:
+2. The app already points at the production API, so nothing else to set up.
+   Only for a LAN server, set the address in a terminal run as Administrator:
 
    ```powershell
    setx FORNO_API_URL "http://192.168.1.10:4000" /M
    ```
 
-3. Close and reopen the app (sign out of Windows and back in if it still uses
+   Close and reopen the app (sign out of Windows and back in if it still uses
    the old value).
-
-Skip step 2 only when the API runs on the same PC as the app; the default is
-`http://127.0.0.1:4000`.
 
 Per-terminal data (login session, terminal ID) lives in
 `%AppData%\Corner Pizza\`. Uninstall from **Settings → Apps → corner_pos**.
@@ -211,7 +237,7 @@ refuses the simulation.
    terminals (there is no auto-update)
 6. Rebuild and re-upload the web site if it is deployed
 
-## 6. Cloud deployment — Vercel + Supabase + Cloudinary
+## 6. Cloud deployment — Vercel + Supabase
 
 The repository ships a [vercel.json](vercel.json) that deploys the web site
 and the API together as two Vercel Services under one domain. Same origin is
@@ -246,16 +272,18 @@ https://<project>.vercel.app/readyz      → api service
    `pnpm --filter @posshope/server db:seed` (destroys existing data — never on
    a live database).
 
-### 6.2 Cloudinary images
+### 6.2 Supabase Storage images
 
-1. Create a Cloudinary product environment (free plan is enough).
-2. Copy **Cloud name**, **API key** and **API secret** from the dashboard.
-3. Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
-   (optional `CLOUDINARY_UPLOAD_FOLDER`, default `corner-pizza`).
-4. In the menu item editor, use **Upload image** next to the URL field. The
-   browser downscales to 1600 px / WebP before sending; the API stores it in
-   Cloudinary and saves the secure URL on the menu item. Pasting an external
-   URL still works.
+1. Use the same Supabase project that hosts the database.
+2. Create the public bucket once (reads `SUPABASE_URL` and
+   `SUPABASE_SERVICE_ROLE_KEY` from the environment or the repo-root
+   `.env.local` pulled by Vercel):
+   `pnpm --filter @posshope/server storage:setup`
+   This creates `menu-images` (public, 200 KB limit, JPEG/PNG/WebP only).
+3. In the menu item editor, use **Upload image** next to the URL field. The
+   browser downscales and re-encodes to WebP until the file fits 200 KB; the
+   API stores it in Supabase Storage and saves the public URL on the menu item.
+   Pasting an external URL still works.
 
 ### 6.3 Vercel environment variables
 
@@ -266,9 +294,9 @@ work). `JWT_SECRET` must be a unique random string of 32+ characters.
 | --- | --- |
 | `DATABASE_URL` | Supabase transaction pooler URL (`:6543`) |
 | `JWT_SECRET` | random 32+ character secret |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
-| `CLOUDINARY_API_KEY` | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| `SUPABASE_URL` | injects automatically with the Vercel Supabase integration |
+| `SUPABASE_SERVICE_ROLE_KEY` | injects automatically with the Vercel Supabase integration |
+| `SUPABASE_MENU_BUCKET` | optional, defaults to `menu-images` |
 | `CORS_ORIGINS` | `https://<project>.vercel.app` (same origin is always trusted) |
 | `BUSINESS_TIMEZONE` | `Africa/Cairo` (or the restaurant's timezone) |
 
@@ -281,9 +309,6 @@ Deploy from the repository root:
 npx vercel link
 npx vercel env add DATABASE_URL production
 npx vercel env add JWT_SECRET production
-npx vercel env add CLOUDINARY_CLOUD_NAME production
-npx vercel env add CLOUDINARY_API_KEY production
-npx vercel env add CLOUDINARY_API_SECRET production
 npx vercel --prod
 ```
 
@@ -293,14 +318,14 @@ Then check `https://<project>.vercel.app/readyz` reports
 ### 6.4 Serverless notes
 
 - Function request bodies are capped at 4.5 MB by Vercel; the upload UI
-  compresses images well below that, and the API rejects anything over 1.5 MB
-  after decoding.
+  compresses images to fit 200 KB, and the API rejects anything larger after
+  decoding.
 - The local filesystem is read-only, so nothing is written to disk — all
-  images go to Cloudinary and all data to Supabase.
+  images go to Supabase Storage and all data to Supabase Postgres.
 - The API runs on Prisma's RHEL engine (`binaryTargets` in
   `apps/server/prisma/schema.prisma`) because Vercel's Node runtime is Amazon
   Linux 2023.
-- File uploads and screenshots are stored on Cloudinary, not on Vercel.
+- File uploads and screenshots are stored in Supabase Storage, not on Vercel.
 
 
 ## Checklist
