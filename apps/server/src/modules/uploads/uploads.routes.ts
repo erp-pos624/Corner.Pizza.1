@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { imageUploadSchema, type ImageUploadInput, type UploadedImageDto } from '@posshope/shared';
+import {
+  imageUploadSchema,
+  MAX_MENU_IMAGE_BYTES,
+  type ImageUploadInput,
+  type UploadedImageDto,
+} from '@posshope/shared';
 import { asyncHandler } from '../../lib/asyncHandler.js';
 import { isCloudinaryConfigured, uploadMenuImage } from '../../lib/cloudinary.js';
 import { AppError } from '../../lib/errors.js';
@@ -18,7 +23,7 @@ const uploadLimiter = rateLimit({
   message: 'Too many uploads. Try again shortly',
 });
 
-const MAX_IMAGE_BYTES = 1_500_000;
+const MAX_IMAGE_BYTES = MAX_MENU_IMAGE_BYTES;
 
 uploadsRouter.post(
   '/image',
@@ -36,7 +41,7 @@ uploadsRouter.post(
     const { data } = req.body as ImageUploadInput;
     const bytes = Buffer.byteLength(data.slice(data.indexOf(',') + 1), 'base64');
     if (bytes > MAX_IMAGE_BYTES) {
-      throw new AppError('Image is too large — please choose a smaller file', {
+      throw new AppError('Image is too large — maximum size is 200 KB', {
         statusCode: 413,
         expose: true,
       });
