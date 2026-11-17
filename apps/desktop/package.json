@@ -1,7 +1,7 @@
 {
   "name": "@posshope/desktop",
   "productName": "Corner Pizza",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Corner Pizza â€” restaurant POS and management (Electron desktop client)",
   "main": ".vite/build/main.js",
