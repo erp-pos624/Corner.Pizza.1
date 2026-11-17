@@ -4,7 +4,7 @@
     "web": {
       "root": "apps/web",
       "framework": "vite",
-      "buildCommand": "pnpm --filter @posshope/shared build && pnpm --filter @posshope/web build",
+      "buildCommand": "pnpm build",
       "outputDirectory": "dist",
       "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
     },
@@ -12,7 +12,7 @@
       "root": "apps/server",
       "framework": "express",
       "entrypoint": "src/vercel.ts",
-      "buildCommand": "pnpm --filter @posshope/shared build && pnpm --filter @posshope/server build"
+      "buildCommand": "pnpm build"
     }
   },
   "rewrites": [
