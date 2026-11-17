@@ -193,7 +193,7 @@
     "foodCost": "Food cost (EGP)",
     "foodCostHint": "Used for profit reporting",
     "imageUrl": "Image URL",
-    "imageHint": "Paste a URL or upload a photo. Cloudinary hosts uploads.",
+    "imageHint": "Paste a URL or upload a photo. Uploads are stored on Supabase.",
     "uploadImage": "Upload image",
     "uploading": "Uploading…",
     "imageUploaded": "Image uploaded",

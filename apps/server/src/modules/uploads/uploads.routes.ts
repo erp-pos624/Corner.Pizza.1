@@ -6,7 +6,7 @@ import {
   type UploadedImageDto,
 } from '@posshope/shared';
 import { asyncHandler } from '../../lib/asyncHandler.js';
-import { isCloudinaryConfigured, uploadMenuImage } from '../../lib/cloudinary.js';
+import { isStorageConfigured, uploadMenuImage } from '../../lib/storage.js';
 import { AppError } from '../../lib/errors.js';
 import { authenticate } from '../../middleware/authenticate.js';
 import { authorize } from '../../middleware/authorize.js';
@@ -31,7 +31,7 @@ uploadsRouter.post(
   uploadLimiter,
   validate({ body: imageUploadSchema }),
   asyncHandler(async (req, res) => {
-    if (!isCloudinaryConfigured()) {
+    if (!isStorageConfigured()) {
       throw new AppError('Image uploads are not configured on this server', {
         statusCode: 503,
         expose: true,
@@ -49,10 +49,8 @@ uploadsRouter.post(
 
     const uploaded = await uploadMenuImage(data);
     const dto: UploadedImageDto = {
-      url: uploaded.secure_url,
-      publicId: uploaded.public_id,
-      width: uploaded.width,
-      height: uploaded.height,
+      url: uploaded.url,
+      publicId: uploaded.publicId,
       bytes: uploaded.bytes,
       format: uploaded.format,
     };

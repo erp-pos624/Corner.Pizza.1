@@ -20,6 +20,7 @@
     "db:reset": "prisma migrate reset --force",
     "db:seed": "tsx --env-file=.env prisma/seed.ts",
     "db:studio": "prisma studio",
+    "storage:setup": "node scripts/setup-storage.mjs",
     "postinstall": "prisma generate"
   },
   "prisma": {
@@ -29,7 +30,6 @@
     "@node-rs/argon2": "^2.0.2",
     "@posshope/shared": "workspace:*",
     "@prisma/client": "^6.2.1",
-    "cloudinary": "^2.11.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

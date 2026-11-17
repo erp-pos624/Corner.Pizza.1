@@ -20,7 +20,7 @@ function productionCsp(apiOrigin: string): Plugin {
     "default-src 'self'",
     "script-src 'self'",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://res.cloudinary.com https://*.tile.openstreetmap.org",
+    "img-src 'self' data: blob: https://*.supabase.co https://*.tile.openstreetmap.org",
     "font-src 'self' data:",
     `connect-src ${connect}`,
     "base-uri 'self'",

@@ -52,11 +52,10 @@ const envSchema = z.object({
   BASATA_ALLOW_SIMULATION: z.enum(['true', 'false']).optional(),
   /** Optional Nominatim-compatible geocoder used for address-only delivery checks. */
   GEOCODER_URL: z.string().trim().optional(),
-  /** Cloudinary image hosting. Required for menu image uploads. */
-  CLOUDINARY_CLOUD_NAME: z.string().trim().optional(),
-  CLOUDINARY_API_KEY: z.string().trim().optional(),
-  CLOUDINARY_API_SECRET: z.string().trim().optional(),
-  CLOUDINARY_UPLOAD_FOLDER: z.string().trim().default('corner-pizza'),
+  /** Supabase Storage image hosting. Required for menu image uploads. */
+  SUPABASE_URL: z.string().trim().url().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().trim().optional(),
+  SUPABASE_MENU_BUCKET: z.string().trim().default('menu-images'),
 });
 
 export type Env = z.infer<typeof envSchema>;
