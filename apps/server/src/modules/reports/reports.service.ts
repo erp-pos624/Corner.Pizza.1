@@ -453,6 +453,36 @@ export async function getSalesReport(
     0,
   );
 
+  const [salaryAggregate, expenseGroups] = await Promise.all([
+    prisma.payrollLine.aggregate({
+      where: {
+        paymentStatus: 'PAID',
+        paidAt: { gte: start, lt: end },
+        ...(branchId ? { employee: { branchId } } : {}),
+      },
+      _sum: { netSalary: true },
+    }),
+    prisma.expense.groupBy({
+      by: ['category'],
+      where: {
+        expenseDate: { gte: parseDateOnly(range.from), lte: parseDateOnly(range.to) },
+        ...(branchId ? { branchId } : {}),
+      },
+      _sum: { amount: true },
+      _count: { _all: true },
+    }),
+  ]);
+  const salaries = Number(salaryAggregate._sum.netSalary ?? 0);
+  const expensesByCategory = expenseGroups
+    .map((group) => ({
+      category: group.category,
+      amount: Number(group._sum.amount ?? 0).toFixed(2),
+      count: group._count._all,
+    }))
+    .sort((a, b) => Number(b.amount) - Number(a.amount));
+  const expenses = expensesByCategory.reduce((sum, row) => sum + Number(row.amount), 0);
+  const netProfit = profit - salaries - expenses;
+
   const cashierGroups = new Map<string, { name: string; orders: number; revenue: number }>();
   for (const order of orders) {
     const existing = cashierGroups.get(order.cashierId) ?? {
@@ -564,6 +594,10 @@ export async function getSalesReport(
       cost: cost.toFixed(2),
       profit: profit.toFixed(2),
       marginPct: netSales > 0 ? Math.round((profit / netSales) * 1000) / 10 : null,
+      salaries: salaries.toFixed(2),
+      expenses: expenses.toFixed(2),
+      netProfit: netProfit.toFixed(2),
+      netMarginPct: netSales > 0 ? Math.round((netProfit / netSales) * 1000) / 10 : null,
     },
     daily: buildSeries(orders, range.from, range.days),
     byCategory: buildCategoryRows(orders, lookup),
@@ -577,6 +611,7 @@ export async function getSalesReport(
     ordersByType,
     byChannel: buildChannelRows(orders),
     refunds: refunds.toFixed(2),
+    expensesByCategory,
   };
 }
 

@@ -1,0 +1,72 @@
+{
+  "title": "Expenses",
+  "filters": {
+    "from": "From",
+    "to": "To",
+    "category": "Category",
+    "allCategories": "All categories",
+    "branch": "Branch",
+    "allBranches": "All branches",
+    "apply": "Apply"
+  },
+  "stats": {
+    "total": "Total expenses",
+    "totalHint": "Recorded in this range",
+    "entries": "Entries",
+    "entriesHint": "Expense records",
+    "top": "Biggest category",
+    "topHint": "{amount} · {count} entries",
+    "none": "Nothing recorded yet"
+  },
+  "table": {
+    "date": "Date",
+    "category": "Category",
+    "description": "Description",
+    "branch": "Branch",
+    "recordedBy": "Recorded by",
+    "amount": "Amount",
+    "actions": "Actions"
+  },
+  "empty": {
+    "title": "No expenses in this range",
+    "message": "Record rent, electricity, water and other running costs so they are deducted from net profit."
+  },
+  "error": "Could not load expenses",
+  "categories": {
+    "RENT": "Rent",
+    "UTILITIES": "Electricity & water",
+    "MAINTENANCE": "Maintenance",
+    "SUPPLIES": "Supplies",
+    "MARKETING": "Marketing",
+    "OTHER": "Other"
+  },
+  "form": {
+    "newTitle": "Record expense",
+    "editTitle": "Edit expense",
+    "category": "Category",
+    "description": "Description",
+    "descriptionPlaceholder": "e.g. November electricity bill",
+    "amount": "Amount",
+    "date": "Expense date",
+    "branch": "Branch",
+    "notes": "Notes",
+    "notesPlaceholder": "Optional details, invoice number or supplier",
+    "save": "Save changes",
+    "create": "Record expense"
+  },
+  "delete": {
+    "title": "Delete expense?",
+    "message": "This removes \"{description}\" from reports and net profit.",
+    "confirm": "Delete"
+  },
+  "toast": {
+    "created": "Expense recorded",
+    "updated": "Expense updated",
+    "deleted": "Expense deleted"
+  },
+  "validation": {
+    "description": "Describe the expense",
+    "amount": "Enter an amount greater than zero",
+    "date": "Pick the expense date"
+  }
+}

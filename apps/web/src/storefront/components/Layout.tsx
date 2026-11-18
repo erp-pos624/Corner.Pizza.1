@@ -1,10 +1,10 @@
-import { Clock, MapPin, Menu as MenuIcon, Phone, ShoppingBag, User, X } from 'lucide-react';
+import { Clock, Mail, MapPin, Menu as MenuIcon, Phone, ShoppingBag, User, X } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import logo from '../assets/corner-logo.svg';
 import { useI18n } from '../i18n';
 import { formatOpeningHours } from '../lib/format';
-import { useActiveBranch } from '../lib/menu';
+import { useActiveBranch, usePublicSettings } from '../lib/menu';
 import { cartCount, useCart } from '../store/cart';
 import { useCartDrawer } from '../store/cart-drawer';
 import { useSession } from '../store/session';
@@ -177,8 +177,14 @@ function ClosedBanner(): ReactElement | null {
 function Footer(): ReactElement {
   const { t } = useI18n();
   const { branch } = useActiveBranch();
+  const { settings } = usePublicSettings();
   const openDrawer = useCartDrawer((state) => state.openDrawer);
   const branchName = branch ? (branch.name.split('—').pop() ?? branch.name).trim() : null;
+  // Dashboard Settings hold the restaurant's contact details; the active
+  // branch is only a fallback for installations that fill branches instead.
+  const address = settings?.address ?? branch?.address ?? null;
+  const phone = settings?.phone ?? branch?.phone ?? null;
+  const email = settings?.email ?? null;
 
   return (
     <footer className="mt-24 border-t border-line bg-forest-2">
@@ -216,30 +222,40 @@ function Footer(): ReactElement {
         </div>
         <div>
           <h2 className="text-sm font-semibold text-cream">{t('footer.findUs')}</h2>
-          {branch ? (
+          {address || phone || email || branch ? (
             <ul className="mt-4 space-y-3 text-cream-dim">
-              {branch.address ? (
+              {address ? (
                 <li className="flex gap-3">
                   <MapPin className="mt-1 h-4 w-4 shrink-0 text-gold" />
-                  <span>{branch.address}</span>
+                  <span>{address}</span>
                 </li>
               ) : null}
-              {branch.phone ? (
+              {phone ? (
                 <li className="flex gap-3">
                   <Phone className="mt-1 h-4 w-4 shrink-0 text-gold" />
-                  <a href={`tel:${branch.phone.replace(/\s/g, '')}`} className="hover:text-cream">
-                    {branch.phone}
+                  <a href={`tel:${phone.replace(/\s/g, '')}`} className="hover:text-cream">
+                    {phone}
                   </a>
                 </li>
               ) : null}
-              <li className="flex gap-3">
-                <Clock className="mt-1 h-4 w-4 shrink-0 text-gold" />
-                <span>
-                  {t('footer.onlineOrders', {
-                    hours: formatOpeningHours(branch.onlineOpenTime, branch.onlineCloseTime, t),
-                  })}
-                </span>
-              </li>
+              {email ? (
+                <li className="flex gap-3">
+                  <Mail className="mt-1 h-4 w-4 shrink-0 text-gold" />
+                  <a href={`mailto:${email}`} className="break-all hover:text-cream" dir="ltr">
+                    {email}
+                  </a>
+                </li>
+              ) : null}
+              {branch ? (
+                <li className="flex gap-3">
+                  <Clock className="mt-1 h-4 w-4 shrink-0 text-gold" />
+                  <span>
+                    {t('footer.onlineOrders', {
+                      hours: formatOpeningHours(branch.onlineOpenTime, branch.onlineCloseTime, t),
+                    })}
+                  </span>
+                </li>
+              ) : null}
             </ul>
           ) : (
             <div className="skeleton mt-4 h-20 w-full" />

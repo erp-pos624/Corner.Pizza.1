@@ -9,6 +9,8 @@
     "table": "Table {number}",
     "guest": "Guest",
     "phone": "Phone",
+    "address": "Address",
+    "deliveryZone": "Delivery zone",
     "subtotal": "Subtotal",
     "discount": "Discount",
     "tax": "Tax ({rate}%)",

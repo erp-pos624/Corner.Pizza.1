@@ -26,7 +26,7 @@
   "metrics": {
     "revenue": "Revenue",
     "orders": "Orders",
-    "profit": "Net profit"
+    "profit": "Profit"
   },
   "stats": {
     "revenue": "Revenue",
@@ -36,6 +36,7 @@
     "netProfit": "Net profit",
     "recipeBasis": "Recipe cost basis",
     "margin": "{percent}% margin after cost",
+    "netMargin": "{percent}% margin after salaries & expenses",
     "averageOrder": "Average order",
     "averageHint": "Revenue ÷ paid orders"
   },
@@ -46,14 +47,17 @@
   },
   "financial": {
     "title": "Financial breakdown",
-    "description": "Costs from recipe snapshots at time of sale",
+    "description": "Costs from recipe snapshots, paid salaries and recorded expenses",
     "gross": "Gross revenue",
     "discounts": "Discounts given",
     "tax": "Tax collected",
     "delivery": "Delivery fees",
     "foodCost": "Food cost",
+    "grossProfit": "Gross profit",
+    "salaries": "Salaries (paid)",
+    "otherExpenses": "Operating expenses",
     "netProfit": "Net profit",
-    "formula": "Profit = revenue − discounts − ingredient cost + delivery. Taxes are excluded."
+    "formula": "Net profit = gross profit − paid salaries − operating expenses. Taxes are excluded."
   },
   "category": {
     "title": "Sales by category",

@@ -28,6 +28,7 @@ const MANAGEMENT_ROOTS = new Set([
   'salary-history',
   'hr-settings',
   'reports',
+  'expenses',
   'users',
   'branches',
   'shifts',

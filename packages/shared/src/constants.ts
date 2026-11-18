@@ -351,3 +351,36 @@ export const HR_DEFAULTS = {
   /** 0 = Sunday … 6 = Saturday. Egyptian weekend by default. */
   weeklyDaysOff: [5, 6],
 } as const;
+
+// ---------------------------------------------------------------------------
+// Operating expenses
+// ---------------------------------------------------------------------------
+
+/** Salaries are deducted from paid payroll, so they are deliberately absent. */
+export const EXPENSE_CATEGORIES = [
+  'RENT',
+  'UTILITIES',
+  'MAINTENANCE',
+  'SUPPLIES',
+  'MARKETING',
+  'OTHER',
+] as const;
+export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
+
+export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
+  RENT: 'Rent',
+  UTILITIES: 'Electricity & water',
+  MAINTENANCE: 'Maintenance',
+  SUPPLIES: 'Supplies',
+  MARKETING: 'Marketing',
+  OTHER: 'Other',
+};
+
+export const EXPENSE_CATEGORY_LABELS_AR: Record<ExpenseCategory, string> = {
+  RENT: 'إيجار',
+  UTILITIES: 'كهرباء ومياه',
+  MAINTENANCE: 'صيانة',
+  SUPPLIES: 'مستلزمات',
+  MARKETING: 'تسويق',
+  OTHER: 'أخرى',
+};

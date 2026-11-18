@@ -93,6 +93,12 @@ export function InvoiceDocument({
         </div>
         {order.customerName ? <div className="row"><span>{t('invoices.document.guest')}</span><span>{order.customerName}</span></div> : null}
         {order.customerPhone ? <div className="row"><span>{t('invoices.document.phone')}</span><span>{order.customerPhone}</span></div> : null}
+        {order.type === 'DELIVERY' && order.customerAddress ? (
+          <div className="row"><span>{t('invoices.document.address')}</span><span style={{ textAlign: 'end' }}>{order.customerAddress}</span></div>
+        ) : null}
+        {order.deliveryZoneName ? (
+          <div className="row"><span>{t('invoices.document.deliveryZone')}</span><strong>{order.deliveryZoneName}</strong></div>
+        ) : null}
 
         <div className="divider" />
 
@@ -217,6 +223,11 @@ export function InvoiceDocument({
           </p>
           {order.customerPhone ? <p style={{ margin: '0.5mm 0 0', fontSize: '10px', color: '#4b5563' }}>{order.customerPhone}</p> : null}
           {order.customerAddress ? <p style={{ margin: '0.5mm 0 0', fontSize: '10px', color: '#4b5563' }}>{order.customerAddress}</p> : null}
+          {order.deliveryZoneName ? (
+            <p style={{ margin: '1mm 0 0', fontSize: '10px', fontWeight: 700, color: '#A32026' }}>
+              {t('invoices.document.deliveryZone')}: {order.deliveryZoneName}
+            </p>
+          ) : null}
         </div>
         <div style={{ flex: 1 }}>
           <p style={{ margin: 0, fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b7280' }}>{t('invoices.document.payment')}</p>

@@ -312,6 +312,7 @@
     "threshold": "الحد",
     "raised": "تاريخ الإنشاء",
     "resolve": "معالجة",
+    "createPo": "إنشاء أمر شراء",
     "resolvedToast": "تمت معالجة التنبيه",
     "resolveFailed": "تعذر معالجة التنبيه",
     "reorder": "حد إعادة الطلب",

@@ -1,6 +1,11 @@
+import cornerLogoSvg from '../assets/corner-logo.svg?raw';
+import { translate } from '../i18n/dictionaries';
 import { getActiveLanguage } from './language';
 
 export type ExportValue = string | number | null | undefined;
+
+/** Inlined so html2canvas never has to fetch the logo (file:// in Electron). */
+const LOGO_DATA_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(cornerLogoSvg)}`;
 
 function escapeCsv(value: ExportValue): string {
   if (value === null || value === undefined) return '';
@@ -74,9 +79,11 @@ function escapeHtml(value: ExportValue): string {
 }
 
 function buildPdfHtml(doc: PdfDocument): string {
-  const rtl = getActiveLanguage() === 'ar';
+  const language = getActiveLanguage();
+  const rtl = language === 'ar';
   const direction = rtl ? 'rtl' : 'ltr';
   const alignStart = rtl ? 'right' : 'left';
+  const brandName = escapeHtml(translate(language, 'app.fullName'));
   const meta = (doc.meta ?? [])
     .map(
       (row) =>
@@ -108,10 +115,13 @@ function buildPdfHtml(doc: PdfDocument): string {
   return `
     <div dir="${direction}" style="font-family:'Inter','Segoe UI',Arial,sans-serif;color:#2F2A26;padding:4px 6px;background:#ffffff;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:3px solid #9C1C21;padding-bottom:10px;">
-        <div>
-          <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#9C1C21;">Corner Pizza</p>
-          <h1 style="margin:4px 0 0;font-size:22px;font-weight:800;">${escapeHtml(doc.title)}</h1>
-          ${doc.subtitle ? `<p style="margin:4px 0 0;font-size:12px;color:#8B8178;">${escapeHtml(doc.subtitle)}</p>` : ''}
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <img src="${LOGO_DATA_URL}" alt="" style="display:block;width:52px;height:52px;object-fit:contain;flex-shrink:0;" />
+          <div>
+            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#9C1C21;">${brandName}</p>
+            <h1 style="margin:4px 0 0;font-size:22px;font-weight:800;">${escapeHtml(doc.title)}</h1>
+            ${doc.subtitle ? `<p style="margin:4px 0 0;font-size:12px;color:#8B8178;">${escapeHtml(doc.subtitle)}</p>` : ''}
+          </div>
         </div>
         <div style="min-width:200px;text-align:${alignStart};">${meta}</div>
       </div>

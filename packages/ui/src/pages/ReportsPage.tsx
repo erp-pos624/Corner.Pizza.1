@@ -228,7 +228,7 @@ export function ReportsPage(): ReactElement {
     0,
   );
 
-  const exportBaseName = `forno-sales-${scopeBranch?.code ?? 'all'}-${from}_${to}`;
+  const exportBaseName = `corner-pizza-sales-${scopeBranch?.code ?? 'all'}-${from}_${to}`;
   const rangeLabel = `${from} — ${to}`;
 
   const dailyRows = (): ExportValue[][] =>
@@ -298,7 +298,10 @@ export function ReportsPage(): ReactElement {
           [t('reports.financial.tax'), Number(summary.tax)],
           [t('reports.financial.delivery'), Number(summary.deliveryFees)],
           [t('reports.financial.foodCost'), Number(summary.cost)],
-          [t('reports.financial.netProfit'), Number(summary.profit)],
+          [t('reports.financial.grossProfit'), Number(summary.profit)],
+          [t('reports.financial.salaries'), Number(summary.salaries)],
+          [t('reports.financial.otherExpenses'), Number(summary.expenses)],
+          [t('reports.financial.netProfit'), Number(summary.netProfit)],
           [t('reports.stats.averageOrder'), Number(summary.averageOrderValue)],
         ]
       : [];
@@ -421,7 +424,7 @@ export function ReportsPage(): ReactElement {
         },
         { label: t('reports.stats.revenue'), value: formatMoney(summary.revenue) },
         { label: t('reports.stats.paidOrders'), value: formatNumber(summary.orders) },
-        { label: t('reports.stats.netProfit'), value: formatMoney(summary.profit) },
+        { label: t('reports.stats.netProfit'), value: formatMoney(summary.netProfit) },
         { label: t('reports.stats.averageOrder'), value: formatMoney(summary.averageOrderValue) },
       ],
       sections: [
@@ -631,12 +634,12 @@ export function ReportsPage(): ReactElement {
             />
             <StatCard
               label={t('reports.stats.netProfit')}
-              value={formatMoney(summary.profit)}
+              value={formatMoney(summary.netProfit)}
               hint={
-                summary.marginPct === null
+                summary.netMarginPct === null
                   ? t('reports.stats.recipeBasis')
-                  : t('reports.stats.margin', {
-                      percent: formatDecimal(summary.marginPct, 1),
+                  : t('reports.stats.netMargin', {
+                      percent: formatDecimal(summary.netMarginPct, 1),
                     })
               }
               icon={<PiggyBank className="h-4 w-4" />}
@@ -726,6 +729,23 @@ export function ReportsPage(): ReactElement {
                       muted: true,
                       negative: true,
                     },
+                    {
+                      labelKey: 'reports.financial.grossProfit',
+                      value: summary.profit,
+                      strong: true,
+                    },
+                    {
+                      labelKey: 'reports.financial.salaries',
+                      value: summary.salaries,
+                      muted: true,
+                      negative: true,
+                    },
+                    {
+                      labelKey: 'reports.financial.otherExpenses',
+                      value: summary.expenses,
+                      muted: true,
+                      negative: true,
+                    },
                   ] as Array<{
                     labelKey: TranslationKey;
                     value: string;
@@ -750,7 +770,7 @@ export function ReportsPage(): ReactElement {
                     {t('reports.financial.netProfit')}
                   </span>
                   <span className="numeric text-base font-bold text-success">
-                    {formatMoney(summary.profit)}
+                    {formatMoney(summary.netProfit)}
                   </span>
                 </div>
                 <p className="pt-1 text-[11px] leading-relaxed text-muted-foreground">

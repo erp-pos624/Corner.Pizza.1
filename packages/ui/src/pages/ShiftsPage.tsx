@@ -202,7 +202,7 @@ export function ShiftsPage(): ReactElement {
   ];
 
   const zExportBaseName = (report: ZReportDto): string =>
-    `forno-z-report-${report.reportNumber}`;
+    `corner-pizza-z-report-${report.reportNumber}`;
 
   const exportZCsv = (): void => {
     if (!zDetail) return;

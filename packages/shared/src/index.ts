@@ -28,4 +28,5 @@ export * from './schemas/report.js';
 export * from './schemas/settings.js';
 export * from './schemas/operations.js';
 export * from './schemas/hr.js';
+export * from './schemas/expenses.js';
 export * from './schemas/uploads.js';

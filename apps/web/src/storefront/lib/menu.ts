@@ -1,4 +1,4 @@
-import type { PublicBranchDto, PublicMenuDto } from '@posshope/shared';
+import type { PublicBranchDto, PublicMenuDto, PublicSettingsDto } from '@posshope/shared';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { create } from 'zustand';
@@ -19,6 +19,16 @@ export const useBranchChoice = create<BranchState>()(
 
 export function useBranches() {
   return useQuery({ queryKey: ['branches'], queryFn: api.branches, staleTime: 60_000 });
+}
+
+/** Restaurant contact details, maintained in dashboard Settings. */
+export function usePublicSettings(): { settings: PublicSettingsDto | null } {
+  const query = useQuery({
+    queryKey: ['public-settings'],
+    queryFn: api.settings,
+    staleTime: 60_000,
+  });
+  return { settings: query.data ?? null };
 }
 
 /** The branch being ordered from: the saved choice, else the first one open. */

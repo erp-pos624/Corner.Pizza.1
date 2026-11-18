@@ -53,6 +53,9 @@ export const PERMISSIONS = [
   'hr:read',
   'hr:write',
   'hr:payroll',
+  // operating expenses & profitability
+  'expenses:read',
+  'expenses:write',
   // cash drawer & shifts
   'shifts:view',
   'shifts:manage',

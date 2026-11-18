@@ -1,13 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, BellRing, CheckCircle2, PackageSearch } from 'lucide-react';
-import { useState, type ReactElement } from 'react';
-import type { StockAlertStatus } from '@posshope/shared';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { AlertTriangle, BellRing, PackagePlus, PackageSearch } from 'lucide-react';
+import { useMemo, useState, type ReactElement } from 'react';
+import type { StockAlertDto, StockAlertStatus } from '@posshope/shared';
 import { Button } from '../components/ui/button';
+import {
+  CreateOrderDialog,
+  type PurchaseOrderPrefill,
+} from '../components/purchasing/CreateOrderDialog';
 import { EmptyPanel, ErrorState } from '../components/ui/states';
 import { Pagination } from '../components/ui/pagination';
 import { StatCard } from '../components/ui/stat-card';
 import { StatusBadge } from '../components/ui/status-badge';
-import { toast } from '../components/ui/toast';
 import { cn } from '../lib/utils';
 import { api } from '../lib/api';
 import { formatDateTime, formatDecimal, unitLabel } from '../lib/format';
@@ -20,8 +23,14 @@ export function StockAlertsPage(): ReactElement {
   const { t } = useI18n();
   const queryClient = useQueryClient();
   const canManage = useAuthStore((state) => state.can('alerts:manage'));
+  const canPurchase = useAuthStore((state) => state.can('purchasing:write'));
+  const role = useAuthStore((state) => state.user?.role);
   const [status, setStatus] = useState<StockAlertStatus>('OPEN');
   const [page, setPage] = useState(1);
+  const [poTarget, setPoTarget] = useState<{
+    alert: StockAlertDto;
+    initial: PurchaseOrderPrefill;
+  } | null>(null);
 
   const alerts = useQuery({
     queryKey: ['inventory', 'alerts', { status, page }],
@@ -35,20 +44,54 @@ export function StockAlertsPage(): ReactElement {
     staleTime: 30_000,
   });
 
-  const resolve = useMutation({
-    mutationFn: (id: string) => api.inventory.resolveAlert(id),
-    onSuccess: () => {
-      toast.success(t('inventory.alerts.resolvedToast'));
-      void queryClient.invalidateQueries({ queryKey: ['inventory', 'alerts'] });
-      void queryClient.invalidateQueries({ queryKey: ['inventory', 'replenishment'] });
-    },
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : t('inventory.alerts.resolveFailed')),
+  const suppliers = useQuery({
+    queryKey: ['suppliers', 'options'],
+    queryFn: () => api.suppliers.list({ page: 1, pageSize: 200 }),
+    staleTime: 60_000,
+    enabled: canPurchase,
+  });
+  const ingredients = useQuery({
+    queryKey: ['inventory', 'ingredients', 'purchase-options'],
+    queryFn: () => api.inventory.ingredients({ page: 1, pageSize: 200, isActive: true }),
+    staleTime: 60_000,
+    enabled: canPurchase,
+  });
+  const branches = useQuery({
+    queryKey: ['branches'],
+    queryFn: () => api.branches.list(),
+    staleTime: 60_000,
+    enabled: canPurchase && role === 'ADMIN',
   });
 
   const rows = alerts.data?.items ?? [];
   const suggestions = replenishment.data ?? [];
   const openCount = alerts.data?.total ?? 0;
+
+  const suggestionMap = useMemo(
+    () => new Map(suggestions.map((row) => [`${row.branchId}:${row.ingredientId}`, row])),
+    [suggestions],
+  );
+
+  /**
+   * Snapshots the replenishment suggestion for one alert so the purchase-order
+   * form opens with the same numbers the row showed, even if queries refetch.
+   */
+  const openPurchaseOrder = (alert: StockAlertDto): void => {
+    const suggestion = suggestionMap.get(`${alert.branchId}:${alert.ingredientId}`);
+    const ingredient = (ingredients.data?.items ?? []).find((item) => item.id === alert.ingredientId);
+    setPoTarget({
+      alert,
+      initial: {
+        ingredientId: alert.ingredientId,
+        branchId: alert.branchId,
+        supplierId: suggestion?.supplierId ?? ingredient?.supplierId ?? undefined,
+        quantity:
+          suggestion?.suggestedQty ??
+          Math.max(Number((alert.threshold - alert.currentStock).toFixed(3)), 1),
+        unitPrice: ingredient?.costPerUnit,
+      },
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -190,16 +233,18 @@ export function StockAlertsPage(): ReactElement {
                     </td>
                     <td className="px-3 py-2.5">
                       <div className="flex justify-end">
-                        {alert.status === 'OPEN' && canManage ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={resolve.isPending}
-                            onClick={() => resolve.mutate(alert.id)}
-                          >
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            {t('inventory.alerts.resolve')}
-                          </Button>
+                        {alert.status === 'OPEN' ? (
+                          canPurchase ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="whitespace-nowrap"
+                              onClick={() => openPurchaseOrder(alert)}
+                            >
+                              <PackagePlus className="h-3.5 w-3.5" />
+                              {t('inventory.alerts.createPo')}
+                            </Button>
+                          ) : null
                         ) : (
                           <span className="text-[11px] text-muted-foreground">
                             {alert.resolvedAt
@@ -290,6 +335,33 @@ export function StockAlertsPage(): ReactElement {
           </div>
         )}
       </div>
+
+      {poTarget ? (
+        <CreateOrderDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setPoTarget(null);
+          }}
+          suppliers={suppliers.data?.items ?? []}
+          ingredients={ingredients.data?.items ?? []}
+          branches={role === 'ADMIN' ? (branches.data ?? []) : []}
+          initial={poTarget.initial}
+          onSaved={() => {
+            const alertId = poTarget.alert.id;
+            void (async () => {
+              if (canManage) {
+                try {
+                  await api.inventory.resolveAlert(alertId);
+                } catch {
+                  // The alert may already be auto-resolved by a stock sync.
+                }
+              }
+              void queryClient.invalidateQueries({ queryKey: ['inventory'] });
+              void queryClient.invalidateQueries({ queryKey: ['purchasing'] });
+            })();
+          }}
+        />
+      ) : null}
     </div>
   );
 }

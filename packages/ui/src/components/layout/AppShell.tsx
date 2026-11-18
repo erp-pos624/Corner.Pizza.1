@@ -9,6 +9,7 @@ import {
   Banknote,
   ChefHat,
   ClipboardList,
+  Coins,
   FileText,
   Globe,
   HeartPulse,
@@ -78,6 +79,7 @@ export type PageKey =
   | 'salaryHistory'
   | 'hrSettings'
   | 'reports'
+  | 'expenses'
   | 'users'
   | 'branches'
   | 'settings';
@@ -230,6 +232,12 @@ export const NAV_GROUPS: NavGroup[] = [
         labelKey: 'nav.items.reports',
         icon: BarChart3,
         permission: 'reports:view',
+      },
+      {
+        key: 'expenses',
+        labelKey: 'nav.items.expenses',
+        icon: Coins,
+        permission: 'expenses:read',
       },
     ],
   },

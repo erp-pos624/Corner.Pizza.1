@@ -9,6 +9,8 @@
     "table": "طاولة {number}",
     "guest": "الضيف",
     "phone": "الهاتف",
+    "address": "العنوان",
+    "deliveryZone": "منطقة التوصيل",
     "subtotal": "المجموع الفرعي",
     "discount": "الخصم",
     "tax": "الضريبة ({rate}%)",

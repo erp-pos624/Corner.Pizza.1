@@ -312,6 +312,7 @@
     "threshold": "Threshold",
     "raised": "Raised",
     "resolve": "Resolve",
+    "createPo": "Create purchase order",
     "resolvedToast": "Alert resolved",
     "resolveFailed": "Could not resolve alert",
     "reorder": "Reorder point",

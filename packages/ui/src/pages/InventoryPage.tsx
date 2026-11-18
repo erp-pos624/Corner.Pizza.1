@@ -96,7 +96,7 @@ export function InventoryPage(): ReactElement {
       row.supplierName ?? '',
     ]);
 
-  const exportBaseName = `forno-inventory-${todayIso()}`;
+  const exportBaseName = `corner-pizza-inventory-${todayIso()}`;
 
   const exportCsv = (): void =>
     downloadCsv(exportBaseName, [ingredientHeaders(), ...ingredientRows()]);

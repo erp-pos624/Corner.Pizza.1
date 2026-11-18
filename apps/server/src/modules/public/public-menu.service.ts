@@ -8,6 +8,7 @@ import {
   type PublicDeliveryCheckInput,
   type PublicMenuDto,
   type PublicMenuItemDto,
+  type PublicSettingsDto,
   type PublicToppingDto,
   type PublicZoneDto,
 } from '@posshope/shared';
@@ -55,6 +56,22 @@ export async function listPublicBranches(now = new Date()): Promise<PublicBranch
     orderBy: { name: 'asc' },
   });
   return branches.map((branch) => toPublicBranchDto(branch, now));
+}
+
+/** Contact details from dashboard Settings; the storefront footer shows these. */
+export async function getPublicSettings(): Promise<PublicSettingsDto> {
+  const settings = await getSettings();
+  const language = currentLanguage();
+  return {
+    name: pickLocalized(language, settings.name, settings.nameAr),
+    nameEn: settings.name,
+    nameAr: settings.nameAr,
+    address: pickLocalizedNullable(language, settings.address, settings.addressAr),
+    addressEn: settings.address,
+    addressAr: settings.addressAr,
+    phone: settings.phone,
+    email: settings.email,
+  };
 }
 
 async function loadPublicBranch(branchId: string): Promise<PublicBranchRow> {

@@ -188,7 +188,7 @@ export function InventoryReportsPage(): ReactElement {
     };
   }, [data, tab, t]);
 
-  const exportName = `forno-inventory-${tab}-${to}`;
+  const exportName = `corner-pizza-inventory-${tab}-${to}`;
   const exportRows = (): ExportValue[][] => [table.headers, ...table.rows];
 
   if (report.isLoading) {

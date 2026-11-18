@@ -33,6 +33,10 @@ import type {
   EmployeeDto,
   EmployeePayrollHistoryDto,
   EmployeeUpdateInput,
+  ExpenseCreateInput,
+  ExpenseDto,
+  ExpenseSummaryDto,
+  ExpenseUpdateInput,
   HrDashboardDto,
   HrSettingsDto,
   HrSettingsUpdateInput,
@@ -513,6 +517,18 @@ export const api = {
     }) => call<ReportDto>({ method: 'GET', path: '/reports/sales', query: params }),
     inventory: (params: InventoryReportQuery = {}) =>
       call<InventoryReportsDto>({ method: 'GET', path: '/reports/inventory', query: params }),
+  },
+
+  expenses: {
+    list: (params: ListParams) =>
+      call<Paginated<ExpenseDto>>({ method: 'GET', path: '/expenses', query: params }),
+    summary: (params: { from?: string; to?: string; category?: string } = {}) =>
+      call<ExpenseSummaryDto>({ method: 'GET', path: '/expenses/summary', query: params }),
+    create: (body: ExpenseCreateInput) =>
+      call<ExpenseDto>({ method: 'POST', path: '/expenses', body }),
+    update: (id: string, body: ExpenseUpdateInput) =>
+      call<ExpenseDto>({ method: 'PATCH', path: `/expenses/${id}`, body }),
+    remove: (id: string) => call<{ ok: boolean }>({ method: 'DELETE', path: `/expenses/${id}` }),
   },
 
   purchasing: {

@@ -5,6 +5,7 @@ import enCommon from './locales/en/common.json';
 import enCustomers from './locales/en/customers.json';
 import enDashboard from './locales/en/dashboard.json';
 import enDelivery from './locales/en/delivery.json';
+import enExpenses from './locales/en/expenses.json';
 import enHr from './locales/en/hr.json';
 import enInventory from './locales/en/inventory.json';
 import enInvoices from './locales/en/invoices.json';
@@ -25,6 +26,7 @@ import arCommon from './locales/ar/common.json';
 import arCustomers from './locales/ar/customers.json';
 import arDashboard from './locales/ar/dashboard.json';
 import arDelivery from './locales/ar/delivery.json';
+import arExpenses from './locales/ar/expenses.json';
 import arHr from './locales/ar/hr.json';
 import arInventory from './locales/ar/inventory.json';
 import arInvoices from './locales/ar/invoices.json';
@@ -65,6 +67,7 @@ const en = {
   tables: enTables,
   branches: enBranches,
   hr: enHr,
+  expenses: enExpenses,
 };
 const ar = {
   ...arCommon,
@@ -87,6 +90,7 @@ const ar = {
   tables: arTables,
   branches: arBranches,
   hr: arHr,
+  expenses: arExpenses,
 };
 
 export const dictionaries = { en, ar };

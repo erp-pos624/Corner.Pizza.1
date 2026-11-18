@@ -401,7 +401,7 @@ export function DeliveryPage(): ReactElement {
       settlement.settledAt ? formatDateTime(settlement.settledAt) : '',
     ]);
 
-  const settlementExportName = `forno-driver-settlements-${todayIso()}`;
+  const settlementExportName = `corner-pizza-driver-settlements-${todayIso()}`;
 
   const exportCsv = (): void => {
     if (!settlementsQuery.data) return;

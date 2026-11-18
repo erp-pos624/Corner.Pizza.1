@@ -6,6 +6,7 @@ import type {
   DeliveryStatus,
   DiscountType,
   EmploymentStatus,
+  ExpenseCategory,
   IngredientUnit,
   InventoryMovementType,
   MenuKind,
@@ -166,6 +167,26 @@ export interface SupplierDto {
   address: string | null;
   notes: string | null;
   isActive: boolean;
+}
+
+export interface ExpenseDto {
+  id: string;
+  category: ExpenseCategory;
+  description: string;
+  amount: string;
+  expenseDate: string;
+  branchId: string | null;
+  branchName: string | null;
+  notes: string | null;
+  createdByName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExpenseSummaryDto {
+  total: string;
+  count: number;
+  byCategory: Array<{ category: ExpenseCategory; amount: string; count: number }>;
 }
 
 export interface IngredientCategoryDto {
@@ -485,8 +506,16 @@ export interface ReportSummary {
   tax: string;
   deliveryFees: string;
   cost: string;
+  /** Gross profit: revenue − discounts − ingredient cost + delivery. */
   profit: string;
   marginPct: number | null;
+  /** Paid payroll net salaries inside the range. */
+  salaries: string;
+  /** Operating expenses recorded inside the range. */
+  expenses: string;
+  /** Net profit: gross profit − salaries − operating expenses. */
+  netProfit: string;
+  netMarginPct: number | null;
 }
 
 export interface CashierPerformanceRow {
@@ -524,6 +553,7 @@ export interface ReportDto {
   ordersByType: ReportRow[];
   byChannel: ReportRow[];
   refunds: string;
+  expensesByCategory: Array<{ category: ExpenseCategory; amount: string; count: number }>;
 }
 
 export interface AuditEntryDto {
@@ -641,6 +671,18 @@ export interface PublicBranchDto {
   isOpenNow: boolean;
   acceptingOrders: boolean;
   closedReason: OnlineClosedReason | null;
+}
+
+/** Restaurant identity from dashboard Settings, localized for the storefront. */
+export interface PublicSettingsDto {
+  name: string;
+  nameEn: string;
+  nameAr: string | null;
+  address: string | null;
+  addressEn: string | null;
+  addressAr: string | null;
+  phone: string | null;
+  email: string | null;
 }
 
 export interface PublicCategoryDto {

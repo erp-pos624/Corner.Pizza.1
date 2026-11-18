@@ -21,7 +21,7 @@ import { env } from '../../env.js';
 import { prisma } from '../../prisma.js';
 import { customerAccountRouter } from '../customer-account/customer-account.routes.js';
 import { quoteOrder } from '../orders/orders.service.js';
-import { checkPublicDelivery, getPublicMenu, listPublicBranches } from './public-menu.service.js';
+import { checkPublicDelivery, getPublicMenu, getPublicSettings, listPublicBranches } from './public-menu.service.js';
 import { placePublicOrder } from './public-order.service.js';
 
 export const publicRouter = Router();
@@ -43,6 +43,13 @@ publicRouter.get(
   '/branches',
   asyncHandler(async (_req, res) => {
     res.status(200).json(await listPublicBranches());
+  }),
+);
+
+publicRouter.get(
+  '/settings',
+  asyncHandler(async (_req, res) => {
+    res.status(200).json(await getPublicSettings());
   }),
 );
 

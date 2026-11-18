@@ -1,0 +1,72 @@
+{
+  "title": "المصروفات",
+  "filters": {
+    "from": "من",
+    "to": "إلى",
+    "category": "التصنيف",
+    "allCategories": "كل التصنيفات",
+    "branch": "الفرع",
+    "allBranches": "كل الفروع",
+    "apply": "تطبيق"
+  },
+  "stats": {
+    "total": "إجمالي المصروفات",
+    "totalHint": "المسجلة في هذه الفترة",
+    "entries": "البنود",
+    "entriesHint": "سجلات المصروفات",
+    "top": "أكبر تصنيف",
+    "topHint": "{amount} في {count} بندًا",
+    "none": "لا يوجد سجل بعد"
+  },
+  "table": {
+    "date": "التاريخ",
+    "category": "التصنيف",
+    "description": "الوصف",
+    "branch": "الفرع",
+    "recordedBy": "سجّله",
+    "amount": "المبلغ",
+    "actions": "إجراءات"
+  },
+  "empty": {
+    "title": "لا مصروفات في هذه الفترة",
+    "message": "سجّل الإيجار والكهرباء والمياه وغيرها من التكاليف التشغيلية ليتم خصمها من صافي الربح."
+  },
+  "error": "تعذر تحميل المصروفات",
+  "categories": {
+    "RENT": "إيجار",
+    "UTILITIES": "كهرباء ومياه",
+    "MAINTENANCE": "صيانة",
+    "SUPPLIES": "مستلزمات",
+    "MARKETING": "تسويق",
+    "OTHER": "أخرى"
+  },
+  "form": {
+    "newTitle": "تسجيل مصروف",
+    "editTitle": "تعديل المصروف",
+    "category": "التصنيف",
+    "description": "الوصف",
+    "descriptionPlaceholder": "مثال: فاتورة كهرباء نوفمبر",
+    "amount": "المبلغ",
+    "date": "تاريخ المصروف",
+    "branch": "الفرع",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "تفاصيل اختيارية أو رقم الفاتورة أو المورد",
+    "save": "حفظ التغييرات",
+    "create": "تسجيل المصروف"
+  },
+  "delete": {
+    "title": "حذف المصروف؟",
+    "message": "سيُزال \"{description}\" من التقارير ومن صافي الربح.",
+    "confirm": "حذف"
+  },
+  "toast": {
+    "created": "تم تسجيل المصروف",
+    "updated": "تم تحديث المصروف",
+    "deleted": "تم حذف المصروف"
+  },
+  "validation": {
+    "description": "اكتب وصف المصروف",
+    "amount": "أدخل مبلغًا أكبر من صفر",
+    "date": "اختر تاريخ المصروف"
+  }
+}

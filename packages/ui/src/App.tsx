@@ -87,6 +87,9 @@ const HrSettingsPage = lazy(() =>
 const ReportsPage = lazy(() =>
   import('./pages/ReportsPage').then((m) => ({ default: m.ReportsPage })),
 );
+const ExpensesPage = lazy(() =>
+  import('./pages/ExpensesPage').then((m) => ({ default: m.ExpensesPage })),
+);
 const UsersPage = lazy(() => import('./pages/UsersPage').then((m) => ({ default: m.UsersPage })));
 const ShiftsPage = lazy(() =>
   import('./pages/ShiftsPage').then((m) => ({ default: m.ShiftsPage })),
@@ -352,6 +355,7 @@ function Shell({ routing }: Required<RootProps>): ReactElement {
           {page === 'salaryHistory' ? <SalaryHistoryPage /> : null}
           {page === 'hrSettings' ? <HrSettingsPage /> : null}
           {page === 'reports' ? <ReportsPage /> : null}
+          {page === 'expenses' ? <ExpensesPage /> : null}
           {page === 'users' ? <UsersPage /> : null}
           {page === 'branches' ? <BranchesPage /> : null}
           {page === 'shifts' ? <ShiftsPage /> : null}

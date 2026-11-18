@@ -13,6 +13,7 @@ import {
   type PublicMenuDto,
   type PublicOrderDto,
   type PublicQuoteDto,
+  type PublicSettingsDto,
 } from '@posshope/shared';
 
 /**
@@ -178,6 +179,7 @@ export interface OrderRequest {
 
 export const api = {
   branches: () => request<PublicBranchDto[]>('GET', '/branches'),
+  settings: () => request<PublicSettingsDto>('GET', '/settings'),
   menu: (branchId: string) =>
     request<PublicMenuDto>('GET', `/menu?branchId=${encodeURIComponent(branchId)}`),
   quote: (body: {

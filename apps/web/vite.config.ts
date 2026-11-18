@@ -73,6 +73,9 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       // Linked workspace package whose export list changes during development.
       exclude: ['@posshope/shared'],
+      // Lazy imports in @posshope/ui exports; prebundle them so the first
+      // export click does not race Vite's mid-session re-optimization.
+      include: ['html2pdf.js', 'write-excel-file/browser'],
     },
     build: {
       target: 'es2020',

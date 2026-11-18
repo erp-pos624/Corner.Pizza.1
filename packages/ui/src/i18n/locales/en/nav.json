@@ -35,7 +35,8 @@
     "adjustments": "Deductions & bonuses",
     "payroll": "Payroll",
     "salaryHistory": "Salary history",
-    "hrSettings": "HR settings"
+    "hrSettings": "HR settings",
+    "expenses": "Expenses"
   },
   "subtitles": {
     "dashboard": "Live restaurant performance and floor activity",
@@ -66,7 +67,8 @@
     "adjustments": "Manual deductions and bonuses before payroll closing",
     "payroll": "Monthly salary calculation, closing and payment status",
     "salaryHistory": "Closed payroll months and printable payslips",
-    "hrSettings": "Working hours, grace period and deduction rules"
+    "hrSettings": "Working hours, grace period and deduction rules",
+    "expenses": "Rent, utilities and running costs deducted from net profit"
   },
   "aria": {
     "expandNavigation": "Expand navigation",

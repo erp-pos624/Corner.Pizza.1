@@ -13,6 +13,7 @@ import { branchesRouter } from './modules/branches/branches.routes.js';
 import { customersRouter } from './modules/customers/customers.routes.js';
 import { deliveryRouter } from './modules/delivery/delivery.routes.js';
 import { deliveryZonesRouter } from './modules/delivery-zones/delivery-zones.routes.js';
+import { expensesRouter } from './modules/expenses/expenses.routes.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { hrRouter } from './modules/hr/hr.routes.js';
 import { inventoryRouter } from './modules/inventory/inventory.routes.js';
@@ -126,6 +127,7 @@ export function createApp(): Express {
   v1.use('/hr', hrRouter);
   v1.use('/purchasing', purchasingRouter);
   v1.use('/suppliers', suppliersRouter);
+  v1.use('/expenses', expensesRouter);
   v1.use('/reports', reportsRouter);
   v1.use('/shifts', shiftsRouter);
   v1.use('/settings', settingsRouter);
