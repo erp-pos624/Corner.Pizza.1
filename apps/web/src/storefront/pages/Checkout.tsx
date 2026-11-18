@@ -10,7 +10,7 @@ import { useI18n } from '../i18n';
 import { ApiError, api, errorMessage } from '../lib/api';
 import { formatMoney } from '../lib/format';
 import { rememberGuestOrder } from '../lib/guest-orders';
-import { useMenu } from '../lib/menu';
+import { useMenu, usePublicSettings } from '../lib/menu';
 import { toOrderItems, useCart } from '../store/cart';
 import { useCartDrawer } from '../store/cart-drawer';
 import { useSession } from '../store/session';
@@ -43,6 +43,10 @@ export function CheckoutPage(): ReactElement {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { menu, branch } = useMenu();
+  const { settings } = usePublicSettings();
+  // Dashboard Settings hold the restaurant's contact details; branches only
+  // fill in when Settings leave them empty.
+  const pickupAddress = settings?.address ?? branch?.address ?? null;
   const openDrawer = useCartDrawer((state) => state.openDrawer);
   const status = useSession((state) => state.status);
   const customer = useSession((state) => state.customer);
@@ -265,10 +269,10 @@ export function CheckoutPage(): ReactElement {
             </div>
             {!delivery && branch ? (
               <p className="mt-4 text-cream-dim">
-                {branch.address
+                {pickupAddress
                   ? t('checkout.collectFromAddress', {
                       branch: branch.name,
-                      address: branch.address,
+                      address: pickupAddress,
                     })
                   : t('checkout.collectFrom', { branch: branch.name })}
               </p>

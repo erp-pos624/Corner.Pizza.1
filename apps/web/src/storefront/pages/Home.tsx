@@ -35,7 +35,7 @@ import { MealImage, Notice } from '../components/ui';
 import { useI18n } from '../i18n';
 import { api, errorMessage } from '../lib/api';
 import { formatMoney, formatOpeningHours, slugify, startingPrice } from '../lib/format';
-import { useMenu } from '../lib/menu';
+import { useMenu, usePublicSettings } from '../lib/menu';
 
 function useDeliveryZones(
   enabled: boolean,
@@ -529,6 +529,11 @@ function Fulfilment({
   currency: string;
 }): ReactElement {
   const { t } = useI18n();
+  const { settings } = usePublicSettings();
+  // The restaurant's contact details live in dashboard Settings; the branch
+  // record is only a fallback for installations that fill branches instead.
+  const address = settings?.address ?? branch?.address ?? null;
+  const phone = settings?.phone ?? branch?.phone ?? null;
   return (
     <section className="page grid gap-4 pt-20 lg:grid-cols-2" aria-label={t('home.deliveryPickup')}>
       <div className="panel flex flex-col p-6 sm:p-8">
@@ -570,30 +575,32 @@ function Fulfilment({
           <h2 className="text-2xl font-semibold">{t('home.pickupTitle')}</h2>
         </div>
         <p className="mt-4 max-w-[52ch] text-cream-dim">{t('home.pickupBody')}</p>
-        {branch ? (
+        {address || phone || branch ? (
           <ul className="mt-6 space-y-3 border-y border-line py-3.5 text-[15px]">
-            {branch.address ? (
+            {address ? (
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                <span>{branch.address}</span>
+                <span>{address}</span>
               </li>
             ) : null}
-            {branch.phone ? (
+            {phone ? (
               <li className="flex gap-3">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                <a href={`tel:${branch.phone.replace(/\s/g, '')}`} className="hover:text-cream">
-                  {branch.phone}
+                <a href={`tel:${phone.replace(/\s/g, '')}`} className="hover:text-cream">
+                  {phone}
                 </a>
               </li>
             ) : null}
-            <li className="flex gap-3">
-              <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-              <span>
-                {t('footer.onlineOrders', {
-                  hours: formatOpeningHours(branch.onlineOpenTime, branch.onlineCloseTime, t),
-                })}
-              </span>
-            </li>
+            {branch ? (
+              <li className="flex gap-3">
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                <span>
+                  {t('footer.onlineOrders', {
+                    hours: formatOpeningHours(branch.onlineOpenTime, branch.onlineCloseTime, t),
+                  })}
+                </span>
+              </li>
+            ) : null}
           </ul>
         ) : null}
         <Link to="/meals" className="btn-primary mt-6 w-fit">
