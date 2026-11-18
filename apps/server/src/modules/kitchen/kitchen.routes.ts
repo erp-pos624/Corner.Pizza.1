@@ -21,8 +21,8 @@ const idParams = z.object({ id: idSchema });
 kitchenRouter.get(
   '/orders',
   authorize('kitchen:view'),
-  asyncHandler(async (_req, res) => {
-    res.status(200).json(await kitchenService.listKitchenOrders());
+  asyncHandler(async (req, res) => {
+    res.status(200).json(await kitchenService.listKitchenOrders(req.user!));
   }),
 );
 

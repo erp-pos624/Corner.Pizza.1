@@ -28,6 +28,7 @@ import { reportsRouter } from './modules/reports/reports.routes.js';
 import { settingsRouter } from './modules/settings/settings.routes.js';
 import { shiftsRouter } from './modules/shifts/shifts.routes.js';
 import { suppliersRouter } from './modules/suppliers/suppliers.routes.js';
+import { storefrontRouter } from './modules/storefront/storefront.routes.js';
 import { tablesRouter } from './modules/tables/tables.routes.js';
 import { uploadsRouter } from './modules/uploads/uploads.routes.js';
 import { buildOpenApiDocument, renderDocsPage } from './openapi.js';
@@ -127,6 +128,7 @@ export function createApp(): Express {
   v1.use('/hr', hrRouter);
   v1.use('/purchasing', purchasingRouter);
   v1.use('/suppliers', suppliersRouter);
+  v1.use('/storefront', storefrontRouter);
   v1.use('/expenses', expensesRouter);
   v1.use('/reports', reportsRouter);
   v1.use('/shifts', shiftsRouter);

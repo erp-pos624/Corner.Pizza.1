@@ -20,6 +20,7 @@ const MANAGEMENT_ROOTS = new Set([
   'inventory-reports',
   'customers',
   'online-store',
+  'storefront',
   'hr-dashboard',
   'employees',
   'attendance',

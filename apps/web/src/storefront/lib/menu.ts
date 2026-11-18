@@ -1,4 +1,10 @@
-import type { PublicBranchDto, PublicMenuDto, PublicSettingsDto } from '@posshope/shared';
+import {
+  DEFAULT_STOREFRONT_CONTENT,
+  type PublicBranchDto,
+  type PublicMenuDto,
+  type PublicSettingsDto,
+  type StorefrontContent,
+} from '@posshope/shared';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { create } from 'zustand';
@@ -29,6 +35,16 @@ export function usePublicSettings(): { settings: PublicSettingsDto | null } {
     staleTime: 60_000,
   });
   return { settings: query.data ?? null };
+}
+
+/** Home-page copy edited from the dashboard; defaults cover a missing column. */
+export function useStorefrontContent(): StorefrontContent {
+  const query = useQuery({
+    queryKey: ['storefront-content'],
+    queryFn: api.storefront,
+    staleTime: 60_000,
+  });
+  return query.data ?? DEFAULT_STOREFRONT_CONTENT;
 }
 
 /** The branch being ordered from: the saved choice, else the first one open. */

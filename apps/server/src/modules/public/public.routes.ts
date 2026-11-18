@@ -22,6 +22,7 @@ import { prisma } from '../../prisma.js';
 import { customerAccountRouter } from '../customer-account/customer-account.routes.js';
 import { quoteOrder } from '../orders/orders.service.js';
 import { checkPublicDelivery, getPublicMenu, getPublicSettings, listPublicBranches } from './public-menu.service.js';
+import { getStorefrontContent } from '../storefront/storefront.routes.js';
 import { placePublicOrder } from './public-order.service.js';
 
 export const publicRouter = Router();
@@ -50,6 +51,13 @@ publicRouter.get(
   '/settings',
   asyncHandler(async (_req, res) => {
     res.status(200).json(await getPublicSettings());
+  }),
+);
+
+publicRouter.get(
+  '/storefront',
+  asyncHandler(async (_req, res) => {
+    res.status(200).json(await getStorefrontContent());
   }),
 );
 

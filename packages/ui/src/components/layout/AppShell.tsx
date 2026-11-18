@@ -16,6 +16,7 @@ import {
   History,
   IdCard,
   LayoutDashboard,
+  LayoutTemplate,
   LogOut,
   Menu as MenuIcon,
   PanelLeftClose,
@@ -71,6 +72,7 @@ export type PageKey =
   | 'inventoryReports'
   | 'customers'
   | 'onlineStore'
+  | 'storefront'
   | 'hrDashboard'
   | 'employees'
   | 'attendance'
@@ -185,6 +187,12 @@ export const NAV_GROUPS: NavGroup[] = [
       },
       { key: 'customers', labelKey: 'nav.items.customers', icon: Users, adminOnly: true },
       { key: 'onlineStore', labelKey: 'nav.items.onlineStore', icon: Globe, adminOnly: true },
+      {
+        key: 'storefront',
+        labelKey: 'nav.items.storefront',
+        icon: LayoutTemplate,
+        adminOnly: true,
+      },
     ],
   },
   {

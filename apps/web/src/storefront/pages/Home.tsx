@@ -1,7 +1,10 @@
-import type {
-  PublicBranchDto,
-  PublicDeliveryCheckDto,
-  PublicMenuItemDto,
+import {
+  pickStorefrontLine,
+  type PublicBranchDto,
+  type PublicDeliveryCheckDto,
+  type PublicMenuItemDto,
+  type StorefrontContent,
+  type StorefrontLine,
 } from '@posshope/shared';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -35,7 +38,13 @@ import { MealImage, Notice } from '../components/ui';
 import { useI18n } from '../i18n';
 import { api, errorMessage } from '../lib/api';
 import { formatMoney, formatOpeningHours, slugify, startingPrice } from '../lib/format';
-import { useMenu, usePublicSettings } from '../lib/menu';
+import { useMenu, usePublicSettings, useStorefrontContent } from '../lib/menu';
+
+/** Picks the language's text with the admin's other-language copy as fallback. */
+function useLine(): (line: StorefrontLine) => string {
+  const { language } = useI18n();
+  return (line) => pickStorefrontLine(language, line);
+}
 
 function useDeliveryZones(
   enabled: boolean,
@@ -59,6 +68,7 @@ function Hero({
   spotlight,
   currency,
   deliveryFrom,
+  copy,
 }: {
   open: boolean | null;
   hours: string | null;
@@ -67,8 +77,10 @@ function Hero({
   spotlight: PublicMenuItemDto | null;
   currency: string;
   deliveryFrom: number | null;
+  copy: StorefrontContent['hero'];
 }): ReactElement {
   const { t } = useI18n();
+  const line = useLine();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const search = (event: FormEvent): void => {
@@ -106,13 +118,13 @@ function Hero({
           </div>
 
           <h1 className="display mt-6 text-[clamp(3rem,7.5vw,5.5rem)]">
-            {t('home.heroLine1')}
+            {line(copy.line1)}
             <br />
-            {t('home.heroLine2Body')}
+            {line(copy.line2)}
             <br />
-            <span className="text-gold">{t('home.heroLine2Accent')}</span>
+            <span className="text-gold">{line(copy.accent)}</span>
           </h1>
-          <p className="mt-6 max-w-[46ch] text-lg text-cream-dim">{t('home.heroLead')}</p>
+          <p className="mt-6 max-w-[46ch] text-lg text-cream-dim">{line(copy.lead)}</p>
 
           <form onSubmit={search} className="mt-8 max-w-xl" role="search">
             <label htmlFor="hero-search" className="sr-only">
@@ -125,41 +137,38 @@ function Hero({
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder={t('home.searchPlaceholder')}
+                placeholder={line(copy.searchPlaceholder)}
                 className="field h-14 rounded-full ps-12 pe-28 text-base"
               />
               <button
                 type="submit"
                 className="btn-primary absolute end-2 top-1/2 h-10 -translate-y-1/2 px-5"
               >
-                {t('home.search')}
+                {line(copy.searchButton)}
               </button>
             </div>
           </form>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Link to="/meals" className="btn-primary h-12 px-6 text-base">
-              {t('home.orderNow')}
+              {line(copy.primaryCta)}
               <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
             </Link>
             <Link to="/track" className="btn-ghost h-12 px-6">
-              {t('home.track')}
+              {line(copy.secondaryCta)}
             </Link>
           </div>
 
           <ul className="mt-10 grid max-w-xl grid-cols-2 gap-x-6 gap-y-4 border-t border-line pt-6 sm:grid-cols-3">
-            <li className="flex items-center gap-2.5">
-              <Flame className="h-5 w-5 shrink-0 text-gold" strokeWidth={1.75} />
-              <span className="text-sm text-cream-dim">{t('home.firedToOrder')}</span>
-            </li>
-            <li className="flex items-center gap-2.5">
-              <CreditCard className="h-5 w-5 shrink-0 text-gold" strokeWidth={1.75} />
-              <span className="text-sm text-cream-dim">{t('home.cashOrCard')}</span>
-            </li>
-            <li className="flex items-center gap-2.5">
-              <Bike className="h-5 w-5 shrink-0 text-gold" strokeWidth={1.75} />
-              <span className="text-sm text-cream-dim">{t('home.deliveryPickup')}</span>
-            </li>
+            {copy.bullets.map((bullet, index) => {
+              const Icon = BULLET_ICONS[index] ?? Flame;
+              return (
+                <li key={index} className="flex items-center gap-2.5">
+                  <Icon className="h-5 w-5 shrink-0 text-gold" strokeWidth={1.75} />
+                  <span className="text-sm text-cream-dim">{line(bullet)}</span>
+                </li>
+              );
+            })}
           </ul>
 
           {itemCount > 0 ? (
@@ -179,8 +188,8 @@ function Hero({
             aria-hidden="true"
           />
           <img
-            src={hero}
-            alt={t('home.heroAlt')}
+            src={copy.imageUrl ?? hero}
+            alt={line(copy.imageAlt)}
             className="relative h-full w-full animate-spin-in rounded-full object-cover shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]"
             // React 18 only passes the lower-case attribute through to the DOM.
             {...{ fetchpriority: 'high' }}
@@ -192,7 +201,7 @@ function Hero({
               className="group absolute end-0 top-6 hidden w-56 rounded-card border border-line bg-forest/90 p-4 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.85)] backdrop-blur transition duration-200 ease-out hover:border-cream-faint sm:block"
             >
               <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-cream-faint">
-                {t('home.fromOven')}
+                {line(copy.spotlightLabel)}
               </span>
               <span className="mt-1 block line-clamp-2 font-semibold leading-snug">
                 {spotlight.name}
@@ -211,7 +220,7 @@ function Hero({
 
           <div className="absolute bottom-6 start-0 hidden rounded-card border border-line bg-forest/90 p-4 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.85)] backdrop-blur sm:block">
             <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-cream-faint">
-              <Bike className="h-3.5 w-3.5 text-gold" /> {t('home.delivery')}
+              <Bike className="h-3.5 w-3.5 text-gold" /> {line(copy.deliveryLabel)}
             </span>
             <span className="mt-1 block font-semibold">
               {deliveryFrom != null
@@ -481,25 +490,20 @@ function Spotlight({
 
 const STEP_ICONS = [UtensilsCrossed, ChefHat, Bike];
 
-function HowItWorks(): ReactElement {
-  const { t } = useI18n();
-  const steps = [
-    { title: t('home.step1Title'), body: t('home.step1Body') },
-    { title: t('home.step2Title'), body: t('home.step2Body') },
-    { title: t('home.step3Title'), body: t('home.step3Body') },
-  ];
+function HowItWorks({ copy }: { copy: StorefrontContent['how'] }): ReactElement {
+  const line = useLine();
   return (
     <section className="page pt-20" aria-labelledby="how-heading">
       <SectionHeading
         id="how-heading"
-        title={t('home.howTitle')}
-        lead={t('home.howLead')}
+        title={line(copy.title)}
+        lead={line(copy.lead)}
       />
       <ol className="grid gap-4 md:grid-cols-3">
-        {steps.map(({ title, body }, index) => {
-          const Icon = STEP_ICONS[index];
+        {copy.steps.map((step, index) => {
+          const Icon = STEP_ICONS[index] ?? UtensilsCrossed;
           return (
-            <li key={title} className="panel relative p-6">
+            <li key={index} className="panel relative p-6">
               <span
                 className="price absolute end-5 top-5 text-sm font-semibold text-cream-faint"
                 aria-hidden="true"
@@ -509,8 +513,8 @@ function HowItWorks(): ReactElement {
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold/15 text-gold">
                 <Icon className="h-5 w-5" strokeWidth={1.75} />
               </span>
-              <h3 className="mt-5 text-lg font-semibold">{title}</h3>
-              <p className="mt-2 text-[15px] text-cream-dim">{body}</p>
+              <h3 className="mt-5 text-lg font-semibold">{line(step.title)}</h3>
+              <p className="mt-2 text-[15px] text-cream-dim">{line(step.body)}</p>
             </li>
           );
         })}
@@ -523,12 +527,15 @@ function Fulfilment({
   zones,
   branch,
   currency,
+  copy,
 }: {
   zones: PublicDeliveryCheckDto | undefined;
   branch: PublicBranchDto | null;
   currency: string;
+  copy: Pick<StorefrontContent, 'deliveryCard' | 'pickupCard'>;
 }): ReactElement {
   const { t } = useI18n();
+  const line = useLine();
   const { settings } = usePublicSettings();
   // The restaurant's contact details live in dashboard Settings; the branch
   // record is only a fallback for installations that fill branches instead.
@@ -541,9 +548,9 @@ function Fulfilment({
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold/15 text-gold">
             <Bike className="h-5 w-5" strokeWidth={1.75} />
           </span>
-          <h2 className="text-2xl font-semibold">{t('home.deliveredTitle')}</h2>
+          <h2 className="text-2xl font-semibold">{line(copy.deliveryCard.title)}</h2>
         </div>
-        <p className="mt-4 max-w-[52ch] text-cream-dim">{t('home.deliveredBody')}</p>
+        <p className="mt-4 max-w-[52ch] text-cream-dim">{line(copy.deliveryCard.body)}</p>
         {zones && zones.zones.length > 0 ? (
           <dl className="mt-6 divide-y divide-line border-y border-line">
             {zones.zones.map((zone) => (
@@ -562,7 +569,7 @@ function Fulfilment({
           </dl>
         ) : (
           <p className="mt-6 border-y border-line py-3.5 text-sm text-cream-faint">
-            {t('home.feesBeforePay')}
+            {line(copy.deliveryCard.feesNote)}
           </p>
         )}
       </div>
@@ -572,9 +579,9 @@ function Fulfilment({
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold/15 text-gold">
             <Store className="h-5 w-5" strokeWidth={1.75} />
           </span>
-          <h2 className="text-2xl font-semibold">{t('home.pickupTitle')}</h2>
+          <h2 className="text-2xl font-semibold">{line(copy.pickupCard.title)}</h2>
         </div>
-        <p className="mt-4 max-w-[52ch] text-cream-dim">{t('home.pickupBody')}</p>
+        <p className="mt-4 max-w-[52ch] text-cream-dim">{line(copy.pickupCard.body)}</p>
         {address || phone || branch ? (
           <ul className="mt-6 space-y-3 border-y border-line py-3.5 text-[15px]">
             {address ? (
@@ -612,8 +619,8 @@ function Fulfilment({
   );
 }
 
-function ClosingCta(): ReactElement {
-  const { t } = useI18n();
+function ClosingCta({ copy }: { copy: StorefrontContent['closing'] }): ReactElement {
+  const line = useLine();
   return (
     <section className="page pt-20">
       <div className="relative overflow-hidden rounded-card border border-line bg-gradient-to-br from-forest-3 via-forest-2 to-forest px-6 py-10 sm:px-12 sm:py-14">
@@ -623,11 +630,11 @@ function ClosingCta(): ReactElement {
         />
         <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div>
-            <h2 className="display text-4xl sm:text-5xl">{t('home.hungryTitle')}</h2>
-            <p className="mt-3 max-w-[46ch] text-cream-dim">{t('home.hungryBody')}</p>
+            <h2 className="display text-4xl sm:text-5xl">{line(copy.title)}</h2>
+            <p className="mt-3 max-w-[46ch] text-cream-dim">{line(copy.body)}</p>
           </div>
           <Link to="/meals" className="btn-primary h-12 shrink-0 px-7 text-base">
-            {t('home.startOrder')}
+            {line(copy.cta)}
             <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
           </Link>
         </div>
@@ -636,6 +643,8 @@ function ClosingCta(): ReactElement {
   );
 }
 
+const BULLET_ICONS = [Flame, CreditCard, Bike] as const;
+
 /** One wrapper so the scrolling sections share the same rhythm. */
 function SectionBlock({ children }: { children: ReactNode }): ReactElement {
   return <section className="page pt-16 sm:pt-20">{children}</section>;
@@ -643,6 +652,8 @@ function SectionBlock({ children }: { children: ReactNode }): ReactElement {
 
 export function HomePage(): ReactElement {
   const { t } = useI18n();
+  const line = useLine();
+  const content = useStorefrontContent();
   const { menu, branch, isLoading, error } = useMenu();
   const zones = useDeliveryZones(
     Boolean(branch),
@@ -688,6 +699,7 @@ export function HomePage(): ReactElement {
         spotlight={spotlight}
         currency={currency}
         deliveryFrom={deliveryFrom}
+        copy={content.hero}
       />
 
       {error ? (
@@ -699,8 +711,8 @@ export function HomePage(): ReactElement {
       <SectionBlock>
         <SectionHeading
           id="categories-heading"
-          title={t('home.startTitle')}
-          lead={t('home.startLead')}
+          title={line(content.categories.title)}
+          lead={line(content.categories.lead)}
           href="/meals"
           linkLabel={t('home.openFullMenu')}
         />
@@ -710,8 +722,8 @@ export function HomePage(): ReactElement {
       {isLoading || popular.length > 0 ? (
         <SectionBlock>
           <SectionHeading
-            title={t('home.mostTitle')}
-            lead={t('home.mostLead')}
+            title={line(content.popular.title)}
+            lead={line(content.popular.lead)}
             href="/meals"
             linkLabel={t('home.seeEverything')}
           />
@@ -739,8 +751,8 @@ export function HomePage(): ReactElement {
           {featured.length > 1 ? (
             <SectionBlock>
               <SectionHeading
-                title={t('home.moreTitle')}
-                lead={t('home.moreLead')}
+                title={line(content.more.title)}
+                lead={line(content.more.lead)}
                 href="/meals"
                 linkLabel={t('home.seeFullMenu')}
               />
@@ -755,9 +767,14 @@ export function HomePage(): ReactElement {
         </>
       ) : null}
 
-      <HowItWorks />
-      <Fulfilment zones={zones.data} branch={branch} currency={currency} />
-      <ClosingCta />
+      <HowItWorks copy={content.how} />
+      <Fulfilment
+        zones={zones.data}
+        branch={branch}
+        currency={currency}
+        copy={{ deliveryCard: content.deliveryCard, pickupCard: content.pickupCard }}
+      />
+      <ClosingCta copy={content.closing} />
     </>
   );
 }

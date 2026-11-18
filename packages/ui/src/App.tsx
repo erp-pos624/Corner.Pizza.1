@@ -63,6 +63,9 @@ const CustomersPage = lazy(() =>
 const OnlineStorePage = lazy(() =>
   import('./pages/OnlineStorePage').then((m) => ({ default: m.OnlineStorePage })),
 );
+const StorefrontPage = lazy(() =>
+  import('./pages/StorefrontPage').then((m) => ({ default: m.StorefrontPage })),
+);
 const HrDashboardPage = lazy(() =>
   import('./pages/HrDashboardPage').then((m) => ({ default: m.HrDashboardPage })),
 );
@@ -347,6 +350,7 @@ function Shell({ routing }: Required<RootProps>): ReactElement {
           {page === 'inventoryReports' ? <InventoryReportsPage /> : null}
           {page === 'customers' ? <CustomersPage /> : null}
           {page === 'onlineStore' ? <OnlineStorePage /> : null}
+          {page === 'storefront' ? <StorefrontPage /> : null}
           {page === 'hrDashboard' ? <HrDashboardPage onNavigate={navigate} /> : null}
           {page === 'employees' ? <EmployeesPage /> : null}
           {page === 'attendance' ? <AttendancePage /> : null}

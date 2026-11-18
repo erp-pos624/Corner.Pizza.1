@@ -14,6 +14,7 @@ import {
   type PublicOrderDto,
   type PublicQuoteDto,
   type PublicSettingsDto,
+  type StorefrontContent,
 } from '@posshope/shared';
 
 /**
@@ -180,6 +181,7 @@ export interface OrderRequest {
 export const api = {
   branches: () => request<PublicBranchDto[]>('GET', '/branches'),
   settings: () => request<PublicSettingsDto>('GET', '/settings'),
+  storefront: () => request<StorefrontContent>('GET', '/storefront'),
   menu: (branchId: string) =>
     request<PublicMenuDto>('GET', `/menu?branchId=${encodeURIComponent(branchId)}`),
   quote: (body: {

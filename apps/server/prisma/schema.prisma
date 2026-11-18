@@ -1276,6 +1276,8 @@ model RestaurantSettings {
    * BLOCK refuses a sale that would drive stock negative; WARN allows it and raises an alert.
    */
   stockPolicy           StockPolicy @default(BLOCK)
+  /** Customer home-page copy edited from the dashboard; null means the defaults. */
+  storefront            Json?
   updatedAt             DateTime    @updatedAt
 
   @@map("restaurant_settings")

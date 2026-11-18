@@ -96,6 +96,7 @@ import type {
   StockTransferDto,
   StoreStockRowDto,
   StoreSummaryDto,
+  StorefrontContent,
   SupplierCreateInput,
   SupplierDto,
   TableCreateInput,
@@ -627,6 +628,12 @@ export const api = {
     get: () => call<SettingsDto>({ method: 'GET', path: '/settings' }),
     update: (body: SettingsUpdateInput) =>
       call<SettingsDto>({ method: 'PATCH', path: '/settings', body }),
+  },
+
+  storefront: {
+    get: () => call<StorefrontContent>({ method: 'GET', path: '/storefront' }),
+    update: (body: StorefrontContent) =>
+      call<StorefrontContent>({ method: 'PUT', path: '/storefront', body }),
   },
 
   users: {

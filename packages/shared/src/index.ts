@@ -12,6 +12,7 @@ export * from './i18n.js';
 export * from './money.js';
 export * from './geo.js';
 export * from './types.js';
+export * from './storefront.js';
 export * from './client.js';
 
 export * from './schemas/common.js';

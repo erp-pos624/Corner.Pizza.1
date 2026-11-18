@@ -62,11 +62,17 @@ export async function syncStockAlertsMany(
   tx: Tx,
   pairs: ReadonlyArray<{ ingredientId: string; branchId: string }>,
 ): Promise<void> {
-  const seen = new Set<string>();
+  const unique = new Map<string, { ingredientId: string; branchId: string }>();
   for (const pair of pairs) {
     const key = `${pair.branchId}:${pair.ingredientId}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
+    if (!unique.has(key)) unique.set(key, pair);
+  }
+  // Deterministic order matches the stock-row lock order used by order flow.
+  const ordered = [...unique.values()].sort(
+    (a, b) =>
+      a.branchId.localeCompare(b.branchId) || a.ingredientId.localeCompare(b.ingredientId),
+  );
+  for (const pair of ordered) {
     await syncStockAlerts(tx, pair.ingredientId, pair.branchId);
   }
 }

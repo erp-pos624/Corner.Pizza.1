@@ -19,16 +19,20 @@ const ACTIVE_KITCHEN_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'] a
 
 interface Actor {
   id: string;
+  branchId: string | null;
 }
 
 /**
- * Returns everything still in the kitchen plus the orders completed during the
- * current business day, oldest first so the most urgent ticket is on top.
+ * Returns today's kitchen queue: active tickets created during the current
+ * business day plus everything completed today, oldest first so the most
+ * urgent ticket is on top. Branch staff only see their own branch; abandoned
+ * tickets from previous days are handled on the orders screen, not here.
  */
-export async function listKitchenOrders(): Promise<KitchenQueueDto> {
+export async function listKitchenOrders(actor: Actor): Promise<KitchenQueueDto> {
   const dayStart = businessDayStart(todayInBusinessTimezone());
   const orders = await prisma.order.findMany({
     where: {
+      ...(actor.branchId ? { branchId: actor.branchId } : {}),
       AND: [
         // Unpaid card orders are only sent to the kitchen after capture.
         {
@@ -39,7 +43,7 @@ export async function listKitchenOrders(): Promise<KitchenQueueDto> {
         },
         {
           OR: [
-            { status: { in: [...ACTIVE_KITCHEN_STATUSES] } },
+            { AND: [{ status: { in: [...ACTIVE_KITCHEN_STATUSES] } }, { createdAt: { gte: dayStart } }] },
             { status: 'COMPLETED', completedAt: { gte: dayStart } },
           ],
         },

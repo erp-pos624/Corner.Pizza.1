@@ -1,0 +1,67 @@
+{
+  "intro": "Customer website home page",
+  "description": "Every headline, paragraph and photo on the customer home page. Saves apply to the live website immediately.",
+  "unsaved": "Unsaved changes",
+  "save": "Save changes",
+  "reset": "Reset to defaults",
+  "footer": "Resetting restores the built-in copy for both languages; save to publish it.",
+  "errors": {
+    "load": "Could not load the home-page content."
+  },
+  "toast": {
+    "saved": "Home page updated",
+    "savedMessage": "The customer website now shows the new content.",
+    "saveFailed": "Could not save the home page",
+    "uploaded": "Hero image uploaded",
+    "uploadFailed": "Could not upload the image"
+  },
+  "hero": {
+    "title": "Hero section",
+    "description": "The first screen visitors see — headline, intro, search box and photo.",
+    "upload": "Upload image",
+    "remove": "Use default",
+    "imageUrl": "Image URL",
+    "imageHint": "Square photos work best. When empty, the bundled pizza photo is used.",
+    "imageAlt": "Image description",
+    "line1": "Headline · line 1",
+    "line2": "Headline · line 2",
+    "accent": "Headline · highlighted line",
+    "lead": "Intro paragraph",
+    "searchPlaceholder": "Search placeholder",
+    "searchButton": "Search button",
+    "primaryCta": "Main button",
+    "secondaryCta": "Secondary button",
+    "bullets": "Highlights (3)",
+    "bullet": "Highlight {index}",
+    "spotlightLabel": "Featured item label",
+    "deliveryLabel": "Delivery label"
+  },
+  "sections": {
+    "title": "Section headings",
+    "description": "Titles and short introductions above each menu section.",
+    "categories": "Categories",
+    "popular": "Most ordered",
+    "more": "More favourites",
+    "headingTitle": "Title",
+    "headingLead": "Introduction"
+  },
+  "how": {
+    "title": "How ordering works",
+    "description": "The three-step explainer, including the headline above it.",
+    "step": "Step {index}",
+    "stepTitle": "Title",
+    "stepBody": "Text"
+  },
+  "fulfilment": {
+    "title": "Delivery & pickup",
+    "description": "The two cards under the menu. Address, phone and hours still come from Settings and the selected branch.",
+    "delivery": "Delivery card",
+    "pickup": "Pickup card",
+    "feesNote": "Fees note"
+  },
+  "closing": {
+    "title": "Closing banner",
+    "description": "The final call to action before the footer.",
+    "cta": "Button"
+  }
+}

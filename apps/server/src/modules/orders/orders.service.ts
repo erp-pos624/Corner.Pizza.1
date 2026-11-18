@@ -648,21 +648,28 @@ async function restoreOrderStock(
   }
   if (restore.size === 0) return { ingredients: 0, quantity: 0 };
 
+  // Acquire stock rows in the same ingredient-id order as consumeStock so
+  // concurrent creates and restores can never deadlock on each other.
+  const restoreIds = [...restore.keys()].sort();
   await tx.inventoryMovement.createMany({
-    data: [...restore.entries()].map(([ingredientId, entry]) => ({
-      ingredientId,
-      branchId: order.branchId,
-      orderId: order.id,
-      type: 'CANCELLATION_RETURN',
-      quantity: entry.quantity.toFixed(3),
-      unitCost: entry.unitCost === null ? null : entry.unitCost.toFixed(2),
-      note: `Cancelled order ${order.orderNumber}`,
-      userId,
-    })),
+    data: restoreIds.map((ingredientId) => {
+      const entry = restore.get(ingredientId)!;
+      return {
+        ingredientId,
+        branchId: order.branchId,
+        orderId: order.id,
+        type: 'CANCELLATION_RETURN' as const,
+        quantity: entry.quantity.toFixed(3),
+        unitCost: entry.unitCost === null ? null : entry.unitCost.toFixed(2),
+        note: `Cancelled order ${order.orderNumber}`,
+        userId,
+      };
+    }),
   });
 
   let total = 0;
-  for (const [ingredientId, entry] of restore.entries()) {
+  for (const ingredientId of restoreIds) {
+    const entry = restore.get(ingredientId)!;
     total += entry.quantity;
     await tx.ingredientStock.upsert({
       where: { ingredientId_branchId: { ingredientId, branchId: order.branchId } },
@@ -676,7 +683,7 @@ async function restoreOrderStock(
   }
   await syncStockAlertsMany(
     tx,
-    [...restore.keys()].map((ingredientId) => ({ ingredientId, branchId: order.branchId })),
+    restoreIds.map((ingredientId) => ({ ingredientId, branchId: order.branchId })),
   );
   return { ingredients: restore.size, quantity: total };
 }
@@ -1041,6 +1048,10 @@ export async function createOrder(
   return toOrderDto(order);
 }
 
+async function lockOrderRow(tx: Prisma.TransactionClient, orderId: string): Promise<void> {
+  await tx.$queryRaw`SELECT id FROM "orders" WHERE id = ${orderId} FOR UPDATE`;
+}
+
 export async function addOrderItems(
   orderId: string,
   input: OrderAddItemsInput,
@@ -1063,16 +1074,26 @@ export async function addOrderItems(
   );
   const prepared = prepareLines(input.items, menuById, toppingById);
   const requisitions = buildStockRequisitions(prepared);
-
   const addedSubtotalMinor = prepared.reduce((sum, line) => sum + moneyMinor(line.lineTotal), 0);
-  const newSubtotalMinor = moneyMinor(Number(order.subtotal).toFixed(2)) + addedSubtotalMinor;
-  const discountMinor = Math.min(moneyMinor(Number(order.discount).toFixed(2)), newSubtotalMinor);
-  const taxableMinor = Math.max(newSubtotalMinor - discountMinor, 0);
-  const taxMinor = Math.round((taxableMinor * Number(settings.taxRate)) / 100);
-  const deliveryMinor = moneyMinor(Number(order.deliveryFee).toFixed(2));
-  const totalMinor = taxableMinor + taxMinor + deliveryMinor;
 
   const updated = await prisma.$transaction(async (tx) => {
+    // Serialize tab edits so parallel additions never lose a subtotal update.
+    await lockOrderRow(tx, order.id);
+    const current = await tx.order.findUniqueOrThrow({ where: { id: order.id } });
+    if (current.status === 'CANCELLED') {
+      throw new ConflictError('Cancelled orders cannot be modified');
+    }
+    if (current.paymentStatus !== 'UNPAID') {
+      throw new ConflictError('Only open tabs can receive extra items');
+    }
+
+    const newSubtotalMinor = moneyMinor(Number(current.subtotal).toFixed(2)) + addedSubtotalMinor;
+    const discountMinor = Math.min(moneyMinor(Number(current.discount).toFixed(2)), newSubtotalMinor);
+    const taxableMinor = Math.max(newSubtotalMinor - discountMinor, 0);
+    const taxMinor = Math.round((taxableMinor * Number(settings.taxRate)) / 100);
+    const deliveryMinor = moneyMinor(Number(current.deliveryFee).toFixed(2));
+    const totalMinor = taxableMinor + taxMinor + deliveryMinor;
+
     const claimed = await tx.order.updateMany({
       where: { id: order.id, paymentStatus: 'UNPAID', status: { not: 'CANCELLED' } },
       data: {
@@ -1081,7 +1102,7 @@ export async function addOrderItems(
         tax: fromMinorUnits(taxMinor),
         total: fromMinorUnits(totalMinor),
         // New items must reach the kitchen even if the tab was already served.
-        ...(order.status !== 'PENDING' ? { status: 'PENDING' as const, completedAt: null } : {}),
+        ...(current.status !== 'PENDING' ? { status: 'PENDING' as const, completedAt: null } : {}),
       },
     });
     if (claimed.count === 0) {
@@ -1092,14 +1113,14 @@ export async function addOrderItems(
       await tx.orderItem.create({ data: { orderId: order.id, ...lineCreateData(line) } });
     }
 
-    if (order.inventoryDeducted) {
-      await consumeStock(tx, requisitions, order.branchId, order.id, actor.id, {
+    if (current.inventoryDeducted) {
+      await consumeStock(tx, requisitions, current.branchId, order.id, actor.id, {
         allowNegative: settings.stockPolicy === 'WARN',
       });
     } else {
       // The tab is not paid yet, so stock is not touched; extend the snapshot
       // that will be committed when the tab is settled.
-      const plan = requisitionsFromPlan(order.stockPlan);
+      const plan = requisitionsFromPlan(current.stockPlan);
       for (const [ingredientId, entry] of requisitions) {
         const existing = plan.get(ingredientId);
         if (existing) {
@@ -1237,6 +1258,15 @@ export async function refundOrder(
   const shiftId = openShift?.id ?? order.shiftId ?? null;
 
   const updated = await prisma.$transaction(async (tx) => {
+    // Serialize refunds for this order: without the lock two requests each see
+    // the full remaining balance and both refund it, and a full refund restores
+    // inventory twice.
+    await lockOrderRow(tx, order.id);
+    const current = await tx.order.findUniqueOrThrow({ where: { id: order.id } });
+    if (current.status === 'CANCELLED') {
+      throw new ConflictError('Cancelled orders are refunded through the cancellation flow');
+    }
+
     const [payments, refunds] = await Promise.all([
       tx.payment.findMany({
         where: { orderId: order.id },
@@ -1293,8 +1323,8 @@ export async function refundOrder(
     // stock once (guarded by inventoryRestored against duplicate refunds).
     if (
       refundedMinor + amountMinor >= paidMinor &&
-      order.inventoryDeducted &&
-      !order.inventoryRestored
+      current.inventoryDeducted &&
+      !current.inventoryRestored
     ) {
       const movements = await tx.inventoryMovement.findMany({
         where: { orderId: order.id, type: 'SALE_DEDUCTION' },
@@ -1319,7 +1349,7 @@ export async function refundOrder(
         action: 'order.refunded',
         entityType: 'Order',
         entityId: order.id,
-        before: { paymentStatus: order.paymentStatus, refunded: fromMinorUnits(refundedMinor) },
+        before: { paymentStatus: current.paymentStatus, refunded: fromMinorUnits(refundedMinor) },
         after: {
           paymentStatus,
           refunded: fromMinorUnits(refundedMinor + amountMinor),
