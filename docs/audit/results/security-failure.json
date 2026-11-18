@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-11-18T20:29:38.587Z",
+  "results": [
+    {
+      "phase": "security",
+      "name": "kitchen board is branch-scoped",
+      "status": "PASS",
+      "detail": "branch-B staff saw 0, admin saw 288"
+    },
+    {
+      "phase": "security",
+      "name": "cashier blocked from kitchen board",
+      "status": "PASS",
+      "detail": "status 403"
+    },
+    {
+      "phase": "security",
+      "name": "cashier blocked from reports",
+      "status": "PASS",
+      "detail": "status 403"
+    },
+    {
+      "phase": "security",
+      "name": "cashier blocked from user admin",
+      "status": "PASS",
+      "detail": "status 403"
+    },
+    {
+      "phase": "security",
+      "name": "account lockout after repeated failures",
+      "status": "PASS",
+      "detail": "status 401, lockedUntil 2026-11-18T20:44:21.861Z"
+    },
+    {
+      "phase": "security",
+      "name": "SQL injection in login is rejected",
+      "status": "PASS",
+      "detail": "status 401"
+    },
+    {
+      "phase": "security",
+      "name": "injection in order filters stays a parameter",
+      "status": "PASS",
+      "detail": "status 200"
+    },
+    {
+      "phase": "security",
+      "name": "injection in public menu branch is rejected",
+      "status": "PASS",
+      "detail": "status 404, items 0"
+    },
+    {
+      "phase": "security",
+      "name": "reflected markup is returned as JSON only",
+      "status": "PASS",
+      "detail": "content-type application/json; charset=utf-8, status 404"
+    },
+    {
+      "phase": "security",
+      "name": "cookie refresh requires the web-client header",
+      "status": "PASS",
+      "detail": "without header 403, with header 401"
+    },
+    {
+      "phase": "security",
+      "name": "login attempts are rate limited per IP",
+      "status": "PASS",
+      "detail": "{\"401\":10,\"429\":14}"
+    },
+    {
+      "phase": "failure",
+      "name": "database outage is contained and recovers",
+      "status": "PASS",
+      "detail": "during 500/503, recovery 16079ms, after 200/200, rows 50000->50000"
+    },
+    {
+      "phase": "failure",
+      "name": "rejected order leaves no partial rows",
+      "status": "PASS",
+      "detail": "quote 400, create 400, orders 50000->50000"
+    },
+    {
+      "phase": "failure",
+      "name": "idempotent create returns one order",
+      "status": "PASS",
+      "detail": "first 201, replay 201, rows 1"
+    }
+  ]
+}

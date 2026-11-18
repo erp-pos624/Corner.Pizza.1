@@ -1,0 +1,320 @@
+{
+  "base": "http://127.0.0.1:4110",
+  "ranAt": "2026-11-18T19:01:07.793Z",
+  "passed": 49,
+  "failed": 0,
+  "results": [
+    {
+      "name": "health and readiness",
+      "status": "PASS",
+      "detail": "db 1ms",
+      "ms": 37
+    },
+    {
+      "name": "public catalog endpoints respond",
+      "status": "PASS",
+      "detail": "6 branch(es), 55 item(s)",
+      "ms": 198
+    },
+    {
+      "name": "wrong password and unknown user are rejected",
+      "status": "PASS",
+      "detail": "",
+      "ms": 52
+    },
+    {
+      "name": "all staff roles can sign in",
+      "status": "PASS",
+      "detail": "admin, 2 cashiers, kitchen, driver",
+      "ms": 82
+    },
+    {
+      "name": "unauthenticated and tampered tokens are rejected",
+      "status": "PASS",
+      "detail": "",
+      "ms": 4
+    },
+    {
+      "name": "role matrix blocks cashier, kitchen and driver where documented",
+      "status": "PASS",
+      "detail": "6 denials",
+      "ms": 15
+    },
+    {
+      "name": "auth/me returns the signed-in role",
+      "status": "PASS",
+      "detail": "",
+      "ms": 4
+    },
+    {
+      "name": "refresh rotation invalidates the old token",
+      "status": "PASS",
+      "detail": "rotated once, reuse rejected",
+      "ms": 28
+    },
+    {
+      "name": "web origin policy",
+      "status": "INFO",
+      "detail": "foreign origin returned 200 outside production (by design)",
+      "ms": 0
+    },
+    {
+      "name": "web auth requires the web-client header",
+      "status": "PASS",
+      "detail": "",
+      "ms": 31
+    },
+    {
+      "name": "account locks after repeated failures",
+      "status": "PASS",
+      "detail": "locked after 5 failures",
+      "ms": 82
+    },
+    {
+      "name": "temporary passwords are restricted to password change",
+      "status": "PASS",
+      "detail": "",
+      "ms": 95
+    },
+    {
+      "name": "catalog sample",
+      "status": "INFO",
+      "detail": "55 items, 18 toppings",
+      "ms": 0
+    },
+    {
+      "name": "seed catalog is readable with prices",
+      "status": "PASS",
+      "detail": "",
+      "ms": 25
+    },
+    {
+      "name": "create ingredient, category, topping, menu item, size and recipe",
+      "status": "PASS",
+      "detail": "item cmwmhlomo002cq6b00t9bz3ai",
+      "ms": 52
+    },
+    {
+      "name": "menu validation rejects bad payloads and uniquifies duplicate SKUs",
+      "status": "PASS",
+      "detail": "duplicate sku stored as AUD-A465209-2",
+      "ms": 17
+    },
+    {
+      "name": "quote computes subtotal, 14% tax, topping and size surcharge",
+      "status": "PASS",
+      "detail": "takeaway 285.00, delivery 156.80",
+      "ms": 15
+    },
+    {
+      "name": "discount caps: cashier blocked above 20%, admin allowed",
+      "status": "PASS",
+      "detail": "cashier 403, admin total 95.76",
+      "ms": 54
+    },
+    {
+      "name": "inactive items are rejected by checkout",
+      "status": "PASS",
+      "detail": "",
+      "ms": 24
+    },
+    {
+      "name": "cash order is created atomically with payment, invoice and stock",
+      "status": "PASS",
+      "detail": "order ORD-20261118-4F9483, stock 999.9 -> 999.8",
+      "ms": 43
+    },
+    {
+      "name": "idempotency key replays the same order and blocks another user",
+      "status": "PASS",
+      "detail": "replayed ORD-20261118-0D0CEA",
+      "ms": 35
+    },
+    {
+      "name": "open tab can receive items and settle with split payment",
+      "status": "PASS",
+      "detail": "tab ORD-20261118-750AAD settled 273.60",
+      "ms": 67
+    },
+    {
+      "name": "status transitions follow the documented graph",
+      "status": "PASS",
+      "detail": "invalid skip rejected, valid path accepted",
+      "ms": 42
+    },
+    {
+      "name": "kitchen board hides prices and customer phone; kitchen updates status",
+      "status": "PASS",
+      "detail": "101 tickets, no financial fields, advanced to ready",
+      "ms": 31
+    },
+    {
+      "name": "completed order cannot be cancelled; open tab cancel succeeds",
+      "status": "PASS",
+      "detail": "completed blocked, paid order cancelled and refunded",
+      "ms": 102
+    },
+    {
+      "name": "partial then full refund; over-refund and double refund rejected",
+      "status": "PASS",
+      "detail": "36.80 + 100.00 refunded, extras rejected",
+      "ms": 75
+    },
+    {
+      "name": "insufficient stock blocks checkout with shortages",
+      "status": "PASS",
+      "detail": "order rejected, shortage reported",
+      "ms": 41
+    },
+    {
+      "name": "concurrent checkouts cannot oversell the last stock unit",
+      "status": "PASS",
+      "detail": "1 success, 4 stock conflicts",
+      "ms": 59
+    },
+    {
+      "name": "parallel idempotent creates yield one order",
+      "status": "PASS",
+      "detail": "5 requests, 1 order cmwmhlp4f008eq6b0nnxmwthq",
+      "ms": 73
+    },
+    {
+      "name": "parallel settles produce exactly one winner",
+      "status": "PASS",
+      "detail": "1 settled, 4 conflicts",
+      "ms": 56
+    },
+    {
+      "name": "parallel add-items preserve every line (no lost update)",
+      "status": "PASS",
+      "detail": "subtotal 480.00",
+      "ms": 74
+    },
+    {
+      "name": "parallel full refunds cannot exceed captured payment",
+      "status": "PASS",
+      "detail": "exactly one refund accepted",
+      "ms": 44
+    },
+    {
+      "name": "parallel full refunds restore stock only once",
+      "status": "PASS",
+      "detail": "one refund effective, stock 999.1",
+      "ms": 59
+    },
+    {
+      "name": "stock adjustment, waste and movement ledger",
+      "status": "PASS",
+      "detail": "4 movement types recorded",
+      "ms": 25
+    },
+    {
+      "name": "stocktake completes and locks counted quantity",
+      "status": "PASS",
+      "detail": "raised to 1005.1",
+      "ms": 31
+    },
+    {
+      "name": "purchase order lifecycle updates stock and average cost",
+      "status": "PASS",
+      "detail": "PO received, stock 1015.1",
+      "ms": 64
+    },
+    {
+      "name": "cross-branch transfer moves stock both ways",
+      "status": "PASS",
+      "detail": "2 units at branch AUD5209",
+      "ms": 45
+    },
+    {
+      "name": "shift opens, receives cash movements and closes with Z-report",
+      "status": "PASS",
+      "detail": "expected 286.80, variance 0.00",
+      "ms": 69
+    },
+    {
+      "name": "delivery order resolves zone fee, assigns driver, driver delivers",
+      "status": "PASS",
+      "detail": "fee 20.00, delivered by Youssef Adel",
+      "ms": 53
+    },
+    {
+      "name": "driver settlement aggregates COD and settles",
+      "status": "PASS",
+      "detail": "6 COD order(s), 784.00 collected, variance 0",
+      "ms": 35
+    },
+    {
+      "name": "public card checkout captures via simulated gateway exactly once",
+      "status": "PASS",
+      "detail": "ref PAY-ORD-20261118-F14335 captured, duplicate ignored",
+      "ms": 64
+    },
+    {
+      "name": "webhook without a configured secret returns 503",
+      "status": "PASS",
+      "detail": "HTTP 503",
+      "ms": 1
+    },
+    {
+      "name": "delivery zone lookup and rejection outside all zones",
+      "status": "PASS",
+      "detail": "inside fee 20.00",
+      "ms": 11
+    },
+    {
+      "name": "payroll",
+      "status": "INFO",
+      "detail": "November run already present with 6 line(s)",
+      "ms": 0
+    },
+    {
+      "name": "employee, attendance, adjustment and payroll run",
+      "status": "PASS",
+      "detail": "existing run 2026-11",
+      "ms": 41
+    },
+    {
+      "name": "expense is created and appears in the summary",
+      "status": "PASS",
+      "detail": "123.45 recorded",
+      "ms": 14
+    },
+    {
+      "name": "settings change is applied to pricing and can be restored",
+      "status": "PASS",
+      "detail": "15% applied to quote, restored",
+      "ms": 17
+    },
+    {
+      "name": "dashboard and sales report respond with consistent totals",
+      "status": "PASS",
+      "detail": "179 orders, revenue 90714.36",
+      "ms": 406
+    },
+    {
+      "name": "audit trail records privileged mutations and is role-guarded",
+      "status": "PASS",
+      "detail": "5 recent entries",
+      "ms": 15
+    },
+    {
+      "name": "cashier cannot read another branch order",
+      "status": "PASS",
+      "detail": "cross-branch read denied",
+      "ms": 51
+    },
+    {
+      "name": "upload validation: non-image rejected, storage absent returns 503",
+      "status": "PASS",
+      "detail": "png -> 503 (storage config absent)",
+      "ms": 5
+    },
+    {
+      "name": "SQL injection probes are treated as literals",
+      "status": "PASS",
+      "detail": "both filters treated as literal text",
+      "ms": 11
+    }
+  ]
+}

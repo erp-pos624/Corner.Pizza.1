@@ -1,0 +1,82 @@
+{
+  "profile": "mixed",
+  "api": "http://127.0.0.1:4110",
+  "seconds": 15,
+  "stages": [
+    {
+      "users": 100,
+      "seconds": 15.4,
+      "requests": 2410,
+      "rps": 156.2,
+      "latency": {
+        "count": 2410,
+        "avgMs": 620.3,
+        "p50Ms": 631.2,
+        "p95Ms": 834.2,
+        "p99Ms": 2209.3,
+        "maxMs": 7498.5
+      },
+      "byEndpoint": {
+        "orders:list": {
+          "count": 1031,
+          "avgMs": 592.7,
+          "p50Ms": 606.2,
+          "p95Ms": 709.2,
+          "p99Ms": 748.8,
+          "maxMs": 840.8
+        },
+        "public:menu": {
+          "count": 1000,
+          "avgMs": 706.5,
+          "p50Ms": 722.7,
+          "p95Ms": 858.6,
+          "p99Ms": 934.4,
+          "maxMs": 1487.2
+        },
+        "public:quote": {
+          "count": 252,
+          "avgMs": 220,
+          "p50Ms": 127.2,
+          "p95Ms": 615.5,
+          "p99Ms": 618.9,
+          "maxMs": 619.5
+        },
+        "orders:create": {
+          "count": 127,
+          "avgMs": 960.6,
+          "p50Ms": 0,
+          "p95Ms": 4709.2,
+          "p99Ms": 5852,
+          "maxMs": 7498.5
+        }
+      },
+      "statuses": {
+        "orders:create:201": 40,
+        "orders:create:429": 87,
+        "orders:list:200": 1031,
+        "public:menu:200": 1000,
+        "public:quote:200": 80,
+        "public:quote:429": 172
+      },
+      "errors": {},
+      "throttled": 259,
+      "serverErrors": 0,
+      "timeouts": 0,
+      "db": {
+        "connectionsStart": 18,
+        "connectionsEnd": 18,
+        "activePeak": 19,
+        "lockWaitPeak": 11,
+        "deadlocks": 0,
+        "rollbacks": 0,
+        "commits": 26256
+      },
+      "process": {
+        "rssStartMb": 164,
+        "rssEndMb": 348,
+        "rssPeakMb": 348,
+        "cpuPct": 265.9
+      }
+    }
+  ]
+}

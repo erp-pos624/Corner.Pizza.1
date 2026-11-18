@@ -1,0 +1,245 @@
+{
+  "runTag": "sim-1795032064921",
+  "startedAt": "2026-11-18T20:01:04.922Z",
+  "durationSeconds": 521,
+  "configuration": {
+    "days": 30,
+    "perDay": 1000,
+    "concurrency": 12,
+    "totalOrders": 30000,
+    "horizonDays": 1825,
+    "recent": true
+  },
+  "counters": {
+    "created": 30000,
+    "settled": 4526,
+    "cancelled": 338,
+    "refunded": 800,
+    "completed": 6839,
+    "delivered": 4763,
+    "failed": 0
+  },
+  "stepErrors": {
+    "cancel": 6,
+    "refund": 13
+  },
+  "latencyMs": {
+    "create": {
+      "p50": 52.1929,
+      "p95": 164.7242,
+      "p99": 279.9627,
+      "avg": 62.9856278466669
+    },
+    "settle": {
+      "p50": 65.4804,
+      "p95": 188.8817,
+      "count": 4526
+    },
+    "event": {
+      "p50": 76.8519,
+      "p95": 234.026,
+      "p99": 4294.553
+    },
+    "throughputOrdersPerSecond": 57.55252147188655
+  },
+  "storage": {
+    "databaseBytesBefore": 264891539,
+    "databaseBytesAfter": 530467987,
+    "bytesPerOrder": 8853,
+    "freeDiskBytes": 11611508736,
+    "projectedFiveYearBytes": 16155900587,
+    "fiveYearTargetOrders": 1825000,
+    "fullTargetFeasible": false,
+    "note": "Projected five-year volume exceeds safe free-disk headroom; full target NOT TESTED"
+  },
+  "reconciliation": {
+    "totals": {
+      "orders": 30000,
+      "revenue": "13647784.53",
+      "tax": "1635629.08",
+      "discounts": "149578.55",
+      "delivery_fees": "329100.00"
+    },
+    "math": {
+      "violations": 0
+    },
+    "paymentMismatch": {
+      "violations": 0
+    },
+    "refundMismatch": {
+      "violations": 0
+    },
+    "overRefund": {
+      "violations": 0
+    },
+    "stockMismatch": {
+      "violations": 0
+    },
+    "doubleRestore": {
+      "violations": 0
+    },
+    "orphans": {
+      "orders": 0,
+      "payments": 0,
+      "items": 0,
+      "invoices": 0
+    },
+    "duplicates": {
+      "order_numbers": 0,
+      "invoice_numbers": 0
+    },
+    "byStatus": [
+      {
+        "status": "PENDING",
+        "count": 18297
+      },
+      {
+        "status": "COMPLETED",
+        "count": 11365
+      },
+      {
+        "status": "CANCELLED",
+        "count": 338
+      }
+    ],
+    "byMethod": [
+      {
+        "method": "CASH",
+        "count": 14990,
+        "revenue": "6881846.10"
+      },
+      {
+        "method": "CARD",
+        "count": 12694,
+        "revenue": "5708855.06"
+      },
+      {
+        "method": "WALLET",
+        "count": 2316,
+        "revenue": "1057083.37"
+      }
+    ],
+    "simDays": [
+      {
+        "sim_day": 1795,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1796,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1797,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1798,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1799,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1800,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1801,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1802,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1803,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1804,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1805,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1806,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1807,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1808,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1809,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1810,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1811,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1812,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1813,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1814,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1815,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1816,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1817,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1818,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1819,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1820,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1821,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1822,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1823,
+        "orders": 1000
+      },
+      {
+        "sim_day": 1824,
+        "orders": 1000
+      }
+    ]
+  }
+}

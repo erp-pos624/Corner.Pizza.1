@@ -1,0 +1,67 @@
+{
+  "profile": "read",
+  "api": "http://127.0.0.1:4110",
+  "seconds": 20,
+  "stages": [
+    {
+      "users": 100,
+      "seconds": 22.3,
+      "requests": 1413,
+      "rps": 63.4,
+      "latency": {
+        "count": 1413,
+        "avgMs": 1520.2,
+        "p50Ms": 1395.8,
+        "p95Ms": 3189,
+        "p99Ms": 5600.1,
+        "maxMs": 6400.2
+      },
+      "byEndpoint": {
+        "orders:list": {
+          "count": 730,
+          "avgMs": 1514.2,
+          "p50Ms": 1575.3,
+          "p95Ms": 3068.1,
+          "p99Ms": 5600.1,
+          "maxMs": 6206.9
+        },
+        "public:menu": {
+          "count": 683,
+          "avgMs": 1526.7,
+          "p50Ms": 1164.7,
+          "p95Ms": 3231.2,
+          "p99Ms": 5693.7,
+          "maxMs": 6400.2
+        }
+      },
+      "statuses": {
+        "orders:list:0": 347,
+        "orders:list:200": 383,
+        "public:menu:0": 338,
+        "public:menu:200": 345
+      },
+      "errors": {
+        "orders:list:fetch failed": 347,
+        "public:menu:fetch failed": 338
+      },
+      "throttled": 0,
+      "serverErrors": 685,
+      "timeouts": 0,
+      "db": {
+        "connectionsStart": 18,
+        "connectionsEnd": 19,
+        "activePeak": 17,
+        "lockWaitPeak": 0,
+        "deadlocks": 0,
+        "rollbacks": 0,
+        "commits": 43684
+      },
+      "process": {
+        "rssStartMb": 199,
+        "rssEndMb": 345,
+        "rssPeakMb": 397,
+        "cpuPct": 270.2
+      }
+    }
+  ]
+}
