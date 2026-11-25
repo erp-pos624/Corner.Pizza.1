@@ -161,7 +161,10 @@ export interface PublicQuoteDto {
   lines: PublicQuoteLineDto[];
   subtotal: string;
   taxRate: string;
+  /** Total VAT (included + added). */
   tax: string;
+  /** Part of `tax` already contained in tax-inclusive prices. */
+  taxIncluded: string;
   /** Null while a delivery location is still needed or is not serviceable. */
   deliveryFee: string | null;
   deliveryZoneId: string | null;

@@ -1,12 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock3, Globe, Loader2, ReceiptText, RefreshCw, ShoppingBag, Wallet } from 'lucide-react';
 import { useEffect, useState, type ReactElement } from 'react';
-import { PUBLIC_API_PREFIX, type OnlineStoreOverviewDto, type OrderDto } from '@posshope/shared';
+import {
+  PUBLIC_API_PREFIX,
+  WEEKDAY_KEYS,
+  type OnlineStoreOverviewDto,
+  type OnlineStoreSettingsDto,
+  type OrderDto,
+  type WeekdayKey,
+  type WeeklyHours,
+} from '@posshope/shared';
 import { OrderDetailDialog } from '../components/orders/OrderDetailDialog';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
 import { Skeleton } from '../components/ui/skeleton';
 import { StatCard } from '../components/ui/stat-card';
 import { EmptyPanel, ErrorState } from '../components/ui/states';
@@ -19,6 +26,36 @@ import { ALL_BRANCHES } from '../lib/branch-scope';
 import { formatDateTime, formatMoney, formatNumber, orderTypeLabel } from '../lib/format';
 import { cn } from '../lib/utils';
 import { useBranchScopeStore } from '../store/branch';
+
+type DayForm = Record<WeekdayKey, { open: string; close: string; closed: boolean }>;
+
+/** The saved schedule as per-day hours, or null when ordering is not time-limited. */
+function savedHours(settings: OnlineStoreSettingsDto): WeeklyHours | null {
+  if (settings.weeklyHours) return settings.weeklyHours;
+  if (!settings.openTime || !settings.closeTime) return null;
+  const single = { open: settings.openTime, close: settings.closeTime };
+  return Object.fromEntries(WEEKDAY_KEYS.map((key) => [key, single])) as WeeklyHours;
+}
+
+function formFromSettings(settings: OnlineStoreSettingsDto | null): DayForm {
+  const saved = settings ? savedHours(settings) : null;
+  return Object.fromEntries(
+    WEEKDAY_KEYS.map((key) => {
+      const day = saved?.[key];
+      if (saved && day === null) return [key, { open: '10:00', close: '00:00', closed: true }];
+      return [key, { open: day?.open ?? '10:00', close: day?.close ?? '00:00', closed: false }];
+    }),
+  ) as DayForm;
+}
+
+function weeklyFromForm(days: DayForm): WeeklyHours {
+  return Object.fromEntries(
+    WEEKDAY_KEYS.map((key) => {
+      const day = days[key];
+      return [key, day.closed ? null : { open: day.open, close: day.close }];
+    }),
+  ) as WeeklyHours;
+}
 
 const STATUS_TONES: Record<string, 'green' | 'amber' | 'red' | 'neutral'> = {
   accepting: 'green',
@@ -41,21 +78,20 @@ export function OnlineStorePage(): ReactElement {
   const settings = data?.settings ?? null;
 
   const [limitHours, setLimitHours] = useState(false);
-  const [openTime, setOpenTime] = useState('11:00');
-  const [closeTime, setCloseTime] = useState('23:00');
+  const [days, setDays] = useState<DayForm>(() => formFromSettings(null));
   const [selected, setSelected] = useState<OrderDto | null>(null);
 
   /* Reset the form only when the saved values change, so a background poll
      never discards hours the operator is still editing. */
-  const savedOpenTime = settings?.openTime ?? null;
-  const savedCloseTime = settings?.closeTime ?? null;
   const savedUpdatedAt = settings?.updatedAt ?? null;
+  const savedSchedule = settings ? JSON.stringify(savedHours(settings)) : null;
   useEffect(() => {
-    if (!savedUpdatedAt) return;
-    setLimitHours(Boolean(savedOpenTime && savedCloseTime));
-    setOpenTime(savedOpenTime ?? '11:00');
-    setCloseTime(savedCloseTime ?? '23:00');
-  }, [savedUpdatedAt, savedOpenTime, savedCloseTime]);
+    if (!savedUpdatedAt || !settings) return;
+    setLimitHours(savedHours(settings) !== null);
+    setDays(formFromSettings(settings));
+    // `settings` is read through the serialized schedule key.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedUpdatedAt, savedSchedule]);
 
   const applySettings = (updated: OnlineStoreOverviewDto['settings']): void => {
     queryClient.setQueryData<OnlineStoreOverviewDto>(['online-store', scope], (current) =>
@@ -80,15 +116,15 @@ export function OnlineStorePage(): ReactElement {
 
   const hoursDirty =
     settings !== null &&
-    (limitHours
-      ? openTime !== settings.openTime || closeTime !== settings.closeTime
-      : settings.openTime !== null || settings.closeTime !== null);
+    JSON.stringify(limitHours ? weeklyFromForm(days) : null) !== savedSchedule;
 
   const saveHours = useMutation({
     mutationFn: () =>
-      api.onlineStore.updateSettings(
-        limitHours ? { openTime, closeTime } : { openTime: null, closeTime: null },
-      ),
+      api.onlineStore.updateSettings({
+        openTime: null,
+        closeTime: null,
+        weeklyHours: limitHours ? weeklyFromForm(days) : null,
+      }),
     onSuccess: (updated) => {
       applySettings(updated);
       toast.success(t('onlineStore.toast.savedMessage'), t('onlineStore.toast.saved'));
@@ -98,7 +134,11 @@ export function OnlineStorePage(): ReactElement {
   });
 
   const submitHours = (): void => {
-    if (limitHours && (!openTime || !closeTime || openTime === closeTime)) {
+    const invalid = WEEKDAY_KEYS.some((key) => {
+      const day = days[key];
+      return !day.closed && (!day.open || !day.close || day.open === day.close);
+    });
+    if (limitHours && invalid) {
       toast.error(t('onlineStore.hours.error'), t('onlineStore.hours.title'));
       return;
     }
@@ -244,33 +284,61 @@ export function OnlineStorePage(): ReactElement {
               label={t('onlineStore.hours.limit')}
               onChange={() => setLimitHours((current) => !current)}
             />
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <Label htmlFor="online-open" className="th-label">
-                  {t('onlineStore.hours.open')}
-                </Label>
-                <Input
-                  id="online-open"
-                  type="time"
-                  value={openTime}
-                  disabled={!limitHours}
-                  onChange={(event) => setOpenTime(event.target.value)}
-                  className="h-9"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="online-close" className="th-label">
-                  {t('onlineStore.hours.close')}
-                </Label>
-                <Input
-                  id="online-close"
-                  type="time"
-                  value={closeTime}
-                  disabled={!limitHours}
-                  onChange={(event) => setCloseTime(event.target.value)}
-                  className="h-9"
-                />
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-muted-foreground">
+                    <th className="th-label py-1 text-start">{t('onlineStore.hours.day')}</th>
+                    <th className="th-label py-1 text-start">{t('onlineStore.hours.open')}</th>
+                    <th className="th-label py-1 text-start">{t('onlineStore.hours.close')}</th>
+                    <th className="th-label py-1 text-start">{t('onlineStore.hours.closed')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {WEEKDAY_KEYS.map((key) => {
+                    const day = days[key];
+                    const update = (patch: Partial<DayForm[WeekdayKey]>): void =>
+                      setDays((current) => ({ ...current, [key]: { ...current[key], ...patch } }));
+                    return (
+                      <tr key={key} className="border-t border-border">
+                        <td className="py-1.5 pe-2 font-medium">
+                          {t(`onlineStore.hours.days.${key}` as TranslationKey)}
+                        </td>
+                        <td className="py-1.5 pe-2">
+                          <Input
+                            type="time"
+                            value={day.open}
+                            disabled={!limitHours || day.closed}
+                            onChange={(event) => update({ open: event.target.value })}
+                            className="h-8"
+                            aria-label={`${t(`onlineStore.hours.days.${key}` as TranslationKey)} ${t('onlineStore.hours.open')}`}
+                          />
+                        </td>
+                        <td className="py-1.5 pe-2">
+                          <Input
+                            type="time"
+                            value={day.close}
+                            disabled={!limitHours || day.closed}
+                            onChange={(event) => update({ close: event.target.value })}
+                            className="h-8"
+                            aria-label={`${t(`onlineStore.hours.days.${key}` as TranslationKey)} ${t('onlineStore.hours.close')}`}
+                          />
+                        </td>
+                        <td className="py-1.5">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-input"
+                            checked={day.closed}
+                            disabled={!limitHours}
+                            onChange={(event) => update({ closed: event.target.checked })}
+                            aria-label={`${t(`onlineStore.hours.days.${key}` as TranslationKey)} ${t('onlineStore.hours.closed')}`}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
             <p className="text-[11px] text-muted-foreground">{t('onlineStore.hours.overnight')}</p>
             <div className="flex justify-end">

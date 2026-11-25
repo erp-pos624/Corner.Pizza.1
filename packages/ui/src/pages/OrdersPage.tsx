@@ -337,7 +337,7 @@ export function OrdersPage(): ReactElement {
                     <td className="px-3 py-2.5">
                       <div className="flex flex-wrap items-center gap-1.5 text-xs">
                         <span>{orderTypeLabel(order.type)}</span>
-                        {order.channel === 'ONLINE' ? (
+                        {order.channel !== 'POS' ? (
                           <OnlineTag label={orderChannelLabel(order.channel)} />
                         ) : null}
                       </div>

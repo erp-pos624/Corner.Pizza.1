@@ -18,12 +18,23 @@
   },
   "hours": {
     "title": "Online opening hours",
-    "description": "Optional daily window when the website accepts orders. Leave it off to take online orders around the clock.",
+    "description": "Set the hours the website takes orders for each day. Turn it off to take online orders around the clock.",
     "limit": "Limit online ordering to specific hours",
     "open": "Opens",
     "close": "Closes",
-    "overnight": "A closing time earlier than the opening time wraps past midnight.",
-    "error": "Set both times and make sure they differ."
+    "overnight": "A closing time at or before the opening time runs past midnight (10:00 → 01:00 closes at 1 AM the next morning).",
+    "error": "Each open day needs an opening and a closing time, and they must differ.",
+    "day": "Day",
+    "closed": "Closed",
+    "days": {
+      "sun": "Sunday",
+      "mon": "Monday",
+      "tue": "Tuesday",
+      "wed": "Wednesday",
+      "thu": "Thursday",
+      "fri": "Friday",
+      "sat": "Saturday"
+    }
   },
   "stats": {
     "orders": "Online orders today",

@@ -1,4 +1,7 @@
 import type {
+  PrinterCreateInput,
+  PrinterDto,
+  PrinterUpdateInput,
   AdjustmentCreateInput,
   AdjustmentDto,
   AdjustmentUpdateInput,
@@ -343,6 +346,15 @@ export const api = {
     zReports: (params: { date?: string; branchId?: string } = {}) =>
       call<ZReportDto[]>({ method: 'GET', path: '/shifts/z-reports', query: params }),
     zReport: (id: string) => call<ZReportDto>({ method: 'GET', path: `/shifts/z-reports/${id}` }),
+  },
+
+  printers: {
+    list: () => call<PrinterDto[]>({ method: 'GET', path: '/printers' }),
+    create: (body: PrinterCreateInput) =>
+      call<PrinterDto>({ method: 'POST', path: '/printers', body }),
+    update: (id: string, body: PrinterUpdateInput) =>
+      call<PrinterDto>({ method: 'PATCH', path: `/printers/${id}`, body }),
+    remove: (id: string) => call<{ ok: boolean }>({ method: 'DELETE', path: `/printers/${id}` }),
   },
 
   tables: {

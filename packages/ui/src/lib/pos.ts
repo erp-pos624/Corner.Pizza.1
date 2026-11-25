@@ -14,6 +14,8 @@ export interface CartLine {
   sizeId: string | null;
   sizeName: string | null;
   unitPrice: number;
+  /** Copied from the menu item: true when the price already includes VAT. */
+  taxInclusive: boolean;
   toppings: CartTopping[];
   quantity: number;
   specialInstructions: string;

@@ -1,0 +1,84 @@
+{
+  "title": "Station printers",
+  "description": "Every printer in the restaurant, what it prints and how it looks. Terminals send each job to the matching printers automatically.",
+  "add": "Add printer",
+  "edit": "Edit",
+  "delete": "Delete",
+  "test": "Test print",
+  "active": "Active",
+  "inactive": "Off",
+  "error": "Could not load printers",
+  "browserNote": "You are in the browser. Silent printing works only in the Windows POS app; here Test print opens the print dialog.",
+  "empty": {
+    "title": "No printers yet",
+    "message": "Add the counter, downstairs and upstairs printers to print automatically."
+  },
+  "newTitle": "New printer",
+  "editTitle": "Edit {name}",
+  "editorDescription": "Where the printer is, what it receives and how its tickets look.",
+  "deleteTitle": "Delete printer?",
+  "deleteMessage": "\"{name}\" will stop receiving print jobs. Past orders are not affected.",
+  "preview": "Live preview ({width} mm)",
+  "networkNote": "Network (ESC/POS) printing is English-only and skips the logo. For Arabic receipts, install the printer in Windows and use the Windows printer option.",
+  "roles": {
+    "CUSTOMER_RECEIPT": "Customer receipt",
+    "KITCHEN_ALL": "Kitchen — all items",
+    "KITCHEN_BY_CATEGORY": "Kitchen — selected categories",
+    "DELIVERY_DISPATCH": "Delivery / dispatch slip",
+    "SHIFT_Z_REPORT": "Shift close (Z-report)"
+  },
+  "connection": {
+    "SPOOLER": "Windows printer (USB or installed driver)",
+    "NETWORK": "Network IP (raw ESC/POS, port 9100)"
+  },
+  "fields": {
+    "name": "Name",
+    "namePlaceholder": "Counter / Downstairs / Upstairs",
+    "role": "Prints",
+    "connection": "Connection",
+    "deviceName": "Windows printer name",
+    "deviceNameHint": "Exactly as in Windows Settings → Printers. Suggestions come from this computer.",
+    "host": "IP address",
+    "hostHint": "Local network only, e.g. 192.168.1.50",
+    "port": "Port",
+    "paper": "Roll width",
+    "copies": "Copies",
+    "categories": "Categories for this printer",
+    "categoriesHint": "Only lines from these categories print here.",
+    "channels": "Only these order sources",
+    "channelsHint": "Leave all unticked to print every source.",
+    "active": "Printer is active"
+  },
+  "template": {
+    "title": "Receipt template",
+    "description": "What this printer shows. The preview updates as you change it.",
+    "fontScale": "Text size",
+    "scales": {
+      "COMPACT": "Compact",
+      "NORMAL": "Normal",
+      "LARGE": "Large"
+    },
+    "showLogo": "Logo",
+    "showStoreDetails": "Store address, phone and email",
+    "showOrderMeta": "Order details (date, type, source, table)",
+    "showCustomer": "Customer name and phone",
+    "showPrices": "Prices and totals",
+    "showVatLine": "\"Incl. VAT\" line",
+    "showPayments": "Payment breakdown",
+    "showItemNotes": "Item and order notes",
+    "showQr": "QR code",
+    "qrUrl": "QR code link",
+    "headerNote": "Note under the header",
+    "footerEn": "Footer (English)",
+    "footerAr": "Footer (Arabic)"
+  },
+  "toast": {
+    "created": "Printer added",
+    "updated": "Printer saved",
+    "deleted": "Printer deleted",
+    "saveFailed": "Could not save the printer",
+    "testSent": "Test page sent",
+    "testDialog": "Opened the print dialog for a test page",
+    "testFailed": "Test print failed"
+  }
+}

@@ -20,6 +20,7 @@ import { HomePage } from './pages/Home';
 import { MealDetailsPage } from './pages/MealDetails';
 import { MealsPage } from './pages/Meals';
 import { GuestOrderPage, TrackOrderPage } from './pages/Orders';
+import { DownloadPage } from './pages/Download';
 import { useCartDrawer } from './store/cart-drawer';
 import { useSession } from './store/session';
 import { applyCustomerTheme, useStorefrontTheme } from './theme';
@@ -98,6 +99,7 @@ export function StorefrontApp(): ReactElement {
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="orders/:orderNumber" element={<GuestOrderPage />} />
             <Route path="track" element={<TrackOrderPage />} />
+            <Route path="download" element={<DownloadPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />

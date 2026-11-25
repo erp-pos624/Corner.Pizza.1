@@ -4,13 +4,16 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ApiClient } from './main/api-client.js';
 import { SessionStore } from './main/session.js';
+import { listPrinters, printHtml, printRaw } from './main/printing.js';
 import type {
   ApiRequestPayload,
   AppInfo,
   ChangePasswordPayload,
+  HtmlPrintJob,
   LoginPayload,
   PrintOptions,
   PrintResult,
+  RawPrintJob,
   SessionState,
 } from './shared/ipc.js';
 import { IPC } from './shared/ipc.js';
@@ -19,9 +22,11 @@ import { IPC } from './shared/ipc.js';
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
-// Packaged terminals talk to the deployed Vercel API; `pnpm dev` keeps using
-// the local server. FORNO_API_URL still overrides both (LAN deployments).
-const PRODUCTION_API_URL = 'https://corner-pizza-1.vercel.app';
+// Packaged terminals talk to the production API on the restaurant's own
+// domain (same Vercel deployment as corner-pizza-1.vercel.app); `pnpm dev`
+// keeps using the local server. FORNO_API_URL still overrides both (LAN
+// deployments, or falling back to the .vercel.app host if DNS ever fails).
+const PRODUCTION_API_URL = 'https://eatcornerpizza.com';
 const API_BASE_URL =
   process.env.FORNO_API_URL ?? (app.isPackaged ? PRODUCTION_API_URL : 'http://127.0.0.1:4000');
 
@@ -323,6 +328,15 @@ function registerIpcHandlers(): void {
           },
         );
       }),
+  );
+
+  // Station printers: list installed printers, silent receipts, raw ESC/POS.
+  ipcMain.handle(IPC.printersList, (event: IpcMainInvokeEvent) => listPrinters(event.sender));
+  ipcMain.handle(IPC.printersPrintHtml, (event: IpcMainInvokeEvent, job: HtmlPrintJob) =>
+    printHtml(event.sender, job),
+  );
+  ipcMain.handle(IPC.printersPrintRaw, (_event: IpcMainInvokeEvent, job: RawPrintJob) =>
+    printRaw(job),
   );
 }
 

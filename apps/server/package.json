@@ -21,6 +21,7 @@
     "db:seed": "tsx --env-file=.env prisma/seed.ts",
     "db:studio": "prisma studio",
     "storage:setup": "node scripts/setup-storage.mjs",
+    "menu:sync": "tsx --env-file-if-exists=.env scripts/sync-official-menu.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

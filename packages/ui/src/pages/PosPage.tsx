@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import type { CategoryDto, MenuItemDto, OrderDto, ToppingDto } from '@posshope/shared';
 import { InvoiceViewer } from '../components/invoice/InvoiceViewer';
 import { KitchenTicket } from '../components/invoice/KitchenTicket';
@@ -14,6 +14,7 @@ import { ErrorState } from '../components/ui/states';
 import { toast } from '../components/ui/toast';
 import type { PageKey } from '../components/layout/AppShell';
 import { usePosCart } from '../hooks/usePosCart';
+import { useStationPrinting } from '../hooks/useStationPrinting';
 import { api } from '../lib/api';
 import type { CartLine } from '../lib/pos';
 import { takeTableIntent } from '../lib/table-intent';
@@ -117,16 +118,36 @@ export function PosPage({ onNavigate }: { onNavigate: (page: PageKey) => void })
 
   const tables = useMemo(() => tablesQuery.data ?? [], [tablesQuery.data]);
 
+  const categoryOf = useCallback(
+    (menuItemId: string): string | null =>
+      items.find((item) => item.id === menuItemId)?.categoryId ?? null,
+    [items],
+  );
+  const station = useStationPrinting({ settings, categoryOf });
+
+  /**
+   * Station printers configured in the dashboard print silently; when none
+   * takes the kitchen ticket, fall back to the original print-dialog ticket.
+   */
+  const routeKitchenPrint = (order: OrderDto, addedItems: OrderDto['items'] | null): void => {
+    void station
+      .printNewOrder(order, addedItems)
+      .then(({ kitchenRouted }) => {
+        if (!kitchenRouted) setKotOrder(addedItems ? { ...order, items: addedItems } : order);
+      })
+      .catch(() => setKotOrder(addedItems ? { ...order, items: addedItems } : order));
+  };
+
   const handleOrderCreated = (order: OrderDto, addedItems: OrderDto['items'] | null): void => {
     resetCustomization();
     if (addedItems) {
-      setKotOrder({ ...order, items: addedItems });
+      routeKitchenPrint(order, addedItems);
       toast.success(t('pos.addedToTab'));
       return;
     }
     setLastOrder(order);
     setSuccessOpen(true);
-    setKotOrder(order);
+    routeKitchenPrint(order, null);
   };
 
   const cart = usePosCart({
@@ -219,6 +240,7 @@ export function PosPage({ onNavigate }: { onNavigate: (page: PageKey) => void })
       sizeId,
       sizeName: selectedSize?.name ?? null,
       unitPrice: selected.hasSizes ? Number(selectedSize?.price ?? 0) : Number(selected.basePrice),
+      taxInclusive: selected.taxInclusive,
       toppings: selectedToppings.map((topping) => ({
         id: topping.id,
         name: topping.name,

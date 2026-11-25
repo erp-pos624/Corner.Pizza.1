@@ -300,7 +300,7 @@ export function StoresPage(): ReactElement {
       toast.error(error instanceof Error ? error.message : t('inventory.stores.transferFailed')),
   });
 
-  const storeRows = stores.data ?? [];
+  const storeRows = useMemo(() => stores.data ?? [], [stores.data]);
   const stockRows = stock.data ?? [];
   const totals = useMemo(
     () => ({

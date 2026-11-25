@@ -64,7 +64,7 @@ export function StockAlertsPage(): ReactElement {
   });
 
   const rows = alerts.data?.items ?? [];
-  const suggestions = replenishment.data ?? [];
+  const suggestions = useMemo(() => replenishment.data ?? [], [replenishment.data]);
   const openCount = alerts.data?.total ?? 0;
 
   const suggestionMap = useMemo(

@@ -71,6 +71,8 @@ export const PERMISSIONS = [
   // administration
   'users:manage',
   'settings:manage',
+  /** Read the printer fleet so a terminal can route its print jobs. */
+  'printers:view',
   'branches:manage',
   'audit:read',
 ] as const;
@@ -101,6 +103,7 @@ export const CASHIER_PERMISSIONS: readonly Permission[] = [
   'settlements:manage',
   'shifts:view',
   'shifts:manage',
+  'printers:view',
 ];
 
 /**
@@ -110,6 +113,7 @@ export const CASHIER_PERMISSIONS: readonly Permission[] = [
 export const KITCHEN_STAFF_PERMISSIONS: readonly Permission[] = [
   'kitchen:view',
   'kitchen:update',
+  'printers:view',
 ];
 
 /** Drivers only see their own dispatch queue and settlement history. */

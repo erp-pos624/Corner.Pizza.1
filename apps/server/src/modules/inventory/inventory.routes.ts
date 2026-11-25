@@ -59,7 +59,7 @@ import { authenticate } from '../../middleware/authenticate.js';
 import { authorize } from '../../middleware/authorize.js';
 import { validate } from '../../middleware/validate.js';
 import { prisma } from '../../prisma.js';
-import { syncStockAlerts, syncStockAlertsMany } from './alerts.service.js';
+import { syncStockAlerts } from './alerts.service.js';
 
 export const inventoryRouter = Router();
 inventoryRouter.use(authenticate);

@@ -105,6 +105,7 @@ enum OrderType {
 enum OrderChannel {
   POS
   ONLINE
+  TALABAT
 }
 
 enum OrderStatus {
@@ -130,6 +131,19 @@ enum PaymentStatus {
   PENDING_PAYMENT
   PAID_ONLINE
   PAYMENT_FAILED
+}
+
+enum PrinterRole {
+  CUSTOMER_RECEIPT
+  KITCHEN_ALL
+  KITCHEN_BY_CATEGORY
+  DELIVERY_DISPATCH
+  SHIFT_Z_REPORT
+}
+
+enum PrinterConnection {
+  SPOOLER
+  NETWORK
 }
 
 enum OnlinePaymentStatus {
@@ -222,6 +236,12 @@ model Branch {
    */
   onlineOpenTime        String?
   onlineCloseTime       String?
+  /**
+   * Per-weekday online hours, keyed sun..sat: { "fri": { "open": "10:00", "close": "01:00" } }.
+   * A close at or before the open time ends after midnight. A missing day falls
+   * back to onlineOpenTime/onlineCloseTime; null means no per-day schedule.
+   */
+  onlineWeeklyHours     Json?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
@@ -243,6 +263,7 @@ model Branch {
   purchaseReceipts   PurchaseReceipt[]
   stockAlerts        StockAlert[]
   expenses           Expense[]
+  printers           Printer[]
 
   @@index([isActive])
   @@map("branches")
@@ -367,6 +388,10 @@ model MenuItem {
   isAvailable   Boolean  @default(true)
   isFeatured    Boolean  @default(false)
   hasSizes      Boolean  @default(false)
+  /**
+   * True when basePrice and size prices already include VAT.
+   */
+  taxInclusive  Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -713,6 +738,10 @@ model Order {
   discountLabelAr   String?
   discountId        String?
   tax               Decimal         @default(0) @db.Decimal(14, 2)
+  /**
+   * Part of `tax` already contained in tax-inclusive prices (not added to the total).
+   */
+  taxIncluded       Decimal         @default(0) @db.Decimal(14, 2)
   deliveryFee       Decimal         @default(0) @db.Decimal(14, 2)
   total             Decimal         @db.Decimal(14, 2)
   amountPaid        Decimal         @default(0) @db.Decimal(14, 2)
@@ -724,6 +753,10 @@ model Order {
    */
   isCod             Boolean         @default(false)
   notes             String?
+  /**
+   * Aggregator order number (e.g. Talabat) for orders keyed in at the till.
+   */
+  externalRef       String?
   inventoryDeducted Boolean         @default(false)
   inventoryRestored Boolean         @default(false)
   /**
@@ -785,6 +818,10 @@ model OrderItem {
   unitPrice           Decimal  @db.Decimal(14, 2)
   toppingsTotal       Decimal  @default(0) @db.Decimal(14, 2)
   lineTotal           Decimal  @db.Decimal(14, 2)
+  /**
+   * Snapshot of the menu item's pricing mode at sale time.
+   */
+  taxInclusive        Boolean  @default(false)
   unitCost            Decimal  @default(0) @db.Decimal(14, 2)
   specialInstructions String?
   createdAt           DateTime @default(now())
@@ -1276,7 +1313,9 @@ model RestaurantSettings {
    * BLOCK refuses a sale that would drive stock negative; WARN allows it and raises an alert.
    */
   stockPolicy           StockPolicy @default(BLOCK)
-  /** Customer home-page copy edited from the dashboard; null means the defaults. */
+  /**
+   * Customer home-page copy edited from the dashboard; null means the defaults.
+   */
   storefront            Json?
   updatedAt             DateTime    @updatedAt
 
@@ -1301,7 +1340,7 @@ model Employee {
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
-  branch      Branch?               @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  branch      Branch?              @relation(fields: [branchId], references: [id], onDelete: SetNull)
   attendance  AttendanceRecord[]
   adjustments EmployeeAdjustment[]
   payroll     PayrollLine[]
@@ -1313,17 +1352,17 @@ model Employee {
 }
 
 model AttendanceRecord {
-  id           String           @id @default(cuid())
-  employeeId   String
-  date         DateTime         @db.Date
-  checkIn      String?
-  checkOut     String?
-  status       AttendanceStatus
-  lateMinutes  Int              @default(0)
-  note         String?
-  createdById  String?
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  id          String           @id @default(cuid())
+  employeeId  String
+  date        DateTime         @db.Date
+  checkIn     String?
+  checkOut    String?
+  status      AttendanceStatus
+  lateMinutes Int              @default(0)
+  note        String?
+  createdById String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
@@ -1353,23 +1392,23 @@ model EmployeeAdjustment {
 }
 
 model PayrollRun {
-  id              String        @id @default(cuid())
-  month           String        @unique
-  status          PayrollStatus @default(DRAFT)
-  employeeCount   Int
-  basicTotal      Decimal       @db.Decimal(12, 2)
-  bonusTotal      Decimal       @db.Decimal(12, 2)
-  deductionTotal  Decimal       @db.Decimal(12, 2)
-  netTotal        Decimal       @db.Decimal(12, 2)
-  paidTotal       Decimal       @db.Decimal(12, 2) @default(0)
-  notes           String?
-  closedAt        DateTime?
-  closedById      String?
-  closedByName    String?
-  reopenedAt      DateTime?
-  reopenReason    String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id             String        @id @default(cuid())
+  month          String        @unique
+  status         PayrollStatus @default(DRAFT)
+  employeeCount  Int
+  basicTotal     Decimal       @db.Decimal(12, 2)
+  bonusTotal     Decimal       @db.Decimal(12, 2)
+  deductionTotal Decimal       @db.Decimal(12, 2)
+  netTotal       Decimal       @db.Decimal(12, 2)
+  paidTotal      Decimal       @default(0) @db.Decimal(12, 2)
+  notes          String?
+  closedAt       DateTime?
+  closedById     String?
+  closedByName   String?
+  reopenedAt     DateTime?
+  reopenReason   String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   lines PayrollLine[]
 
@@ -1378,7 +1417,7 @@ model PayrollRun {
 }
 
 model PayrollLine {
-  id                  String                @id @default(cuid())
+  id                  String               @id @default(cuid())
   payrollRunId        String
   employeeId          String
   employeeCode        String
@@ -1386,20 +1425,20 @@ model PayrollLine {
   jobTitle            String
   branchName          String?
   salaryType          SalaryType
-  basicSalary         Decimal               @db.Decimal(12, 2)
-  payableDays         Decimal               @db.Decimal(8, 2)
+  basicSalary         Decimal              @db.Decimal(12, 2)
+  payableDays         Decimal              @db.Decimal(8, 2)
   presentDays         Int
   absentDays          Int
   lateMinutes         Int
-  attendanceDeduction Decimal               @db.Decimal(12, 2)
-  bonusTotal          Decimal               @db.Decimal(12, 2)
-  deductionTotal      Decimal               @db.Decimal(12, 2)
-  netSalary           Decimal               @db.Decimal(12, 2)
-  paymentStatus       PayrollPaymentStatus  @default(UNPAID)
+  attendanceDeduction Decimal              @db.Decimal(12, 2)
+  bonusTotal          Decimal              @db.Decimal(12, 2)
+  deductionTotal      Decimal              @db.Decimal(12, 2)
+  netSalary           Decimal              @db.Decimal(12, 2)
+  paymentStatus       PayrollPaymentStatus @default(UNPAID)
   paidAt              DateTime?
   breakdown           Json
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 
   payrollRun PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
   employee   Employee   @relation(fields: [employeeId], references: [id], onDelete: Restrict)
@@ -1410,14 +1449,14 @@ model PayrollLine {
 }
 
 model HrSettings {
-  id                        String   @id @default("default")
-  workStart                 String   @default("09:00")
-  workEnd                   String   @default("17:00")
-  graceMinutes              Int      @default(10)
-  lateDeductionPerMinute    Decimal  @default(5) @db.Decimal(10, 2)
-  absenceDeductionMultiplier Decimal @default(1) @db.Decimal(4, 2)
-  weeklyDaysOff             Int[]    @default([5, 6])
-  updatedAt                 DateTime @updatedAt
+  id                         String   @id @default("default")
+  workStart                  String   @default("09:00")
+  workEnd                    String   @default("17:00")
+  graceMinutes               Int      @default(10)
+  lateDeductionPerMinute     Decimal  @default(5) @db.Decimal(10, 2)
+  absenceDeductionMultiplier Decimal  @default(1) @db.Decimal(4, 2)
+  weeklyDaysOff              Int[]    @default([5, 6])
+  updatedAt                  DateTime @updatedAt
 
   @@map("hr_settings")
 }
@@ -1453,4 +1492,52 @@ model Expense {
   @@index([branchId])
   @@index([category])
   @@map("expenses")
+}
+
+/**
+ * A receipt/ticket printer and the template it prints with. Terminals read
+ * this list and send each job to every active printer whose role (and
+ * category/channel rules) match and that they can reach.
+ */
+model Printer {
+  id          String            @id @default(cuid())
+  branchId    String
+  name        String
+  connection  PrinterConnection @default(SPOOLER)
+  /**
+   * Windows printer name, used for silent printing through the spooler.
+   */
+  deviceName  String?
+  /**
+   * Raw ESC/POS target when connection = NETWORK.
+   */
+  host        String?
+  port        Int               @default(9100)
+  /**
+   * Roll width in millimetres: 58 or 80.
+   */
+  paperWidth  Int               @default(80)
+  role        PrinterRole
+  /**
+   * KITCHEN_BY_CATEGORY: only lines from these categories print here.
+   */
+  categoryIds String[]          @default([])
+  /**
+   * Empty means every channel.
+   */
+  channels    OrderChannel[]    @default([])
+  copies      Int               @default(1)
+  isActive    Boolean           @default(true)
+  sortOrder   Int               @default(0)
+  /**
+   * Receipt template overrides; missing fields use the role default.
+   */
+  template    Json?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@index([branchId, isActive])
+  @@map("printers")
 }

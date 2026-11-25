@@ -5,6 +5,7 @@ import {
   type CustomerAddressDto,
   type CustomerAddressInput,
   type CustomerSessionDto,
+  type DesktopReleaseDto,
   type Language,
   type OrderItemInput,
   type Paginated,
@@ -181,6 +182,7 @@ export interface OrderRequest {
 export const api = {
   branches: () => request<PublicBranchDto[]>('GET', '/branches'),
   settings: () => request<PublicSettingsDto>('GET', '/settings'),
+  desktopRelease: () => request<DesktopReleaseDto>('GET', '/desktop-release'),
   storefront: () => request<StorefrontContent>('GET', '/storefront'),
   menu: (branchId: string) =>
     request<PublicMenuDto>('GET', `/menu?branchId=${encodeURIComponent(branchId)}`),

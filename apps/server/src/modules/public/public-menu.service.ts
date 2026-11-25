@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import {
+  parseWeeklyHours,
   pickLocalized,
   pickLocalizedNullable,
   type PublicBranchDto,
@@ -19,7 +20,10 @@ import { getSettings } from '../../lib/settings.js';
 import { logger } from '../../logger.js';
 import { prisma } from '../../prisma.js';
 import { checkDeliveryZone } from '../delivery-zones/delivery-zones.service.js';
-import { evaluateOnlineStatus } from '../online-store/online-store.service.js';
+import {
+  evaluateOnlineStatus,
+  resolveOnlineHours,
+} from '../online-store/online-store.service.js';
 
 type PublicBranchRow = Prisma.BranchGetPayload<object>;
 
@@ -30,6 +34,7 @@ function money(value: Prisma.Decimal | number | string): string {
 export function toPublicBranchDto(branch: PublicBranchRow, now = new Date()): PublicBranchDto {
   const language = currentLanguage();
   const status = evaluateOnlineStatus(branch, now);
+  const hours = resolveOnlineHours(branch, now);
   return {
     id: branch.id,
     code: branch.code,
@@ -41,8 +46,9 @@ export function toPublicBranchDto(branch: PublicBranchRow, now = new Date()): Pu
     latitude: branch.latitude,
     longitude: branch.longitude,
     onlineOrderingEnabled: branch.onlineOrderingEnabled,
-    onlineOpenTime: branch.onlineOpenTime,
-    onlineCloseTime: branch.onlineCloseTime,
+    onlineOpenTime: hours.openTime,
+    onlineCloseTime: hours.closeTime,
+    onlineWeeklyHours: parseWeeklyHours(branch.onlineWeeklyHours),
     isOpenNow: status.isOpenNow,
     acceptingOrders: status.acceptingOrders,
     closedReason: status.closedReason,
@@ -144,6 +150,7 @@ function toPublicMenuItemDto(
     prepMinutes: item.prepMinutes,
     isFeatured: item.isFeatured,
     hasSizes: item.hasSizes,
+    taxInclusive: item.taxInclusive,
     sizes: item.sizes.map((size) => ({
       id: size.id,
       name: pickLocalized(language, size.name, size.nameAr),

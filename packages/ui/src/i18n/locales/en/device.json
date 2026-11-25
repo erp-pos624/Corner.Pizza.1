@@ -1,0 +1,88 @@
+{
+  "title": "Set up this terminal",
+  "subtitle": "Three quick questions so this computer opens the right screen and prints to the right place. You can change it later in Settings.",
+  "steps": {
+    "type": "Device",
+    "location": "Location",
+    "workflows": "Workflows",
+    "review": "Review"
+  },
+  "questions": {
+    "type": "What is this device?",
+    "location": "Where is it physically located?",
+    "workflows": "What happens on this device?",
+    "review": "Check and save"
+  },
+  "types": {
+    "POS": "POS register / cashier terminal",
+    "KDS": "Kitchen display (KDS)",
+    "MANAGER": "Manager / back-office station",
+    "DISPATCH": "Order & dispatch terminal"
+  },
+  "typesShort": {
+    "POS": "Counter POS",
+    "KDS": "Kitchen display",
+    "MANAGER": "Back office",
+    "DISPATCH": "Dispatch"
+  },
+  "typeHints": {
+    "POS": "Takes orders and payments at the counter.",
+    "KDS": "Shows and advances kitchen tickets.",
+    "MANAGER": "Reports, menu, stock and settings.",
+    "DISPATCH": "Delivery and Talabat orders."
+  },
+  "locations": {
+    "MAIN_COUNTER": "Main counter",
+    "DOWNSTAIRS": "Downstairs / ground floor",
+    "UPSTAIRS": "Upstairs floor",
+    "KITCHEN": "Kitchen / prep pass",
+    "DELIVERY_DESK": "Delivery desk",
+    "CUSTOM": "Other…"
+  },
+  "locationCustom": "Location name",
+  "locationExtra": "Extra detail (optional)",
+  "locationPlaceholder": "e.g. Till 2, by the window",
+  "capabilities": {
+    "ORDERS": "Create and settle orders",
+    "SHIFTS": "Cash shifts and Z-reports",
+    "KDS": "View and update kitchen tickets",
+    "AUTO_PRINT_RECEIPTS": "Auto-print customer receipts",
+    "AUTO_PRINT_KITCHEN": "Auto-print kitchen tickets",
+    "DELIVERY_TALABAT": "Delivery and Talabat orders"
+  },
+  "capabilitiesShort": {
+    "ORDERS": "Checkout",
+    "SHIFTS": "Shifts",
+    "KDS": "KDS",
+    "AUTO_PRINT_RECEIPTS": "Receipts",
+    "AUTO_PRINT_KITCHEN": "Kitchen tickets",
+    "DELIVERY_TALABAT": "Delivery/Talabat"
+  },
+  "capabilityHints": {
+    "ORDERS": "Ring up and take payment.",
+    "SHIFTS": "Open and close the cash drawer.",
+    "KDS": "Kitchen board on this screen.",
+    "AUTO_PRINT_RECEIPTS": "After checkout, to the receipt printers.",
+    "AUTO_PRINT_KITCHEN": "After checkout (and website orders on the kitchen screen).",
+    "DELIVERY_TALABAT": "Talabat tickets and dispatch slips."
+  },
+  "screens": {
+    "pos": "Point of sale",
+    "kitchen": "Kitchen board",
+    "dashboard": "Dashboard",
+    "delivery": "Delivery",
+    "orders": "Orders"
+  },
+  "startScreen": "Opens on",
+  "defaultOrderType": "New tickets start as",
+  "defaultChannel": "Default order source",
+  "paper": "Receipt paper",
+  "reviewHint": "Saved on this computer only. Printers themselves are managed in Printers & receipts.",
+  "back": "Back",
+  "next": "Next",
+  "finish": "Save this terminal",
+  "cardTitle": "This terminal",
+  "cardDescription": "What this computer is set up to do.",
+  "reconfigure": "Reconfigure this terminal",
+  "notConfigured": "Not set up yet"
+}

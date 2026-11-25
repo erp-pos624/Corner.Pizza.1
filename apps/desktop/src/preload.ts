@@ -5,10 +5,13 @@ import type {
   ApiResponse,
   AppInfo,
   ChangePasswordPayload,
+  HtmlPrintJob,
+  LocalPrinterInfo,
   LoginPayload,
   PosshopeBridge,
   PrintOptions,
   PrintResult,
+  RawPrintJob,
   ServerHealth,
   SessionState,
 } from './shared/ipc.js';
@@ -44,6 +47,13 @@ const bridge: PosshopeBridge = {
   },
   print: (options?: PrintOptions): Promise<PrintResult> =>
     ipcRenderer.invoke(IPC.appPrint, options) as Promise<PrintResult>,
+  printing: {
+    listPrinters: (): Promise<LocalPrinterInfo[]> => ipcRenderer.invoke(IPC.printersList),
+    printHtml: (job: HtmlPrintJob): Promise<PrintResult> =>
+      ipcRenderer.invoke(IPC.printersPrintHtml, job) as Promise<PrintResult>,
+    printRaw: (job: RawPrintJob): Promise<PrintResult> =>
+      ipcRenderer.invoke(IPC.printersPrintRaw, job) as Promise<PrintResult>,
+  },
 };
 
 contextBridge.exposeInMainWorld('posshope', Object.freeze(bridge));

@@ -16,12 +16,16 @@ export const ORDER_TYPE_LABELS: Record<OrderType, string> = {
 };
 
 /** Where the order was captured. `ONLINE` orders come from the storefront API. */
-export const ORDER_CHANNELS = ['POS', 'ONLINE'] as const;
+/** POS = walk-in/phone at the till, ONLINE = our website, TALABAT = keyed in from the Talabat tablet/portal. */
+export const ORDER_CHANNELS = ['POS', 'ONLINE', 'TALABAT'] as const;
+/** Channels a staff member may choose when ringing up an order. */
+export const STAFF_ORDER_CHANNELS = ['POS', 'TALABAT'] as const;
 export type OrderChannel = (typeof ORDER_CHANNELS)[number];
 
 export const ORDER_CHANNEL_LABELS: Record<OrderChannel, string> = {
   POS: 'In-store',
   ONLINE: 'Online',
+  TALABAT: 'Talabat',
 };
 
 /** API-facing order statuses are lowercase (e.g. `preparing`). */

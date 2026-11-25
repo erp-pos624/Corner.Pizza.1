@@ -153,7 +153,7 @@ export function OrderView({
               <dd className="price">{money(order.subtotal)}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt>{t('order.tax')}</dt>
+              <dt>{Number(order.taxIncluded) > 0 ? t('order.taxIncluded') : t('order.tax')}</dt>
               <dd className="price">{money(order.tax)}</dd>
             </div>
             {order.type === 'DELIVERY' ? (

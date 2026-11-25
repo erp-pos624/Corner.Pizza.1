@@ -56,6 +56,12 @@ const envSchema = z.object({
   SUPABASE_URL: z.string().trim().url().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().trim().optional(),
   SUPABASE_MENU_BUCKET: z.string().trim().default('menu-images'),
+  /** Public link to the latest Windows POS installer (CornerPOS-Setup.exe). */
+  DESKTOP_DOWNLOAD_URL: z.string().trim().url().optional(),
+  /** Version shown next to the download button, e.g. 0.1.4. */
+  DESKTOP_VERSION: z.string().trim().max(40).optional(),
+  /** Optional SHA-256 of the installer so staff can verify the download. */
+  DESKTOP_SHA256: z.string().trim().regex(/^[a-fA-F0-9]{64}$/u).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

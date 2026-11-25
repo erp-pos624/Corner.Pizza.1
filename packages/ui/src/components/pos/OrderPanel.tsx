@@ -416,6 +416,33 @@ export function OrderPanel({
               })}
             </p>
           ) : null}
+          {!cart.tab ? (
+            <div className="rounded-md border border-border bg-card p-2">
+              <label className="flex items-center gap-2 text-xs font-semibold">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-input"
+                  checked={cart.channel === 'TALABAT'}
+                  onChange={(event) => cart.setChannel(event.target.checked ? 'TALABAT' : 'POS')}
+                />
+                {t('pos.talabat.toggle')}
+              </label>
+              {cart.channel === 'TALABAT' ? (
+                <div className="mt-2 space-y-1">
+                  <Input
+                    value={cart.externalRef}
+                    onChange={(event) => cart.setExternalRef(event.target.value)}
+                    placeholder={t('pos.talabat.refPlaceholder')}
+                    aria-label={t('pos.talabat.ref')}
+                    maxLength={60}
+                    className="h-8 text-xs"
+                    dir="ltr"
+                  />
+                  <p className="text-[10px] text-muted-foreground">{t('pos.talabat.hint')}</p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           <Textarea
             value={notes}
             onChange={(event) => cart.setNotes(event.target.value)}
@@ -440,10 +467,19 @@ export function OrderPanel({
               tone="success"
             />
           ) : null}
-          <SummaryRow
-            label={t('pos.summary.tax', { rate: formatDecimal(cart.taxRate, 2) })}
-            value={formatMoney(fromMinor(cart.taxMinor))}
-          />
+          {cart.addedTaxMinor > 0 || cart.includedTaxMinor === 0 ? (
+            <SummaryRow
+              label={t('pos.summary.tax', { rate: formatDecimal(cart.taxRate, 2) })}
+              value={formatMoney(fromMinor(cart.addedTaxMinor))}
+            />
+          ) : null}
+          {cart.includedTaxMinor > 0 ? (
+            <SummaryRow
+              label={t('pos.summary.taxIncluded', { rate: formatDecimal(cart.taxRate, 2) })}
+              value={formatMoney(fromMinor(cart.includedTaxMinor))}
+              tone="muted"
+            />
+          ) : null}
           {cart.deliveryMinor > 0 ? (
             <SummaryRow
               label={t('pos.summary.delivery')}
@@ -670,12 +706,18 @@ function SummaryRow({
 }: {
   label: string;
   value: string;
-  tone?: 'success';
+  tone?: 'success' | 'muted';
 }): ReactElement {
   return (
     <div className="flex items-center justify-between">
       <span className="text-muted-foreground">{label}</span>
-      <span className={cn('numeric font-medium', tone === 'success' && 'text-success')}>
+      <span
+        className={cn(
+          'numeric font-medium',
+          tone === 'success' && 'text-success',
+          tone === 'muted' && 'text-muted-foreground',
+        )}
+      >
         {value}
       </span>
     </div>

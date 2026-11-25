@@ -1,9 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Upload, X } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 import {
   MENU_KINDS,
+  describeEnteredPrice,
+  fromMinorUnits,
   menuItemCreateSchema,
+  toMinorUnits,
   type CategoryDto,
   type MenuItemDto,
   type MenuKind,
@@ -14,7 +17,7 @@ import { Input, Select, Textarea } from '../ui/input';
 import { Label } from '../ui/label';
 import { toast } from '../ui/toast';
 import { api } from '../../lib/api';
-import { menuKindLabel } from '../../lib/format';
+import { formatDecimal, formatMoney, menuKindLabel } from '../../lib/format';
 import { resolveImageUrl, prepareImageUpload } from '../../lib/images';
 import { useI18n } from '../../i18n';
 
@@ -42,6 +45,8 @@ interface FormState {
   isAvailable: boolean;
   isFeatured: boolean;
   hasSizes: boolean;
+  /** True when the entered prices already include VAT. */
+  taxInclusive: boolean;
   sizes: SizeRow[];
 }
 
@@ -61,6 +66,7 @@ function emptyForm(categories: CategoryDto[]): FormState {
     isAvailable: true,
     isFeatured: false,
     hasSizes: true,
+    taxInclusive: true,
     sizes: [
       {
         key: 'size-1',
@@ -106,6 +112,7 @@ function fromItem(item: MenuItemDto): FormState {
     isAvailable: item.isAvailable,
     isFeatured: item.isFeatured,
     hasSizes: item.hasSizes,
+    taxInclusive: item.taxInclusive,
     sizes: item.sizes.map((size) => ({
       key: size.id,
       nameEn: size.nameEn,
@@ -134,6 +141,13 @@ export function ItemEditorDialog({
   const { t } = useI18n();
   const [form, setForm] = useState<FormState>(() => emptyForm(categories));
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const settingsQuery = useQuery({
+    queryKey: ['settings'],
+    queryFn: () => api.settings.get(),
+    staleTime: 60_000,
+    enabled: open,
+  });
+  const taxRate = Number(settingsQuery.data?.taxRate ?? 14);
 
   useEffect(() => {
     if (!open) return;
@@ -219,6 +233,7 @@ export function ItemEditorDialog({
     isAvailable: form.isAvailable,
     isFeatured: form.isFeatured,
     hasSizes: form.hasSizes,
+    taxInclusive: form.taxInclusive,
     sizes: form.hasSizes
       ? form.sizes.map((size, index) => ({
           name: size.nameEn.trim(),
@@ -474,6 +489,23 @@ export function ItemEditorDialog({
           </div>
         </div>
 
+        <TaxModeField
+          taxInclusive={form.taxInclusive}
+          onChange={(value) => update('taxInclusive', value)}
+          taxRate={taxRate}
+          prices={
+            form.hasSizes
+              ? form.sizes.map((size, index) => ({
+                  key: size.key,
+                  label:
+                    size.nameEn.trim() ||
+                    t('menu.editor.sizeNamePlaceholderEn', { number: index + 1 }),
+                  price: size.price,
+                }))
+              : [{ key: 'base', label: t('menu.editor.tax.basePriceRow'), price: form.basePrice }]
+          }
+        />
+
         {form.hasSizes ? (
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-3">
@@ -579,6 +611,111 @@ export function ItemEditorDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function priceMinor(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed || !Number.isFinite(Number(trimmed)) || Number(trimmed) < 0) return null;
+  try {
+    return toMinorUnits(trimmed);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Asks whether the entered prices include VAT and shows, for every price in
+ * the form, the net amount, the VAT and what the customer pays.
+ */
+function TaxModeField({
+  taxInclusive,
+  onChange,
+  taxRate,
+  prices,
+}: {
+  taxInclusive: boolean;
+  onChange: (value: boolean) => void;
+  taxRate: number;
+  prices: Array<{ key: string; label: string; price: string }>;
+}): ReactElement {
+  const { t } = useI18n();
+  const rate = formatDecimal(taxRate, 2);
+  const options: Array<{ value: boolean; title: string; hint: string }> = [
+    {
+      value: true,
+      title: t('menu.editor.tax.inclusive'),
+      hint: t('menu.editor.tax.inclusiveHint'),
+    },
+    {
+      value: false,
+      title: t('menu.editor.tax.exclusive', { rate }),
+      hint: t('menu.editor.tax.exclusiveHint', { rate }),
+    },
+  ];
+  const cell = (value: number | undefined): string =>
+    value === undefined ? '—' : formatMoney(fromMinorUnits(value));
+
+  return (
+    <div className="space-y-2 rounded-lg border border-border p-3">
+      <div>
+        <p className="text-sm font-semibold">{t('menu.editor.tax.title')}</p>
+        <p className="text-xs text-muted-foreground">{t('menu.editor.tax.question')}</p>
+      </div>
+      <div
+        role="radiogroup"
+        aria-label={t('menu.editor.tax.title')}
+        className="grid gap-2 sm:grid-cols-2"
+      >
+        {options.map((option) => {
+          const selected = option.value === taxInclusive;
+          return (
+            <button
+              key={String(option.value)}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              onClick={() => onChange(option.value)}
+              className={`rounded-lg border px-3 py-2 text-start transition-colors ${
+                selected
+                  ? 'border-primary bg-primary/10 ring-1 ring-primary'
+                  : 'border-border hover:bg-muted/40'
+              }`}
+            >
+              <span className="block text-sm font-semibold">{option.title}</span>
+              <span className="block text-[11px] text-muted-foreground">{option.hint}</span>
+            </button>
+          );
+        })}
+      </div>
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="text-muted-foreground">
+            <th className="py-1 text-start font-medium">{t('menu.editor.tax.price')}</th>
+            <th className="py-1 text-end font-medium">{t('menu.editor.tax.net')}</th>
+            <th className="py-1 text-end font-medium">{t('menu.editor.tax.vat', { rate })}</th>
+            <th className="py-1 text-end font-medium">{t('menu.editor.tax.final')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {prices.map((row) => {
+            const minor = priceMinor(row.price);
+            const breakdown =
+              minor === null ? null : describeEnteredPrice(minor, taxInclusive, taxRate);
+            return (
+              <tr key={row.key} className="border-t border-border">
+                <td className="py-1">{row.label}</td>
+                <td className="numeric py-1 text-end">{cell(breakdown?.netMinor)}</td>
+                <td className="numeric py-1 text-end">{cell(breakdown?.taxMinor)}</td>
+                <td className="numeric py-1 text-end font-semibold">
+                  {cell(breakdown?.finalMinor)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

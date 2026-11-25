@@ -66,7 +66,7 @@ export const kitchenOrderInclude = {
       sizeNameAr: true,
       specialInstructions: true,
       toppings: { select: { name: true, nameAr: true } },
-      menuItem: { select: { prepMinutes: true } },
+      menuItem: { select: { prepMinutes: true, categoryId: true } },
     },
     orderBy: { createdAt: 'asc' },
   },
@@ -214,6 +214,7 @@ export function toMenuItemDto(
     soldOutReason,
     isFeatured: item.isFeatured,
     hasSizes: item.hasSizes,
+    taxInclusive: item.taxInclusive,
     sizes: item.sizes.map((size) => ({
       id: size.id,
       name: pickLocalized(language, size.name, size.nameAr),
@@ -396,6 +397,7 @@ export function toOrderDto(order: OrderRow): OrderDto {
     discountLabelEn: order.discountLabel,
     discountLabelAr: order.discountLabelAr,
     tax: money(order.tax),
+    taxIncluded: money(order.taxIncluded),
     deliveryFee: money(order.deliveryFee),
     total: money(order.total),
     amountPaid: money(order.amountPaid),
@@ -405,6 +407,7 @@ export function toOrderDto(order: OrderRow): OrderDto {
     isCod: order.isCod,
     refundedTotal: refundedTotal.toFixed(2),
     notes: order.notes,
+    externalRef: order.externalRef,
     items: order.items.map((item) => ({
       id: item.id,
       menuItemId: item.menuItemId,
@@ -421,6 +424,7 @@ export function toOrderDto(order: OrderRow): OrderDto {
       unitPrice: money(item.unitPrice),
       toppingsTotal: money(item.toppingsTotal),
       lineTotal: money(item.lineTotal),
+      taxInclusive: item.taxInclusive,
       unitCost: money(item.unitCost),
       specialInstructions: item.specialInstructions,
       toppings: item.toppings.map((topping) => ({
@@ -498,8 +502,10 @@ export function toKitchenOrderDto(order: KitchenOrderRow): KitchenOrderDto {
     status: toApiStatus(order.status),
     tableNumber: order.tableNumber,
     notes: order.notes,
+    externalRef: order.externalRef,
     items: order.items.map((item) => ({
       id: item.id,
+      categoryId: item.menuItem.categoryId,
       name: pickLocalized(language, item.menuItemName, item.menuItemNameAr),
       quantity: item.quantity,
       sizeName: pickLocalizedNullable(language, item.sizeName, item.sizeNameAr),

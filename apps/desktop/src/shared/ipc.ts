@@ -23,6 +23,12 @@ export const IPC = {
   apiRequest: 'api:request',
   /** Renderer -> main: print the current window. */
   appPrint: 'app:print',
+  /** Renderer -> main: installed Windows printers. */
+  printersList: 'printers:list',
+  /** Renderer -> main: silent receipt to a named printer. */
+  printersPrintHtml: 'printers:print-html',
+  /** Renderer -> main: raw ESC/POS to a LAN printer. */
+  printersPrintRaw: 'printers:print-raw',
 } as const;
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC];
@@ -33,11 +39,14 @@ export type {
   ApiResponse,
   AppInfo,
   ChangePasswordPayload,
+  HtmlPrintJob,
   HttpMethod,
+  LocalPrinterInfo,
   LoginPayload,
   LoginResult,
   PrintOptions,
   PrintResult,
+  RawPrintJob,
   ServerHealth,
   SessionState,
   SessionUser,

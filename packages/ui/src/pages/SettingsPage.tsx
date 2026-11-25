@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import { DeviceSummaryCard } from '../components/device/DeviceSetupWizard';
 import { Button } from '../components/ui/button';
 import {
   Card,
@@ -180,6 +181,9 @@ export function SettingsPage(): ReactElement {
   const dirty = JSON.stringify(form) !== JSON.stringify(toForm(settings.data));
 
   return (
+    <div className="space-y-4">
+      {/* Kept outside the form so its buttons never submit restaurant settings. */}
+      <DeviceSummaryCard />
     <form
       className="space-y-4"
       onSubmit={(event) => {
@@ -491,5 +495,6 @@ export function SettingsPage(): ReactElement {
         </CardContent>
       </Card>
     </form>
+    </div>
   );
 }

@@ -13,6 +13,8 @@ import { useLanguageStore } from './store/language';
 import { LoginPage } from './pages/LoginPage';
 import { ChangePasswordPage } from './pages/ChangePasswordPage';
 import { useAuthStore } from './store/auth';
+import { DeviceSetupScreen } from './components/device/DeviceSetupWizard';
+import { readDeviceConfig, useDeviceConfig } from './lib/device';
 
 // Pages are split into their own chunks and fetched on first visit, so the
 // sign-in screen does not pay for the whole application.
@@ -100,6 +102,9 @@ const ShiftsPage = lazy(() =>
 const TablesPage = lazy(() =>
   import('./pages/TablesPage').then((m) => ({ default: m.TablesPage })),
 );
+const PrintersPage = lazy(() =>
+  import('./pages/PrintersPage').then((m) => ({ default: m.PrintersPage })),
+);
 const SettingsPage = lazy(() =>
   import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 );
@@ -115,7 +120,13 @@ const queryClient = new QueryClient({
   },
 });
 
-function defaultPageFor(role: string | undefined): PageKey {
+function defaultPageFor(
+  role: string | undefined,
+  can: (permission: Permission) => boolean,
+): PageKey {
+  // A configured terminal opens on its own screen when the role allows it.
+  const start = readDeviceConfig()?.startScreen;
+  if (start && isPageAllowed(start, role, can)) return start;
   if (role === 'KITCHEN_STAFF') return 'kitchen';
   if (role === 'DRIVER') return 'delivery';
   return role === 'ADMIN' ? 'dashboard' : 'pos';
@@ -244,6 +255,9 @@ function Shell({ routing }: Required<RootProps>): ReactElement {
   const bootstrap = useAuthStore((state) => state.bootstrap);
   const applySession = useAuthStore((state) => state.applySession);
   const bridgeAvailable = useMemo(() => hasBridge(), []);
+  // Only the Windows app (which can print silently) runs first-time device setup.
+  const isDesktop = useMemo(() => hasBridge() && Boolean(getBridge().printing), []);
+  const device = useDeviceConfig();
   const [page, setPage] = useState<PageKey | null>(null);
   const [bootVisible, setBootVisible] = useState(true);
   const [entryPhase, setEntryPhase] = useState<'hidden' | 'visible' | 'leaving'>('hidden');
@@ -287,7 +301,7 @@ function Shell({ routing }: Required<RootProps>): ReactElement {
       if (current && isPageAllowed(current, user.role, can)) return current;
       const requested = urlRouting ? pageFromLocation() : null;
       if (requested && isPageAllowed(requested, user.role, can)) return requested;
-      return defaultPageFor(user.role);
+      return defaultPageFor(user.role, can);
     });
   }, [user, can, urlRouting]);
 
@@ -320,6 +334,7 @@ function Shell({ routing }: Required<RootProps>): ReactElement {
 
   if (!bridgeAvailable) return <BridgeMissing />;
   if (status === 'loading' || bootVisible) return <Splash />;
+  if (isDesktop && !device) return <DeviceSetupScreen onDone={() => undefined} />;
   if (status === 'anonymous' || !user) return <LoginPage />;
   if (user.mustChangePassword) return <ChangePasswordPage />;
   if (!page) return <Splash />;
@@ -363,6 +378,7 @@ function Shell({ routing }: Required<RootProps>): ReactElement {
           {page === 'users' ? <UsersPage /> : null}
           {page === 'branches' ? <BranchesPage /> : null}
           {page === 'shifts' ? <ShiftsPage /> : null}
+          {page === 'printers' ? <PrintersPage /> : null}
           {page === 'settings' ? <SettingsPage /> : null}
         </Suspense>
       </AppShell>

@@ -772,7 +772,7 @@ hrRouter.patch(
   validate({ body: hrSettingsUpdateSchema }),
   asyncHandler(async (req, res) => {
     const input = req.body as HrSettingsUpdateInput;
-    const updated = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const row = await tx.hrSettings.upsert({
         where: { id: 'default' },
         create: {

@@ -5,10 +5,12 @@ import {
   buildPaginated,
   canTransitionOrder,
   fromMinorUnits,
+  computeOrderTax,
   sumCurrency,
   toMinorUnits,
   type IngredientUnit,
   type OrderAddItemsInput,
+  type OrderChannel,
   type OrderCreateInput,
   type OrderQuery,
   type OrderRefundInput,
@@ -18,6 +20,7 @@ import {
   type PublicQuoteDto,
   type PublicQuoteInput,
   type Role,
+  type TaxLineInput,
 } from '@posshope/shared';
 import { prisma } from '../../prisma.js';
 import type { PrismaLike } from '../../lib/audit.js';
@@ -48,8 +51,8 @@ interface Actor {
 interface OrderContext {
   branchId: string;
   terminalId: string;
-  /** Only the storefront sets this; POS orders are always POS. */
-  channel?: 'POS' | 'ONLINE';
+  /** Only the storefront sets this; staff orders take `input.channel` (POS or TALABAT). */
+  channel?: OrderChannel;
   /** Online card orders stay unpaid until the gateway confirms capture. */
   onlineCard?: boolean;
   expectedZoneId?: string | null;
@@ -78,6 +81,7 @@ interface PreparedLine {
   unitPrice: string;
   toppingPrice: string;
   lineTotal: string;
+  taxInclusive: boolean;
   unitCost: string;
   multiplier: number;
   specialInstructions: string | null;
@@ -416,6 +420,7 @@ function prepareLines(
       unitPrice,
       toppingPrice,
       lineTotal,
+      taxInclusive: menuItem.taxInclusive,
       unitCost,
       multiplier: effectiveMultiplier,
       specialInstructions: line.specialInstructions ?? null,
@@ -438,6 +443,7 @@ function lineCreateData(line: PreparedLine) {
     unitPrice: line.unitPrice,
     toppingsTotal: line.toppingPrice,
     lineTotal: line.lineTotal,
+    taxInclusive: line.taxInclusive,
     unitCost: line.unitCost,
     specialInstructions: line.specialInstructions,
     toppings: {
@@ -449,6 +455,13 @@ function lineCreateData(line: PreparedLine) {
       })),
     },
   };
+}
+
+function taxLines(lines: readonly PreparedLine[]): TaxLineInput[] {
+  return lines.map((line) => ({
+    amountMinor: moneyMinor(line.lineTotal),
+    taxInclusive: line.taxInclusive,
+  }));
 }
 
 function paymentPlan(
@@ -749,7 +762,6 @@ export async function quoteOrder(input: PublicQuoteInput): Promise<PublicQuoteDt
   const arabic = currentLanguage() === 'ar';
 
   const subtotalMinor = prepared.reduce((sum, line) => sum + moneyMinor(line.lineTotal), 0);
-  const taxMinor = Math.round((subtotalMinor * Number(settings.taxRate)) / 100);
 
   let deliveryFeeMinor: number | null = 0;
   let deliveryZoneId: string | null = null;
@@ -774,6 +786,12 @@ export async function quoteOrder(input: PublicQuoteInput): Promise<PublicQuoteDt
     }
   }
 
+  const totals = computeOrderTax({
+    lines: taxLines(prepared),
+    taxRate: Number(settings.taxRate),
+    deliveryFeeMinor: deliveryFeeMinor ?? 0,
+  });
+
   return {
     currency: settings.currency,
     lines: prepared.map((line) => ({
@@ -790,11 +808,12 @@ export async function quoteOrder(input: PublicQuoteInput): Promise<PublicQuoteDt
     })),
     subtotal: fromMinorUnits(subtotalMinor),
     taxRate: Number(settings.taxRate).toFixed(2),
-    tax: fromMinorUnits(taxMinor),
+    tax: fromMinorUnits(totals.taxMinor),
+    taxIncluded: fromMinorUnits(totals.includedTaxMinor),
     deliveryFee: deliveryFeeMinor === null ? null : fromMinorUnits(deliveryFeeMinor),
     deliveryZoneId,
     deliveryIssue,
-    total: fromMinorUnits(subtotalMinor + taxMinor + (deliveryFeeMinor ?? 0)),
+    total: fromMinorUnits(totals.totalMinor),
   };
 }
 
@@ -891,8 +910,6 @@ export async function createOrder(
       }
     }
   }
-  const taxableMinor = Math.max(subtotalMinor - discountMinor, 0);
-  const taxMinor = Math.round((taxableMinor * Number(settings.taxRate)) / 100);
   let deliveryMinor = 0;
   let deliveryZoneId: string | null = null;
   if (input.type === 'DELIVERY') {
@@ -924,7 +941,14 @@ export async function createOrder(
     deliveryMinor = resolved.deliveryFeeMinor;
     deliveryZoneId = resolved.zoneId;
   }
-  const totalMinor = taxableMinor + taxMinor + deliveryMinor;
+  const totals = computeOrderTax({
+    lines: taxLines(prepared),
+    discountMinor,
+    taxRate: Number(settings.taxRate),
+    deliveryFeeMinor: deliveryMinor,
+  });
+  const taxMinor = totals.taxMinor;
+  const totalMinor = totals.totalMinor;
 
   const onlineCard = context?.onlineCard === true;
   const deferredPayment = input.payLater || input.isCod || onlineCard;
@@ -937,7 +961,7 @@ export async function createOrder(
     orderNumber,
     idempotencyKey: input.idempotencyKey ?? null,
     type: input.type,
-    channel: context?.channel ?? 'POS',
+    channel: context?.channel ?? input.channel ?? 'POS',
     status: 'PENDING',
     branch: { connect: { id: branchId } },
     ...(table ? { table: { connect: { id: table.id } } } : {}),
@@ -957,6 +981,7 @@ export async function createOrder(
     discountLabelAr: discount?.nameAr ?? null,
     ...(discount ? { discountRel: { connect: { id: discount.id } } } : {}),
     tax: fromMinorUnits(taxMinor),
+    taxIncluded: fromMinorUnits(totals.includedTaxMinor),
     deliveryFee: fromMinorUnits(deliveryMinor),
     total: fromMinorUnits(totalMinor),
     amountPaid: fromMinorUnits(plan?.amountPaidMinor ?? 0),
@@ -966,6 +991,7 @@ export async function createOrder(
     isCod: input.isCod,
     ...(input.type === 'DELIVERY' ? { deliveryStatus: 'PENDING' as const } : {}),
     notes: input.notes ?? null,
+    externalRef: input.externalRef ?? null,
     inventoryDeducted: deductNow,
     ...(deductNow
       ? {}
@@ -1089,10 +1115,27 @@ export async function addOrderItems(
 
     const newSubtotalMinor = moneyMinor(Number(current.subtotal).toFixed(2)) + addedSubtotalMinor;
     const discountMinor = Math.min(moneyMinor(Number(current.discount).toFixed(2)), newSubtotalMinor);
-    const taxableMinor = Math.max(newSubtotalMinor - discountMinor, 0);
-    const taxMinor = Math.round((taxableMinor * Number(settings.taxRate)) / 100);
     const deliveryMinor = moneyMinor(Number(current.deliveryFee).toFixed(2));
-    const totalMinor = taxableMinor + taxMinor + deliveryMinor;
+    // Re-price the whole tab so inclusive and exclusive lines are taxed by
+    // the same rules as checkout.
+    const existingLines = await tx.orderItem.findMany({
+      where: { orderId: order.id },
+      select: { lineTotal: true, taxInclusive: true },
+    });
+    const totals = computeOrderTax({
+      lines: [
+        ...existingLines.map((line) => ({
+          amountMinor: moneyMinor(Number(line.lineTotal).toFixed(2)),
+          taxInclusive: line.taxInclusive,
+        })),
+        ...taxLines(prepared),
+      ],
+      discountMinor,
+      taxRate: Number(settings.taxRate),
+      deliveryFeeMinor: deliveryMinor,
+    });
+    const taxMinor = totals.taxMinor;
+    const totalMinor = totals.totalMinor;
 
     const claimed = await tx.order.updateMany({
       where: { id: order.id, paymentStatus: 'UNPAID', status: { not: 'CANCELLED' } },
@@ -1100,6 +1143,7 @@ export async function addOrderItems(
         subtotal: fromMinorUnits(newSubtotalMinor),
         discount: fromMinorUnits(discountMinor),
         tax: fromMinorUnits(taxMinor),
+        taxIncluded: fromMinorUnits(totals.includedTaxMinor),
         total: fromMinorUnits(totalMinor),
         // New items must reach the kitchen even if the tab was already served.
         ...(current.status !== 'PENDING' ? { status: 'PENDING' as const, completedAt: null } : {}),
@@ -1573,7 +1617,7 @@ export async function cancelOrder(
 }
 
 function assertCanAccess(
-  order: { cashierId: string; branchId: string; channel: 'POS' | 'ONLINE' },
+  order: { cashierId: string; branchId: string; channel: OrderChannel },
   actor: Actor,
 ): void {
   if (actor.role === 'CASHIER' && order.cashierId !== actor.id && order.channel !== 'ONLINE') {
@@ -1615,6 +1659,7 @@ export async function listOrders(
         { orderNumber: { contains: query.q, mode: 'insensitive' } },
         { customerName: { contains: query.q, mode: 'insensitive' } },
         { customerPhone: { contains: query.q, mode: 'insensitive' } },
+        { externalRef: { contains: query.q, mode: 'insensitive' } },
       ],
     });
   }

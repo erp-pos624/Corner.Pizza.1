@@ -98,7 +98,8 @@
     },
     "orderChannel": {
       "POS": "داخل المطعم",
-      "ONLINE": "أونلاين"
+      "ONLINE": "أونلاين",
+      "TALABAT": "طلبات"
     },
     "paymentMethod": {
       "CASH": "نقدي",
@@ -291,5 +292,8 @@
     "busy": "جارٍ التحضير…",
     "done": "الملف جاهز",
     "failed": "تعذّر التصدير"
+  },
+  "printing": {
+    "failedTitle": "فشلت الطابعة \"{printer}\""
   }
 }
