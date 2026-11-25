@@ -17,7 +17,32 @@ if (existsSync(envFile)) {
 // instead of DATABASE_URL; accept them so the connection is not duplicated.
 process.env.DATABASE_URL ??= process.env.POSTGRES_PRISMA_URL;
 
-const envSchema = z.object({
+/**
+ * Dashboards (Vercel included) make it easy to save a variable with an empty
+ * value. Treat empty or whitespace-only values as "not set" so an optional
+ * setting can never stop the API from starting.
+ */
+function blankToUndefined(value: unknown): unknown {
+  return typeof value === 'string' && value.trim() === '' ? undefined : value;
+}
+
+/** Optional setting where a blank value means "not set". */
+function optionalSetting<T extends z.ZodTypeAny>(schema: T) {
+  return z.preprocess(blankToUndefined, schema.optional());
+}
+
+/**
+ * Display-only setting: blank means "not set", and an invalid value is
+ * ignored (reported by `parseEnv`) instead of failing startup.
+ */
+function displaySetting<T extends z.ZodTypeAny>(schema: T) {
+  return z.preprocess(blankToUndefined, schema.optional().catch(undefined));
+}
+
+/** Display-only keys whose invalid values are dropped rather than fatal. */
+const DISPLAY_ONLY_KEYS = ['DESKTOP_DOWNLOAD_URL', 'DESKTOP_VERSION', 'DESKTOP_SHA256'] as const;
+
+export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   HOST: z.string().default('127.0.0.1'),
   PORT: z.coerce.number().int().min(1).max(65535).default(4000),
@@ -53,18 +78,28 @@ const envSchema = z.object({
   /** Optional Nominatim-compatible geocoder used for address-only delivery checks. */
   GEOCODER_URL: z.string().trim().optional(),
   /** Supabase Storage image hosting. Required for menu image uploads. */
-  SUPABASE_URL: z.string().trim().url().optional(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().trim().optional(),
-  SUPABASE_MENU_BUCKET: z.string().trim().default('menu-images'),
+  SUPABASE_URL: optionalSetting(z.string().trim().url()),
+  SUPABASE_SERVICE_ROLE_KEY: optionalSetting(z.string().trim()),
+  SUPABASE_MENU_BUCKET: z.preprocess(blankToUndefined, z.string().trim().default('menu-images')),
   /** Public link to the latest Windows POS installer (CornerPOS-Setup.exe). */
-  DESKTOP_DOWNLOAD_URL: z.string().trim().url().optional(),
-  /** Version shown next to the download button, e.g. 0.1.4. */
-  DESKTOP_VERSION: z.string().trim().max(40).optional(),
+  DESKTOP_DOWNLOAD_URL: displaySetting(z.string().trim().url()),
+  /** Version shown next to the download button, e.g. 0.1.5. */
+  DESKTOP_VERSION: displaySetting(z.string().trim().max(40)),
   /** Optional SHA-256 of the installer so staff can verify the download. */
-  DESKTOP_SHA256: z.string().trim().regex(/^[a-fA-F0-9]{64}$/u).optional(),
+  DESKTOP_SHA256: displaySetting(z.string().trim().regex(/^[a-fA-F0-9]{64}$/u)),
 });
 
 export type Env = z.infer<typeof envSchema>;
+
+/** Keys that were set to a non-blank value but dropped as invalid. */
+export function ignoredDisplaySettings(
+  source: Record<string, string | undefined>,
+  parsed: Pick<Env, (typeof DISPLAY_ONLY_KEYS)[number]>,
+): string[] {
+  return DISPLAY_ONLY_KEYS.filter(
+    (key) => blankToUndefined(source[key]) !== undefined && parsed[key] === undefined,
+  );
+}
 
 function parseEnv(): Env {
   const parsed = envSchema.safeParse(process.env);
@@ -75,6 +110,10 @@ function parseEnv(): Env {
     throw new Error(`Invalid server environment configuration:\n${issues}`);
   }
   const env = parsed.data;
+  for (const key of ignoredDisplaySettings(process.env, env)) {
+    // The logger depends on this module, so report through the console.
+    console.warn(`[env] ${key} has an invalid value and is ignored (treated as not set).`);
+  }
   if (env.NODE_ENV === 'production' && env.JWT_SECRET.startsWith('dev-only')) {
     throw new Error('JWT_SECRET must be set to a strong, unique value in production');
   }
