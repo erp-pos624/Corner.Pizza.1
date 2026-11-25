@@ -22,6 +22,7 @@
     "db:studio": "prisma studio",
     "storage:setup": "node scripts/setup-storage.mjs",
     "menu:sync": "tsx --env-file-if-exists=.env scripts/sync-official-menu.ts",
+    "data:wipe-test-orders": "tsx --env-file-if-exists=.env scripts/wipe-test-orders.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {
