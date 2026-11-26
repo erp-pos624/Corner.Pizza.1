@@ -275,5 +275,33 @@
     "presentDays": "Present days",
     "absentDays": "Absent days",
     "lateMinutes": "Late minutes"
+  },
+  "shifts": {
+    "title": "Shifts",
+    "description": "Named shifts such as Morning and Evening. Lateness is measured from the shift start; without a shift, the work window above applies.",
+    "add": "Add shift",
+    "name": "Shift name",
+    "namePlaceholder": "e.g. Morning",
+    "nameAr": "Arabic name (optional)",
+    "start": "Starts",
+    "end": "Ends",
+    "grace": "Grace minutes",
+    "gracePlaceholder": "Use HR default",
+    "active": "Shift is active",
+    "off": "Off",
+    "overnight": "overnight",
+    "overnightHint": "Ends after midnight: an end time earlier than the start runs into the next day.",
+    "graceShort": "grace {minutes}",
+    "defaultGrace": "default",
+    "employees": "{count} employees",
+    "empty": "No shifts yet. Add Morning and Evening shifts to measure lateness per shift.",
+    "edit": "Edit {name}",
+    "delete": "Delete {name}",
+    "saved": "Shift saved",
+    "deleted": "Shift deleted",
+    "saveFailed": "Could not save the shift",
+    "employeeShift": "Usual shift",
+    "attendanceShift": "Shift worked",
+    "defaultWindow": "Default work window"
   }
 }

@@ -18,11 +18,15 @@ import { prisma } from '../../prisma.js';
 
 export type Db = typeof prisma | Prisma.TransactionClient;
 
-export const employeeInclude = { branch: { select: { name: true } } } satisfies Prisma.EmployeeInclude;
+export const employeeInclude = {
+  branch: { select: { name: true } },
+  shift: { select: { name: true } },
+} satisfies Prisma.EmployeeInclude;
 type EmployeeRow = Prisma.EmployeeGetPayload<{ include: typeof employeeInclude }>;
 
 export const attendanceInclude = {
   employee: { select: { employeeCode: true, fullName: true } },
+  shift: { select: { name: true } },
 } satisfies Prisma.AttendanceRecordInclude;
 type AttendanceRow = Prisma.AttendanceRecordGetPayload<{ include: typeof attendanceInclude }>;
 
@@ -65,13 +69,30 @@ export function minutesOfDay(time: string): number {
   return hours * 60 + minutes;
 }
 
+/** Shift timing used for lateness; null fields fall back to HR Settings. */
+export interface ShiftTiming {
+  startTime: string;
+  endTime: string;
+  graceMinutes: number | null;
+}
+
+/**
+ * Minutes late against the shift start (or the HR Settings work start) plus
+ * grace. For a shift that runs past midnight, a check-in after midnight is
+ * counted as late into the same shift rather than as early for the next day.
+ */
 export function computeLateMinutes(
   checkIn: string | null | undefined,
   settings: HrSettingsDto,
+  shift?: ShiftTiming | null,
 ): number {
   if (!checkIn) return 0;
-  const threshold = minutesOfDay(settings.workStart) + settings.graceMinutes;
-  return Math.max(0, minutesOfDay(checkIn) - threshold);
+  const start = minutesOfDay(shift?.startTime ?? settings.workStart);
+  const grace = shift?.graceMinutes ?? settings.graceMinutes;
+  let late = minutesOfDay(checkIn) - (start + grace);
+  const overnight = shift ? minutesOfDay(shift.endTime) <= start : false;
+  if (overnight && late < -12 * 60) late += 24 * 60;
+  return Math.max(0, late);
 }
 
 export async function getHrSettings(client: Db = prisma): Promise<HrSettingsDto> {
@@ -135,6 +156,8 @@ export function toEmployeeDto(employee: EmployeeRow): EmployeeDto {
     basicSalary: Number(employee.basicSalary).toFixed(2),
     salaryType: employee.salaryType,
     status: employee.status,
+    shiftId: employee.shiftId,
+    shiftName: employee.shift?.name ?? null,
     createdAt: employee.createdAt.toISOString(),
   };
 }
@@ -151,6 +174,8 @@ export function toAttendanceDto(row: AttendanceRow): AttendanceDto {
     status: row.status,
     lateMinutes: row.lateMinutes,
     note: row.note,
+    shiftId: row.shiftId,
+    shiftName: row.shift?.name ?? null,
     updatedAt: row.updatedAt.toISOString(),
   };
 }

@@ -37,6 +37,8 @@ export const employeeCreateSchema = z
     basicSalary: moneyString,
     salaryType: z.enum(SALARY_TYPES).default('MONTHLY'),
     status: z.enum(EMPLOYMENT_STATUSES).default('ACTIVE'),
+    /** Usual shift; attendance defaults to it. Null = the HR Settings work window. */
+    shiftId: z.string().trim().min(1).nullable().optional(),
   })
   .strict();
 export type EmployeeCreateInput = z.infer<typeof employeeCreateSchema>;
@@ -63,10 +65,13 @@ export const attendanceUpsertSchema = z
     checkOut: timeOfDaySchema.optional(),
     status: z.enum(ATTENDANCE_STATUSES).default('PRESENT'),
     note: optionalTrimmedString(300),
+    /** Shift worked; omitted uses the employee's usual shift. */
+    shiftId: z.string().trim().min(1).nullable().optional(),
   })
   .strict()
-  .refine((value) => !(value.checkIn && value.checkOut) || value.checkOut > value.checkIn, {
-    message: 'Check-out must be after check-in',
+  // A check-out earlier than the check-in is an overnight shift (e.g. 17:00 → 01:00).
+  .refine((value) => !(value.checkIn && value.checkOut) || value.checkOut !== value.checkIn, {
+    message: 'Check-out must differ from check-in',
     path: ['checkOut'],
   });
 export type AttendanceUpsertInput = z.infer<typeof attendanceUpsertSchema>;
@@ -140,3 +145,22 @@ export const hrSettingsUpdateSchema = z
     path: ['workEnd'],
   });
 export type HrSettingsUpdateInput = z.infer<typeof hrSettingsUpdateSchema>;
+
+/** A named shift. An end at or before the start runs past midnight. */
+export const hrShiftInputSchema = z
+  .object({
+    name: z.string().trim().min(2, 'Shift name is required').max(60),
+    nameAr: optionalTrimmedString(60),
+    startTime: timeOfDaySchema,
+    endTime: timeOfDaySchema,
+    /** Null uses the grace minutes from HR Settings. */
+    graceMinutes: z.coerce.number().int().min(0).max(120).nullable().optional(),
+    isActive: z.boolean().default(true),
+    sortOrder: z.coerce.number().int().min(0).max(99).default(0),
+  })
+  .strict()
+  .refine((value) => value.startTime !== value.endTime, {
+    message: 'Start and end must differ',
+    path: ['endTime'],
+  });
+export type HrShiftInput = z.infer<typeof hrShiftInputSchema>;

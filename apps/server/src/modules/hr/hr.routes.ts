@@ -27,8 +27,12 @@ import {
   type HrSettingsUpdateInput,
   type PayrollGenerateInput,
   type PayrollPaymentInput,
+  hrShiftInputSchema,
+  type HrShiftDto,
+  type HrShiftInput,
 } from '@posshope/shared';
 import type { Prisma } from '@prisma/client';
+import { currentLanguage } from '../../lib/request-language.js';
 import { asyncHandler } from '../../lib/asyncHandler.js';
 import { recordAudit } from '../../lib/audit.js';
 import { parseDateOnly, todayInBusinessTimezone } from '../../lib/dates.js';
@@ -115,6 +119,10 @@ hrRouter.post(
         const branch = await tx.branch.findUnique({ where: { id: input.branchId } });
         if (!branch) throw new ValidationError('Branch not found');
       }
+      if (input.shiftId) {
+        const shift = await tx.hrShift.findUnique({ where: { id: input.shiftId } });
+        if (!shift) throw new ValidationError('Shift not found');
+      }
       const employeeCode = await nextEmployeeCode(tx);
       const row = await tx.employee.create({
         data: {
@@ -127,6 +135,7 @@ hrRouter.post(
           basicSalary: input.basicSalary,
           salaryType: input.salaryType,
           status: input.status,
+          shiftId: input.shiftId ?? null,
         },
         include: employeeInclude,
       });
@@ -161,6 +170,10 @@ hrRouter.patch(
       const branch = await prisma.branch.findUnique({ where: { id: input.branchId } });
       if (!branch) throw new ValidationError('Branch not found');
     }
+    if (input.shiftId) {
+      const shift = await prisma.hrShift.findUnique({ where: { id: input.shiftId } });
+      if (!shift) throw new ValidationError('Shift not found');
+    }
     const updated = await prisma.$transaction(async (tx) => {
       const row = await tx.employee.update({
         where: { id: existing.id },
@@ -173,6 +186,7 @@ hrRouter.patch(
           ...(input.basicSalary !== undefined ? { basicSalary: input.basicSalary } : {}),
           ...(input.salaryType !== undefined ? { salaryType: input.salaryType } : {}),
           ...(input.status !== undefined ? { status: input.status } : {}),
+          ...(input.shiftId !== undefined ? { shiftId: input.shiftId ?? null } : {}),
         },
         include: employeeInclude,
       });
@@ -269,7 +283,7 @@ hrRouter.put(
     const input = req.body as AttendanceUpsertInput;
     const employee = await prisma.employee.findUnique({
       where: { id: input.employeeId },
-      select: { id: true, status: true, fullName: true },
+      select: { id: true, status: true, fullName: true, shiftId: true },
     });
     if (!employee) throw new NotFoundError('Employee not found');
     if (employee.status === 'INACTIVE') {
@@ -278,10 +292,14 @@ hrRouter.put(
     const month = input.date.slice(0, 7);
     await assertPayrollMonthOpen(month);
     const settings = await getHrSettings();
+    // The shift picked for this record, else the employee's usual shift.
+    const shiftId = input.shiftId !== undefined ? input.shiftId : employee.shiftId;
+    const shift = shiftId ? await prisma.hrShift.findUnique({ where: { id: shiftId } }) : null;
+    if (shiftId && !shift) throw new ValidationError('Shift not found');
     const lateMinutes =
       input.status === 'ABSENT' || input.status === 'DAY_OFF'
         ? 0
-        : computeLateMinutes(input.checkIn, settings);
+        : computeLateMinutes(input.checkIn, settings, shift);
     const status =
       input.status === 'PRESENT' && lateMinutes > 0 ? 'LATE' : input.status;
     const date = parseDateOnly(input.date);
@@ -300,6 +318,7 @@ hrRouter.put(
           status,
           lateMinutes,
           note: input.note ?? null,
+          shiftId: shift?.id ?? null,
           createdById: req.user!.id,
         },
         update: {
@@ -308,6 +327,7 @@ hrRouter.put(
           status,
           lateMinutes,
           note: input.note ?? null,
+          shiftId: shift?.id ?? null,
         },
         include: attendanceInclude,
       });
@@ -319,7 +339,7 @@ hrRouter.put(
           before: previous
             ? { status: previous.status, checkIn: previous.checkIn, checkOut: previous.checkOut }
             : undefined,
-          after: { date: input.date, status, lateMinutes },
+          after: { date: input.date, status, lateMinutes, shift: shift?.name ?? null },
           userId: req.user!.id,
         },
         tx,
@@ -845,5 +865,153 @@ hrRouter.get(
       unpaidCount: unpaid._count,
       currentMonth: month,
     });
+  }),
+);
+
+// ---------------------------------------------------------------------------
+// Shifts
+// ---------------------------------------------------------------------------
+
+type ShiftRow = Prisma.HrShiftGetPayload<{ include: { _count: { select: { employees: true } } } }>;
+
+function toShiftDto(row: ShiftRow, language: string): HrShiftDto {
+  return {
+    id: row.id,
+    name: language === 'ar' && row.nameAr ? row.nameAr : row.name,
+    nameEn: row.name,
+    nameAr: row.nameAr,
+    startTime: row.startTime,
+    endTime: row.endTime,
+    graceMinutes: row.graceMinutes,
+    isActive: row.isActive,
+    sortOrder: row.sortOrder,
+    employeeCount: row._count.employees,
+  };
+}
+
+const shiftCount = { _count: { select: { employees: true } } } as const;
+
+hrRouter.get(
+  '/shifts',
+  authorize('hr:read'),
+  asyncHandler(async (_req, res) => {
+    const rows = await prisma.hrShift.findMany({
+      include: shiftCount,
+      orderBy: [{ sortOrder: 'asc' }, { startTime: 'asc' }],
+    });
+    res.status(200).json(rows.map((row) => toShiftDto(row, currentLanguage())));
+  }),
+);
+
+hrRouter.post(
+  '/shifts',
+  authorize('hr:write'),
+  validate({ body: hrShiftInputSchema }),
+  asyncHandler(async (req, res) => {
+    const input = req.body as HrShiftInput;
+    const clash = await prisma.hrShift.findUnique({ where: { name: input.name } });
+    if (clash) throw new ConflictError('A shift with that name already exists');
+    const row = await prisma.$transaction(async (tx) => {
+      const created = await tx.hrShift.create({
+        data: {
+          name: input.name,
+          nameAr: input.nameAr ?? null,
+          startTime: input.startTime,
+          endTime: input.endTime,
+          graceMinutes: input.graceMinutes ?? null,
+          isActive: input.isActive,
+          sortOrder: input.sortOrder,
+        },
+        include: shiftCount,
+      });
+      await recordAudit(
+        {
+          action: 'hr.shift.created',
+          entityType: 'HrShift',
+          entityId: created.id,
+          after: { name: created.name, startTime: created.startTime, endTime: created.endTime },
+          userId: req.user!.id,
+        },
+        tx,
+      );
+      return created;
+    });
+    res.status(201).json(toShiftDto(row, currentLanguage()));
+  }),
+);
+
+hrRouter.put(
+  '/shifts/:id',
+  authorize('hr:write'),
+  validate({ params: idParams, body: hrShiftInputSchema }),
+  asyncHandler(async (req, res) => {
+    const input = req.body as HrShiftInput;
+    const existing = await prisma.hrShift.findUnique({ where: { id: req.params.id! } });
+    if (!existing) throw new NotFoundError('Shift not found');
+    if (input.name !== existing.name) {
+      const clash = await prisma.hrShift.findUnique({ where: { name: input.name } });
+      if (clash) throw new ConflictError('A shift with that name already exists');
+    }
+    // Saved attendance keeps its late minutes; new records use the new times.
+    const row = await prisma.$transaction(async (tx) => {
+      const updated = await tx.hrShift.update({
+        where: { id: existing.id },
+        data: {
+          name: input.name,
+          nameAr: input.nameAr ?? null,
+          startTime: input.startTime,
+          endTime: input.endTime,
+          graceMinutes: input.graceMinutes ?? null,
+          isActive: input.isActive,
+          sortOrder: input.sortOrder,
+        },
+        include: shiftCount,
+      });
+      await recordAudit(
+        {
+          action: 'hr.shift.updated',
+          entityType: 'HrShift',
+          entityId: updated.id,
+          before: { name: existing.name, startTime: existing.startTime, endTime: existing.endTime },
+          after: { name: updated.name, startTime: updated.startTime, endTime: updated.endTime },
+          userId: req.user!.id,
+        },
+        tx,
+      );
+      return updated;
+    });
+    res.status(200).json(toShiftDto(row, currentLanguage()));
+  }),
+);
+
+hrRouter.delete(
+  '/shifts/:id',
+  authorize('hr:write'),
+  validate({ params: idParams }),
+  asyncHandler(async (req, res) => {
+    const existing = await prisma.hrShift.findUnique({
+      where: { id: req.params.id! },
+      include: { _count: { select: { employees: true, attendance: true } } },
+    });
+    if (!existing) throw new NotFoundError('Shift not found');
+    if (existing._count.employees > 0 || existing._count.attendance > 0) {
+      throw new ConflictError(
+        'This shift is assigned to employees or attendance records. Switch it off instead.',
+      );
+    }
+    await prisma.$transaction(async (tx) => {
+      await tx.hrShift.delete({ where: { id: existing.id } });
+      await recordAudit(
+        {
+          action: 'hr.shift.deleted',
+          entityType: 'HrShift',
+          entityId: existing.id,
+          before: { name: existing.name },
+          userId: req.user!.id,
+        },
+        tx,
+      );
+    });
+    res.status(200).json({ ok: true });
   }),
 );

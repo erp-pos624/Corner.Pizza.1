@@ -1238,6 +1238,8 @@ export interface EmployeeDto {
   basicSalary: string;
   salaryType: SalaryType;
   status: EmploymentStatus;
+  shiftId: string | null;
+  shiftName: string | null;
   createdAt: string;
 }
 
@@ -1252,7 +1254,23 @@ export interface AttendanceDto {
   status: AttendanceStatus;
   lateMinutes: number;
   note: string | null;
+  shiftId: string | null;
+  shiftName: string | null;
   updatedAt: string;
+}
+
+export interface HrShiftDto {
+  id: string;
+  name: string;
+  nameEn: string;
+  nameAr: string | null;
+  startTime: string;
+  endTime: string;
+  /** Null = HR Settings grace minutes. */
+  graceMinutes: number | null;
+  isActive: boolean;
+  sortOrder: number;
+  employeeCount: number;
 }
 
 export interface AdjustmentDto {

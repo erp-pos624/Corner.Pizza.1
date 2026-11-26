@@ -1337,10 +1337,15 @@ model Employee {
   basicSalary  Decimal          @db.Decimal(12, 2)
   salaryType   SalaryType       @default(MONTHLY)
   status       EmploymentStatus @default(ACTIVE)
+  /**
+   * Usual shift; null = the HR Settings work window.
+   */
+  shiftId      String?
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
   branch      Branch?              @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  shift       HrShift?             @relation(fields: [shiftId], references: [id], onDelete: SetNull)
   attendance  AttendanceRecord[]
   adjustments EmployeeAdjustment[]
   payroll     PayrollLine[]
@@ -1360,11 +1365,16 @@ model AttendanceRecord {
   status      AttendanceStatus
   lateMinutes Int              @default(0)
   note        String?
+  /**
+   * Shift worked; late minutes are measured from its start.
+   */
+  shiftId     String?
   createdById String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  shift    HrShift? @relation(fields: [shiftId], references: [id], onDelete: SetNull)
 
   @@unique([employeeId, date])
   @@index([date])
@@ -1540,4 +1550,27 @@ model Printer {
 
   @@index([branchId, isActive])
   @@map("printers")
+}
+
+/**
+ * A named work shift (e.g. Morning 10:00–17:00, Evening 17:00–01:00). An end
+ * at or before the start runs past midnight. Late minutes are measured from
+ * the shift start plus its grace (or the HR Settings grace when null).
+ */
+model HrShift {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  nameAr       String?
+  startTime    String
+  endTime      String
+  graceMinutes Int?
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  employees  Employee[]
+  attendance AttendanceRecord[]
+
+  @@map("hr_shifts")
 }

@@ -1,4 +1,6 @@
 import type {
+  HrShiftDto,
+  HrShiftInput,
   PrinterCreateInput,
   PrinterDto,
   PrinterUpdateInput,
@@ -631,6 +633,13 @@ export const api = {
         body: { status },
       }),
     dashboard: () => call<HrDashboardDto>({ method: 'GET', path: '/hr/dashboard' }),
+    shifts: () => call<HrShiftDto[]>({ method: 'GET', path: '/hr/shifts' }),
+    createShift: (body: HrShiftInput) =>
+      call<HrShiftDto>({ method: 'POST', path: '/hr/shifts', body }),
+    updateShift: (id: string, body: HrShiftInput) =>
+      call<HrShiftDto>({ method: 'PUT', path: `/hr/shifts/${id}`, body }),
+    removeShift: (id: string) =>
+      call<{ ok: boolean }>({ method: 'DELETE', path: `/hr/shifts/${id}` }),
     settings: () => call<HrSettingsDto>({ method: 'GET', path: '/hr/settings' }),
     updateSettings: (body: HrSettingsUpdateInput) =>
       call<HrSettingsDto>({ method: 'PATCH', path: '/hr/settings', body }),
