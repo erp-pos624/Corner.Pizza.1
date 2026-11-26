@@ -43,6 +43,27 @@ describe('HR payroll helpers', () => {
     expect(computeLateMinutes(null, settings)).toBe(0);
   });
 
+  it('measures lateness from the assigned shift and its own grace', () => {
+    const morning = { startTime: '10:00', endTime: '17:00', graceMinutes: 5 };
+    expect(computeLateMinutes('10:05', settings, morning)).toBe(0);
+    expect(computeLateMinutes('10:20', settings, morning)).toBe(15);
+    // A shift without its own grace uses the HR Settings grace (10).
+    const noGrace = { startTime: '10:00', endTime: '17:00', graceMinutes: null };
+    expect(computeLateMinutes('10:20', settings, noGrace)).toBe(10);
+    // No shift at all keeps the original single-window behaviour.
+    expect(computeLateMinutes('09:25', settings, null)).toBe(15);
+  });
+
+  it('handles an evening shift that runs past midnight', () => {
+    const evening = { startTime: '17:00', endTime: '01:00', graceMinutes: 10 };
+    expect(computeLateMinutes('16:50', settings, evening)).toBe(0);
+    expect(computeLateMinutes('17:30', settings, evening)).toBe(20);
+    // Arriving at 00:15 is 7h05m late into the same shift, not "early".
+    expect(computeLateMinutes('00:15', settings, evening)).toBe(7 * 60 + 5);
+    // A day shift never wraps: an early check-in is simply on time.
+    expect(computeLateMinutes('06:00', settings, { startTime: '10:00', endTime: '17:00', graceMinutes: 0 })).toBe(0);
+  });
+
   it('parses clock times into minutes of day', () => {
     expect(minutesOfDay('00:00')).toBe(0);
     expect(minutesOfDay('09:25')).toBe(565);

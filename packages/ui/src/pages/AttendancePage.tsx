@@ -212,6 +212,7 @@ export function AttendancePage(): ReactElement {
                       <p className="font-medium">{row.employeeName}</p>
                       <p className="numeric text-[11px] text-muted-foreground">
                         {row.employeeCode}
+                        {row.shiftName ? ` · ${row.shiftName}` : ''}
                       </p>
                     </td>
                     <td className="px-3 py-2.5 text-xs">{formatDate(row.date)}</td>

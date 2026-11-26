@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { INVENTORY_MOVEMENT_TYPES } from '../constants.js';
-import { optionalTrimmedString, paginationSchema } from './common.js';
+import { optionalTrimmedString, paginationSchema, queryBoolean } from './common.js';
 import { moneyString } from './menu.js';
 
 export const ingredientQuerySchema = paginationSchema.extend({
   q: optionalTrimmedString(120),
-  lowStock: z.coerce.boolean().optional(),
-  isActive: z.coerce.boolean().optional(),
+  lowStock: queryBoolean.optional(),
+  isActive: queryBoolean.optional(),
   categoryId: z.string().trim().min(1).optional(),
 });
 export type IngredientQuery = z.infer<typeof ingredientQuerySchema>;

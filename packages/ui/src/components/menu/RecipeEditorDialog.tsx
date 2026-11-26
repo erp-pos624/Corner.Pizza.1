@@ -10,6 +10,7 @@ import { Skeleton } from '../ui/skeleton';
 import { toast } from '../ui/toast';
 import { api } from '../../lib/api';
 import { formatDecimal, formatMoney, unitLabel } from '../../lib/format';
+import { suggestIngredients } from '../../lib/recipe-suggestions';
 import { useI18n } from '../../i18n';
 
 interface RecipeRow {
@@ -121,13 +122,42 @@ export function RecipeEditorDialog({
     },
   });
 
+  // A new row starts with no quantity: the chef enters the real amount, and
+  // the recipe cannot be saved while any amount is missing.
   const addRow = (): void => {
-    const firstFree = (ingredients.data?.items ?? []).find(
-      (ingredient) => !rows.some((row) => row.ingredientId === ingredient.id),
-    );
     setRows((current) => [
       ...current,
-      { key: `row-${Date.now()}`, ingredientId: firstFree?.id ?? '', quantity: '0.1' },
+      { key: `row-${Date.now()}`, ingredientId: '', quantity: '' },
+    ]);
+  };
+
+  const suggestions = useMemo(() => {
+    if (!item) return [];
+    const used = new Set(rows.map((row) => row.ingredientId).filter(Boolean));
+    return suggestIngredients(
+      {
+        nameEn: item.nameEn,
+        descriptionEn: item.descriptionEn,
+        kind: item.kind,
+        categoryNameEn: item.categoryNameEn,
+      },
+      (ingredients.data?.items ?? []).map((ingredient) => ({
+        id: ingredient.id,
+        sku: ingredient.sku,
+        name: ingredient.nameEn,
+      })),
+      used,
+    );
+  }, [item, rows, ingredients.data]);
+
+  const addSuggested = (ingredientIds: readonly string[]): void => {
+    setRows((current) => [
+      ...current,
+      ...ingredientIds.map((ingredientId, index) => ({
+        key: `row-${Date.now()}-${index}`,
+        ingredientId,
+        quantity: '',
+      })),
     ]);
   };
 
@@ -278,6 +308,40 @@ export function RecipeEditorDialog({
                 {t('menu.recipe.add')}
               </Button>
             </div>
+
+            {suggestions.length > 0 ? (
+              <div className="space-y-2 rounded-lg border border-dashed border-border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-semibold">{t('menu.recipe.suggestions.title')}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {t('menu.recipe.suggestions.hint')}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => addSuggested(suggestions.map((entry) => entry.ingredient.id))}
+                  >
+                    {t('menu.recipe.suggestions.addAll')}
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {suggestions.map((entry) => (
+                    <button
+                      key={entry.ingredient.id}
+                      type="button"
+                      onClick={() => addSuggested([entry.ingredient.id])}
+                      title={t(`menu.recipe.suggestions.reasons.${entry.reason}`)}
+                      className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-xs hover:bg-muted"
+                    >
+                      <Plus className="h-3 w-3" />
+                      {ingredientMap.get(entry.ingredient.id)?.name ?? entry.ingredient.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             <div className="grid gap-3 sm:grid-cols-[1fr_160px]">
               <div>

@@ -234,11 +234,19 @@ menuRouter.get(
         where: { isActive: true },
         orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       }),
+      // The register only lists categories that are switched on, so items in
+      // retired categories would otherwise show under "All" as sold out.
       prisma.menuItem.findMany({
+        where: { category: { isActive: true } },
         include: menuItemInclude,
         orderBy: [{ categoryId: 'asc' }, { name: 'asc' }],
       }),
-      prisma.topping.findMany({ orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }] }),
+      // Switched-off toppings are hidden from the item builder rather than
+      // shown as a row of disabled buttons.
+      prisma.topping.findMany({
+        where: { isAvailable: true },
+        orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      }),
       prisma.discount.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
     ]);
     const stockByIngredient = await branchStockMap(resolveBranchId(req));
@@ -282,6 +290,9 @@ menuRouter.get(
           }
         : {}),
       ...(query.categoryId ? { categoryId: query.categoryId } : {}),
+      // Retired items live in switched-off categories; keep them out of the
+      // list unless asked for, or unless that category is picked explicitly.
+      ...(!query.includeHidden && !query.categoryId ? { category: { isActive: true } } : {}),
       ...(query.kind ? { kind: query.kind } : {}),
       ...(query.isAvailable !== undefined ? { isAvailable: query.isAvailable } : {}),
       ...(query.featured !== undefined ? { isFeatured: query.featured } : {}),

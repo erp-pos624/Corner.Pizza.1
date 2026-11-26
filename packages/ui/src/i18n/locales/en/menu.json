@@ -22,7 +22,8 @@
     "availabilityAria": "Filter by availability",
     "allAvailability": "All availability",
     "available": "Available",
-    "soldOut": "Sold out"
+    "soldOut": "Sold out",
+    "showRetired": "Show retired items"
   },
   "columns": {
     "item": "Item",
@@ -261,11 +262,22 @@
     "saveFailed": "Could not save the recipe",
     "chooseEvery": "Choose an ingredient for every row",
     "duplicate": "Each ingredient can only appear once",
-    "quantityError": "Each quantity must be greater than zero",
+    "quantityError": "Enter an amount greater than zero for every ingredient",
     "scope": "Size variant",
     "baseScope": "Base recipe (scaled by size)",
     "sizeHint": "This size uses its own ingredient list instead of the base recipe multiplier.",
     "version": "active v{version}",
-    "costPerUnit": "Cost per unit"
+    "costPerUnit": "Cost per unit",
+    "suggestions": {
+      "title": "Suggested from the menu description",
+      "hint": "Tap to add. Amounts start empty; nothing is saved until every amount is filled in.",
+      "addAll": "Add all",
+      "reasons": {
+        "description": "Mentioned in the item description",
+        "dough": "Base dough for baked items",
+        "packaging": "Pizza packaging",
+        "frying": "Used for frying"
+      }
+    }
   }
 }

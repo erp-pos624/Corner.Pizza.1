@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock, Save } from 'lucide-react';
 import { useEffect, useState, type ReactElement } from 'react';
 import type { HrSettingsDto } from '@posshope/shared';
+import { ShiftsManager } from '../components/hr/ShiftsManager';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -255,6 +256,7 @@ export function HrSettingsPage(): ReactElement {
           </Button>
         </div>
       </form>
+      <ShiftsManager />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type ReactElement } from 'react';
 import {
   HR_DEFAULTS,
@@ -26,6 +26,7 @@ interface AttendanceFormState {
   checkIn: string;
   checkOut: string;
   note: string;
+  shiftId: string;
 }
 
 export function AttendanceDialog({
@@ -52,8 +53,17 @@ export function AttendanceDialog({
     checkIn: '',
     checkOut: '',
     note: '',
+    shiftId: '',
   });
   const [error, setError] = useState<string | null>(null);
+  const shifts = useQuery({
+    queryKey: ['hr', 'shifts'],
+    queryFn: () => api.hr.shifts(),
+    enabled: open,
+    staleTime: 60_000,
+  });
+  const shiftOf = (employeeId: string): string =>
+    employees.find((employee) => employee.id === employeeId)?.shiftId ?? '';
 
   useEffect(() => {
     if (!open) return;
@@ -66,6 +76,7 @@ export function AttendanceDialog({
             checkIn: record.checkIn ?? '',
             checkOut: record.checkOut ?? '',
             note: record.note ?? '',
+            shiftId: record.shiftId ?? '',
           }
         : {
             employeeId: employees[0]?.id ?? '',
@@ -74,6 +85,7 @@ export function AttendanceDialog({
             checkIn: '',
             checkOut: '',
             note: '',
+            shiftId: employees[0]?.shiftId ?? '',
           },
     );
     setError(null);
@@ -88,6 +100,7 @@ export function AttendanceDialog({
         ...(form.checkIn ? { checkIn: form.checkIn } : {}),
         ...(form.checkOut ? { checkOut: form.checkOut } : {}),
         ...(form.note.trim() ? { note: form.note.trim() } : {}),
+        shiftId: form.shiftId || null,
       };
       return api.hr.saveAttendance(body);
     },
@@ -104,13 +117,18 @@ export function AttendanceDialog({
   });
 
   const timingsDisabled = form.status === 'ABSENT' || form.status === 'DAY_OFF';
+  const selectedShift = (shifts.data ?? []).find((shift) => shift.id === form.shiftId) ?? null;
   const latePreview = timingsDisabled
     ? 0
     : computeLatePreview(
         form.checkIn,
-        settings?.workStart ?? HR_DEFAULTS.workStart,
-        settings?.graceMinutes ?? HR_DEFAULTS.graceMinutes,
+        selectedShift?.startTime ?? settings?.workStart ?? HR_DEFAULTS.workStart,
+        selectedShift?.graceMinutes ?? settings?.graceMinutes ?? HR_DEFAULTS.graceMinutes,
+        selectedShift?.endTime ?? null,
       );
+  const shiftOptions = (shifts.data ?? []).filter(
+    (shift) => shift.isActive || shift.id === form.shiftId,
+  );
   const valid = Boolean(form.employeeId) && Boolean(form.date);
 
   return (
@@ -133,7 +151,13 @@ export function AttendanceDialog({
                 id="hr-attendance-employee"
                 value={form.employeeId}
                 disabled={Boolean(record)}
-                onChange={(event) => setForm({ ...form, employeeId: event.target.value })}
+                onChange={(event) =>
+                  setForm({
+                    ...form,
+                    employeeId: event.target.value,
+                    shiftId: shiftOf(event.target.value),
+                  })
+                }
                 required
               >
                 <option value="">{t('hr.attendance.chooseEmployee')}</option>
@@ -155,6 +179,25 @@ export function AttendanceDialog({
                 required
               />
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="hr-attendance-shift">{t('hr.shifts.attendanceShift')}</Label>
+            <Select
+              id="hr-attendance-shift"
+              value={form.shiftId}
+              onChange={(event) => setForm({ ...form, shiftId: event.target.value })}
+            >
+              <option value="">{t('hr.shifts.defaultWindow')}</option>
+              {shiftOptions.map((shift) => (
+                <option key={shift.id} value={shift.id}>
+                  {shift.name} ({shift.startTime}–{shift.endTime})
+                </option>
+              ))}
+            </Select>
+            {selectedShift && selectedShift.endTime <= selectedShift.startTime ? (
+              <p className="text-[11px] text-muted-foreground">{t('hr.shifts.overnightHint')}</p>
+            ) : null}
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">

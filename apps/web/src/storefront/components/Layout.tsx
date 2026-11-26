@@ -17,11 +17,15 @@ function Brand(): ReactElement {
   const { t } = useI18n();
   return (
     <Link to="/" className="flex items-center gap-2.5" aria-label={t('brand.home')}>
-      <img src={logo} alt="" className="h-11 w-11" />
-      <span className="leading-none" dir="ltr">
-        <span className="display block text-2xl tracking-[0.06em]">Corner</span>
-        <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.22em] text-gold">
-          Pizza · Rehab 2
+      <img src={logo} alt="" className="h-11 w-11 shrink-0" />
+      {/* Brand lockup as approved by the client; the branch address shown
+          elsewhere still comes from the official branch data. */}
+      <span className="min-w-0 leading-none" dir="ltr">
+        <span className="display block whitespace-nowrap text-xl uppercase tracking-[0.06em] sm:text-2xl">
+          Corner Pizza
+        </span>
+        <span className="mt-0.5 block whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.22em] text-gold">
+          Eastcourt Rehab 2
         </span>
       </span>
     </Link>

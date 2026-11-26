@@ -79,15 +79,23 @@ export function minutesOfDay(time: string | null | undefined): number | null {
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
+/**
+ * Same rule as the server: minutes after start + grace. Pass the shift end so
+ * a check-in after midnight on an overnight shift counts as late, not early.
+ */
 export function computeLatePreview(
   checkIn: string | null | undefined,
   workStart: string,
   graceMinutes: number,
+  workEnd?: string | null,
 ): number {
-  const start = minutesOfDay(checkIn);
-  const shift = minutesOfDay(workStart);
-  if (start === null || shift === null) return 0;
-  return Math.max(0, start - shift - graceMinutes);
+  const arrived = minutesOfDay(checkIn);
+  const start = minutesOfDay(workStart);
+  if (arrived === null || start === null) return 0;
+  let late = arrived - start - graceMinutes;
+  const end = minutesOfDay(workEnd ?? null);
+  if (end !== null && end <= start && late < -12 * 60) late += 24 * 60;
+  return Math.max(0, late);
 }
 
 function payslipFileName(line: PayrollLineDto, month: string): string {

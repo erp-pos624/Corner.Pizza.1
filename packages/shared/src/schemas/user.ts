@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ROLES } from '../permissions.js';
-import { paginationSchema } from './common.js';
+import { paginationSchema, queryBoolean } from './common.js';
 
 export const userRoleSchema = z.enum(ROLES);
 export type UserRole = z.infer<typeof userRoleSchema>;
@@ -47,7 +47,7 @@ export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export const userQuerySchema = paginationSchema.extend({
   search: z.string().trim().max(128).optional(),
   role: userRoleSchema.optional(),
-  isActive: z.coerce.boolean().optional(),
+  isActive: queryBoolean.optional(),
   sortBy: z
     .enum(['username', 'fullName', 'role', 'isActive', 'lastLoginAt', 'createdAt'])
     .default('createdAt'),

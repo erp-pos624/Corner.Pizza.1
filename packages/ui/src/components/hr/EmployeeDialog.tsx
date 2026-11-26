@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type ReactElement } from 'react';
 import type {
   BranchDto,
@@ -25,6 +25,7 @@ interface EmployeeFormState {
   basicSalary: string;
   salaryType: SalaryType;
   status: 'ACTIVE' | 'INACTIVE';
+  shiftId: string;
 }
 
 function emptyForm(): EmployeeFormState {
@@ -37,6 +38,7 @@ function emptyForm(): EmployeeFormState {
     basicSalary: '',
     salaryType: 'MONTHLY',
     status: 'ACTIVE',
+    shiftId: '',
   };
 }
 
@@ -50,6 +52,7 @@ function formFromEmployee(employee: EmployeeDto): EmployeeFormState {
     basicSalary: employee.basicSalary,
     salaryType: employee.salaryType,
     status: employee.status,
+    shiftId: employee.shiftId ?? '',
   };
 }
 
@@ -68,6 +71,15 @@ export function EmployeeDialog({
   const queryClient = useQueryClient();
   const [form, setForm] = useState<EmployeeFormState>(emptyForm);
   const [error, setError] = useState<string | null>(null);
+  const shifts = useQuery({
+    queryKey: ['hr', 'shifts'],
+    queryFn: () => api.hr.shifts(),
+    enabled: open,
+    staleTime: 60_000,
+  });
+  const shiftOptions = (shifts.data ?? []).filter(
+    (shift) => shift.isActive || shift.id === form.shiftId,
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -86,6 +98,7 @@ export function EmployeeDialog({
         status: form.status,
         ...(form.phone.trim() ? { phone: form.phone.trim() } : {}),
         branchId: form.branchId || null,
+        shiftId: form.shiftId || null,
       };
       if (employee) {
         const update: EmployeeUpdateInput = { ...base };
@@ -230,6 +243,22 @@ export function EmployeeDialog({
                 <option value="INACTIVE">{t('hr.employees.statusInactive')}</option>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="hr-employee-shift">{t('hr.shifts.employeeShift')}</Label>
+            <Select
+              id="hr-employee-shift"
+              value={form.shiftId}
+              onChange={(event) => setForm({ ...form, shiftId: event.target.value })}
+            >
+              <option value="">{t('hr.shifts.defaultWindow')}</option>
+              {shiftOptions.map((shift) => (
+                <option key={shift.id} value={shift.id}>
+                  {shift.name} ({shift.startTime}–{shift.endTime})
+                </option>
+              ))}
+            </Select>
           </div>
 
           {error ? (
