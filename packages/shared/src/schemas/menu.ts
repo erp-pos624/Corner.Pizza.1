@@ -4,7 +4,7 @@ import {
   INGREDIENT_UNITS,
   MENU_KINDS,
 } from '../constants.js';
-import { optionalTrimmedString, paginationSchema } from './common.js';
+import { optionalTrimmedString, paginationSchema, queryBoolean } from './common.js';
 
 export const moneyString = z
   .string()
@@ -154,8 +154,10 @@ export const menuQuerySchema = paginationSchema.extend({
   q: optionalTrimmedString(120),
   categoryId: z.string().trim().min(1).optional(),
   kind: z.enum(MENU_KINDS).optional(),
-  isAvailable: z.coerce.boolean().optional(),
-  featured: z.coerce.boolean().optional(),
+  isAvailable: queryBoolean.optional(),
+  featured: queryBoolean.optional(),
+  /** Include items whose category is switched off (retired menu). Default: hidden. */
+  includeHidden: queryBoolean.optional(),
 });
 export type MenuQuery = z.infer<typeof menuQuerySchema>;
 

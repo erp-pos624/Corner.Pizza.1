@@ -23,11 +23,13 @@ export function useMenuManagement(itemsTabActive: boolean) {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [availability, setAvailability] = useState<MenuAvailability>('all');
+  /** Retired items sit in switched-off categories and stay hidden unless asked for. */
+  const [showRetired, setShowRetired] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
 
   useEffect(() => {
     setPage(1);
-  }, [search, categoryFilter, availability]);
+  }, [search, categoryFilter, availability, showRetired]);
 
   const categories = useQuery({
     queryKey: ['menu', 'categories'],
@@ -36,7 +38,7 @@ export function useMenuManagement(itemsTabActive: boolean) {
   });
 
   const items = useQuery({
-    queryKey: ['menu', 'items', { page, search, categoryFilter, availability }],
+    queryKey: ['menu', 'items', { page, search, categoryFilter, availability, showRetired }],
     queryFn: () =>
       api.menu.items({
         page,
@@ -44,6 +46,7 @@ export function useMenuManagement(itemsTabActive: boolean) {
         q: search || undefined,
         categoryId: categoryFilter || undefined,
         isAvailable: availability === 'all' ? undefined : availability === 'available',
+        includeHidden: showRetired || undefined,
       }),
     placeholderData: (previous) => previous,
     enabled: itemsTabActive,
@@ -144,6 +147,8 @@ export function useMenuManagement(itemsTabActive: boolean) {
     setCategoryFilter,
     availability,
     setAvailability,
+    showRetired,
+    setShowRetired,
     setPage,
     categories,
     items,

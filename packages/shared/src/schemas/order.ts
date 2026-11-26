@@ -6,7 +6,7 @@ import {
   PAYMENT_METHODS,
   STAFF_ORDER_CHANNELS,
 } from '../constants.js';
-import { optionalTrimmedString, paginationSchema } from './common.js';
+import { optionalTrimmedString, paginationSchema, queryBoolean } from './common.js';
 import { moneyString } from './menu.js';
 
 export const orderItemInputSchema = z
@@ -156,8 +156,8 @@ export const orderQuerySchema = paginationSchema.extend({
   cashierId: z.string().trim().min(1).optional(),
   branchId: z.string().trim().min(1).optional(),
   tableId: z.string().trim().min(1).optional(),
-  openTabs: z.coerce.boolean().optional(),
-  today: z.coerce.boolean().optional(),
+  openTabs: queryBoolean.optional(),
+  today: queryBoolean.optional(),
 });
 export type OrderQuery = z.infer<typeof orderQuerySchema>;
 

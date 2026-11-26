@@ -31,6 +31,8 @@ export function MenuItemsTab({ menu, onAdd, onEdit, onRecipe }: MenuItemsTabProp
     setCategoryFilter,
     availability,
     setAvailability,
+    showRetired,
+    setShowRetired,
     setPage,
     toggleItem,
     requestDelete,
@@ -82,6 +84,15 @@ export function MenuItemsTab({ menu, onAdd, onEdit, onRecipe }: MenuItemsTabProp
           <option value="available">{t('menu.filters.available')}</option>
           <option value="soldout">{t('menu.filters.soldOut')}</option>
         </Select>
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-input"
+            checked={showRetired}
+            onChange={(event) => setShowRetired(event.target.checked)}
+          />
+          {t('menu.filters.showRetired')}
+        </label>
       </div>
 
       {items.isLoading ? (

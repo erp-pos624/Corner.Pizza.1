@@ -6,6 +6,17 @@ export const DEFAULT_PAGE_SIZE = 25;
 
 export const idSchema = z.string().trim().min(1).max(64);
 
+/**
+ * Boolean from a URL query string. `z.coerce.boolean()` is wrong here because
+ * `Boolean("false")` is `true`; this maps "true"/"1" and "false"/"0" (and real
+ * booleans) explicitly and rejects anything else.
+ */
+export const queryBoolean = z.preprocess((value) => {
+  if (value === true || value === 'true' || value === '1') return true;
+  if (value === false || value === 'false' || value === '0') return false;
+  return value;
+}, z.boolean());
+
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
