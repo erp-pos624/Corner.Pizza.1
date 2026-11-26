@@ -75,7 +75,7 @@ export function OrderChannelBadge({
 }): ReactElement {
   return (
     <StatusBadge
-      tone={channel === 'ONLINE' ? 'blue' : 'neutral'}
+      tone={channel === 'ONLINE' ? 'blue' : channel === 'TALABAT' ? 'amber' : 'neutral'}
       label={orderChannelLabel(channel)}
       dot={false}
       className={className}

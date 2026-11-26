@@ -62,6 +62,8 @@ describe('orders concurrency regression', () => {
         categoryId: category.id,
         basePrice: '100.00',
         costPrice: '30.00',
+        // These regressions pin the add-on-top (exclusive) maths: 100 + 14%.
+        taxInclusive: false,
       },
     });
     menuItemId = menuItem.id;
@@ -203,6 +205,42 @@ describe('orders concurrency regression', () => {
       select: { ingredientId: true, currentStock: true },
     });
     for (const row of stocks) expect(Number(row.currentStock)).toBeCloseTo(50, 3);
+  });
+
+  it('charges the menu price for a tax-inclusive Talabat order and records the VAT inside it', async () => {
+    const original = await prisma.menuItem.findUniqueOrThrow({ where: { id: multiItemId } });
+    await prisma.menuItem.update({ where: { id: multiItemId }, data: { taxInclusive: true } });
+    try {
+      const created = await orders.createOrder(
+        {
+          type: 'TAKEAWAY',
+          channel: 'TALABAT',
+          externalRef: 'TB-123456789',
+          payLater: false,
+          isCod: false,
+          items: [{ menuItemId: multiItemId, quantity: 2, toppingIds: [] }],
+          payments: [{ method: 'WALLET', amount: '160.00' }],
+        },
+        actor,
+        { branchId, terminalId: 'TST-TERM' },
+      );
+      expect(created.channel).toBe('TALABAT');
+      expect(created.externalRef).toBe('TB-123456789');
+      expect(created.subtotal).toBe('160.00');
+      // 160 × 14 / 114 = 19.65 VAT inside the price; nothing added on top.
+      expect(created.tax).toBe('19.65');
+      expect(created.taxIncluded).toBe('19.65');
+      expect(created.total).toBe('160.00');
+      expect(created.items[0]?.taxInclusive).toBe(true);
+
+      const found = await orders.listOrders({ page: 1, pageSize: 5, q: 'TB-1234' }, actor);
+      expect(found.items.map((order) => order.id)).toContain(created.id);
+    } finally {
+      await prisma.menuItem.update({
+        where: { id: multiItemId },
+        data: { taxInclusive: original.taxInclusive },
+      });
+    }
   });
 
   it('keeps every parallel tab addition in the totals and stock plan', async () => {

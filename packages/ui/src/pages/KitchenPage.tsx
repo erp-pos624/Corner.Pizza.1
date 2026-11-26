@@ -29,6 +29,7 @@ import { KitchenTicket } from '../components/invoice/KitchenTicket';
 import { resolveThermalPaper } from '../lib/receipt-paper';
 import { useI18n, type Translate, type TranslationKey } from '../i18n';
 import { api } from '../lib/api';
+import { useStationPrinting } from '../hooks/useStationPrinting';
 import { cn } from '../lib/utils';
 import {
   formatNumber,
@@ -139,7 +140,7 @@ function TicketCard({
                 {t('kitchen.ticket.newBadge')}
               </span>
             ) : null}
-            {order.channel === 'ONLINE' ? (
+            {order.channel !== 'POS' ? (
               <OnlineTag label={orderChannelLabel(order.channel)} />
             ) : null}
           </div>
@@ -257,6 +258,13 @@ export function KitchenPage(): ReactElement {
   const [detail, setDetail] = useState<KitchenOrderDto | null>(null);
   const [printing, setPrinting] = useState(false);
   const seenPending = useRef<Set<string> | null>(null);
+  const settingsQuery = useQuery({
+    queryKey: ['settings'],
+    queryFn: () => api.settings.get(),
+    staleTime: 60_000,
+  });
+  const station = useStationPrinting({ settings: settingsQuery.data });
+  const printKitchenTicket = station.printKitchenTicket;
 
   const queue = useQuery({
     queryKey: ['kitchen', 'queue'],
@@ -288,13 +296,18 @@ export function KitchenPage(): ReactElement {
     if (fresh.length === 0) return;
 
     setHighlighted(fresh);
+    // Website orders have no till to print them, so the kitchen screen does.
+    // Till orders (in-store and Talabat) are printed by the till at checkout.
+    for (const order of data.orders) {
+      if (fresh.includes(order.id) && order.channel === 'ONLINE') void printKitchenTicket(order);
+    }
     toast.info(
       fresh.length === 1
         ? t('kitchen.toast.newTicket')
         : t('kitchen.toast.newTickets', { count: formatNumber(fresh.length) }),
       t('kitchen.toast.newTitle'),
     );
-  }, [data, t]);
+  }, [data, t, printKitchenTicket]);
 
   useEffect(() => {
     if (highlighted.length === 0) return;

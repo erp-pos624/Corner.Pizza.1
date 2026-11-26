@@ -11,6 +11,7 @@
     "subtotal": "Subtotal",
     "discount": "Discount",
     "tax": "Tax",
+    "taxIncluded": "VAT (included in prices)",
     "delivery": "Delivery",
     "total": "Total",
     "notes": "Notes",
@@ -34,7 +35,8 @@
       "preparing": "Start preparing",
       "ready": "Mark ready",
       "completed": "Complete & invoice"
-    }
+    },
+    "externalRef": "{source} order number"
   },
   "progress": {
     "aria": "Order preparation progress",

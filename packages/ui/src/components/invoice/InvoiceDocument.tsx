@@ -1,6 +1,6 @@
 import { Mail, MapPin, Phone, Printer } from 'lucide-react';
 import type { ReactElement } from 'react';
-import type { OrderDto, SettingsDto } from '@posshope/shared';
+import { fromMinorUnits, toMinorUnits, type OrderDto, type SettingsDto } from '@posshope/shared';
 import cornerLogo from '../../assets/corner-logo.svg';
 import type { ThermalPaper } from '../../lib/receipt-paper';
 import {
@@ -17,6 +17,22 @@ import { getActiveLanguage } from '../../lib/language';
 import { useI18n } from '../../i18n';
 
 export type InvoiceFormat = 'a4' | 'thermal';
+
+/**
+ * Splits the order VAT into the part added on top (tax-exclusive items) and
+ * the part already inside the prices (tax-inclusive items), so receipts never
+ * show embedded VAT as an extra charge. Orders with no VAT at all keep the
+ * single "Tax 0.00" row they always had.
+ */
+function taxRows(order: OrderDto): { added: string; showAdded: boolean; showIncluded: boolean } {
+  const includedMinor = toMinorUnits(order.taxIncluded ?? '0');
+  const addedMinor = toMinorUnits(order.tax) - includedMinor;
+  return {
+    added: fromMinorUnits(addedMinor),
+    showAdded: addedMinor > 0 || includedMinor === 0,
+    showIncluded: includedMinor > 0,
+  };
+}
 
 export function InvoiceDocument({
   order,
@@ -130,7 +146,12 @@ export function InvoiceDocument({
         {Number(order.discount) > 0 ? (
           <div className="row"><span>{t('invoices.document.discount')}{order.discountLabel ? ` · ${order.discountLabel}` : ''}</span><span>−{formatMoney(order.discount)}</span></div>
         ) : null}
-        <div className="row"><span>{t('invoices.document.tax', { rate: Number(settings.taxRate).toFixed(2) })}</span><span>{formatMoney(order.tax)}</span></div>
+        {taxRows(order).showAdded ? (
+          <div className="row"><span>{t('invoices.document.tax', { rate: Number(settings.taxRate).toFixed(2) })}</span><span>{formatMoney(taxRows(order).added)}</span></div>
+        ) : null}
+        {taxRows(order).showIncluded ? (
+          <div className="row" style={{ fontSize: narrow ? 9 : 10 }}><span>{t('invoices.document.taxIncluded', { rate: Number(settings.taxRate).toFixed(2) })}</span><span>{formatMoney(order.taxIncluded)}</span></div>
+        ) : null}
         {Number(order.deliveryFee) > 0 ? (
           <div className="row"><span>{t('invoices.document.delivery')}</span><span>{formatMoney(order.deliveryFee)}</span></div>
         ) : null}
@@ -294,7 +315,12 @@ export function InvoiceDocument({
               <span>−{formatMoney(order.discount)}</span>
             </div>
           ) : null}
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1.2mm 0' }}><span>{t('invoices.document.tax', { rate: Number(settings.taxRate).toFixed(2) })}</span><span>{formatMoney(order.tax)}</span></div>
+          {taxRows(order).showAdded ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1.2mm 0' }}><span>{t('invoices.document.tax', { rate: Number(settings.taxRate).toFixed(2) })}</span><span>{formatMoney(taxRows(order).added)}</span></div>
+          ) : null}
+          {taxRows(order).showIncluded ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1.2mm 0' }}><span>{t('invoices.document.taxIncluded', { rate: Number(settings.taxRate).toFixed(2) })}</span><span>{formatMoney(order.taxIncluded)}</span></div>
+          ) : null}
           {Number(order.deliveryFee) > 0 ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1.2mm 0' }}><span>{t('invoices.document.delivery')}</span><span>{formatMoney(order.deliveryFee)}</span></div>
           ) : null}

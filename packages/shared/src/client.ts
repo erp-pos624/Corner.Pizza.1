@@ -108,6 +108,39 @@ export interface PrintOptions {
 
 export type PrintResult = { ok: true } | { ok: false; cancelled: boolean; error: string };
 
+/** A printer installed on this computer (Windows spooler). */
+export interface LocalPrinterInfo {
+  name: string;
+  displayName: string;
+  isDefault: boolean;
+}
+
+export interface HtmlPrintJob {
+  /** Self-contained HTML document (inline styles, data: images only). */
+  html: string;
+  /** Windows printer name; omitted opens the system dialog. */
+  deviceName?: string;
+  /** Roll width in millimetres (58 or 80). */
+  paperWidthMm: number;
+  silent: boolean;
+  copies?: number;
+}
+
+export interface RawPrintJob {
+  /** Printer on the restaurant LAN (private IPv4 address or hostname). */
+  host: string;
+  port: number;
+  /** ESC/POS bytes, base64 encoded. */
+  dataBase64: string;
+}
+
+/** Desktop-only printer access; absent in the browser build. */
+export interface PrintingBridge {
+  listPrinters(): Promise<LocalPrinterInfo[]>;
+  printHtml(job: HtmlPrintJob): Promise<PrintResult>;
+  printRaw(job: RawPrintJob): Promise<PrintResult>;
+}
+
 export interface ClientBridge {
   appInfo(): Promise<AppInfo>;
   health(): Promise<ServerHealth>;
@@ -124,4 +157,6 @@ export interface ClientBridge {
   };
   /** Prints the current page; print CSS reveals the document to print. */
   print(options?: PrintOptions): Promise<PrintResult>;
+  /** Silent and network printing; only the desktop app provides it. */
+  printing?: PrintingBridge;
 }

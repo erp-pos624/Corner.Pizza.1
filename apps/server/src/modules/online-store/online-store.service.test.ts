@@ -5,7 +5,9 @@ vi.mock('../../prisma.js', () => ({ prisma: {} }));
 import {
   evaluateOnlineStatus,
   isWithinOnlineHours,
+  resolveOnlineHours,
   timeInTimezone,
+  weekdayInTimezone,
   toOnlineStoreSettingsDto,
 } from './online-store.service.js';
 
@@ -113,5 +115,43 @@ describe('toOnlineStoreSettingsDto', () => {
       closedReason: null,
       updatedAt: '2026-11-13T09:00:00.000Z',
     });
+  });
+});
+
+describe('per-weekday hours in Cairo', () => {
+  // Corner Pizza: Sun–Thu 10:00–00:00, Fri–Sat 10:00–01:00 (Africa/Cairo, UTC+2 in November).
+  const weekly = {
+    sun: { open: '10:00', close: '00:00' },
+    mon: { open: '10:00', close: '00:00' },
+    tue: { open: '10:00', close: '00:00' },
+    wed: { open: '10:00', close: '00:00' },
+    thu: { open: '10:00', close: '00:00' },
+    fri: { open: '10:00', close: '01:00' },
+    sat: { open: '10:00', close: '01:00' },
+  };
+  const corner = { ...branch, onlineWeeklyHours: weekly };
+  const cairo = (iso: string): Date => new Date(iso);
+
+  it('reads the weekday in the business timezone', () => {
+    // 22:30 UTC Friday is 00:30 Saturday in Cairo.
+    expect(weekdayInTimezone(cairo('2026-11-13T22:30:00Z'), 'Africa/Cairo')).toBe(6);
+  });
+
+  it('stays open until 01:00 after Friday night and shows Friday hours', () => {
+    const result = resolveOnlineHours(corner, cairo('2026-11-13T22:30:00Z'), 'Africa/Cairo');
+    expect(result).toEqual({ isOpenNow: true, openTime: '10:00', closeTime: '01:00' });
+  });
+
+  it('is closed at 00:30 after Thursday night', () => {
+    const result = resolveOnlineHours(corner, cairo('2026-11-12T22:30:00Z'), 'Africa/Cairo');
+    expect(result.isOpenNow).toBe(false);
+    // Friday's own window is what the storefront shows.
+    expect(result.closeTime).toBe('01:00');
+  });
+
+  it('closes at 01:00 Saturday morning', () => {
+    expect(
+      resolveOnlineHours(corner, cairo('2026-11-13T23:00:00Z'), 'Africa/Cairo').isOpenNow,
+    ).toBe(false);
   });
 });

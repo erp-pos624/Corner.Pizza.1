@@ -26,7 +26,7 @@
     "title": "Tax & service charges",
     "description": "Applied by the server to every new order at checkout.",
     "tax": "Sales tax rate (%)",
-    "taxHint": "Charged on the subtotal after discounts. Current: {rate}%.",
+    "taxHint": "Current: {rate}%. Tax-inclusive items already contain this VAT, so the customer pays the menu price and the VAT is shown inside it. Tax-exclusive items get it added on top. Either way it applies after discounts; choose the mode per item in the menu editor.",
     "delivery": "Delivery fee",
     "deliveryHint": "Fixed fee added to delivery orders only.",
     "discount": "Cashier discount limit (%)",

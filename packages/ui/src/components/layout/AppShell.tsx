@@ -24,6 +24,7 @@ import {
   Plus,
   ReceiptText,
   Scale,
+  Printer,
   Settings,
   ShoppingBag,
   ShoppingCart,
@@ -43,6 +44,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { Permission, Role } from '@posshope/shared';
 import { Button } from '../ui/button';
+import { DeviceBadge } from '../device/DeviceSetupWizard';
 import { LanguageToggle } from '../ui/language-toggle';
 import { ThemeToggle } from '../ui/theme-toggle';
 import { BranchSelector } from './BranchSelector';
@@ -84,6 +86,7 @@ export type PageKey =
   | 'expenses'
   | 'users'
   | 'branches'
+  | 'printers'
   | 'settings';
 
 interface NavItem {
@@ -254,6 +257,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { key: 'users', labelKey: 'nav.items.users', icon: Users, adminOnly: true },
       { key: 'branches', labelKey: 'nav.items.branches', icon: Store, adminOnly: true },
+      { key: 'printers', labelKey: 'nav.items.printers', icon: Printer, adminOnly: true },
       { key: 'settings', labelKey: 'nav.items.settings', icon: Settings, adminOnly: true },
     ],
   },
@@ -551,6 +555,7 @@ export function AppShell({
           <span className="hidden text-xs font-medium text-muted-foreground md:block">
             {formatDate(new Date())}
           </span>
+          <DeviceBadge />
           <BranchSelector />
           <LanguageToggle />
           <ThemeToggle />

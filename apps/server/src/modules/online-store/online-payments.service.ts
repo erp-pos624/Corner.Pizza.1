@@ -111,6 +111,7 @@ export function toPublicOrderDto(order: PublicOrderRow): PublicOrderDto {
     currency: order.onlinePayment?.currency ?? 'EGP',
     subtotal: money(order.subtotal),
     tax: money(order.tax),
+    taxIncluded: money(order.taxIncluded),
     deliveryFee: money(order.deliveryFee),
     total: money(order.total),
     customerName: order.customerName ?? '',

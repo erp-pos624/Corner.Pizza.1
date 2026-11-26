@@ -11,6 +11,7 @@ import { api } from '../../lib/api';
 import {
   formatDateTime,
   formatMoney,
+  orderChannelLabel,
   orderStatusLabel,
   orderTypeLabel,
   paymentMethodLabel,
@@ -199,7 +200,14 @@ export function OrderDetailDialog({
                   value={`−${formatMoney(order.discount)}`}
                 />
               ) : null}
-              <Row label={t('orders.detail.tax')} value={formatMoney(order.tax)} />
+              <Row
+                label={
+                  Number(order.taxIncluded) > 0
+                    ? t('orders.detail.taxIncluded')
+                    : t('orders.detail.tax')
+                }
+                value={formatMoney(order.tax)}
+              />
               {Number(order.deliveryFee) > 0 ? <Row label={t('orders.detail.delivery')} value={formatMoney(order.deliveryFee)} /> : null}
               <div className="flex items-center justify-between border-t border-border pt-2 text-base font-bold">
                 <span>{t('orders.detail.total')}</span>
@@ -207,6 +215,13 @@ export function OrderDetailDialog({
               </div>
             </div>
           </div>
+
+          {order.externalRef ? (
+            <div className="rounded-lg border border-border px-3 py-2 text-sm">
+              <p className="th-label">{t('orders.detail.externalRef', { source: orderChannelLabel(order.channel) })}</p>
+              <p className="mt-1 font-semibold" dir="ltr">{order.externalRef}</p>
+            </div>
+          ) : null}
 
           {order.notes ? (
             <div className="rounded-lg border border-border px-3 py-2 text-sm">

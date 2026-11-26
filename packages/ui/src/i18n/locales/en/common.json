@@ -98,7 +98,8 @@
     },
     "orderChannel": {
       "POS": "In-store",
-      "ONLINE": "Online"
+      "ONLINE": "Online",
+      "TALABAT": "Talabat"
     },
     "paymentMethod": {
       "CASH": "Cash",
@@ -291,5 +292,8 @@
     "busy": "Preparing…",
     "done": "Export ready",
     "failed": "Export failed"
+  },
+  "printing": {
+    "failedTitle": "Printer \"{printer}\" failed"
   }
 }

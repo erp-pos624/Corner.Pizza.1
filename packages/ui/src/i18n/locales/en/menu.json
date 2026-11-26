@@ -222,7 +222,20 @@
     "saveFailed": "Could not save the menu item",
     "fixFields": "Please fix the highlighted fields",
     "arabicRequired": "Enter the item name in both English and Arabic",
-    "sizeArabicRequired": "Enter every size name in English and Arabic"
+    "sizeArabicRequired": "Enter every size name in English and Arabic",
+    "tax": {
+      "title": "Tax on these prices",
+      "question": "Do the prices you entered already include VAT?",
+      "inclusive": "Tax-inclusive",
+      "inclusiveHint": "The customer pays exactly the price entered. VAT is inside it.",
+      "exclusive": "Tax-exclusive (+{rate}%)",
+      "exclusiveHint": "VAT at {rate}% is added on top at checkout.",
+      "price": "Price",
+      "net": "Net",
+      "vat": "VAT {rate}%",
+      "final": "Customer pays",
+      "basePriceRow": "Base price"
+    }
   },
   "recipe": {
     "title": "Recipe",

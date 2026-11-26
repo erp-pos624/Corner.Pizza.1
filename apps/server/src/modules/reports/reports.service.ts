@@ -32,6 +32,7 @@ const ORDER_TYPE_LABELS_AR: Record<string, string> = {
 };
 
 const ORDER_CHANNEL_LABELS_AR: Record<OrderChannel, string> = {
+  TALABAT: 'طلبات',
   POS: 'نقاط البيع',
   ONLINE: 'الموقع الإلكتروني',
 };
@@ -108,10 +109,15 @@ function orderCost(order: { items: Array<{ unitCost: Prisma.Decimal; quantity: n
   return order.items.reduce((sum, item) => sum + Number(item.unitCost) * item.quantity, 0);
 }
 
+/**
+ * Profit excludes VAT: added tax was never in the subtotal, and the VAT
+ * contained in tax-inclusive prices (`taxIncluded`) is taken out here.
+ */
 function orderProfit(order: ReportOrder): number {
   return (
     Number(order.subtotal) -
     Number(order.discount) -
+    Number(order.taxIncluded) -
     orderCost(order) +
     Number(order.deliveryFee) -
     refundTotal(order)
@@ -443,7 +449,8 @@ export async function getSalesReport(
     (sum, order) =>
       sum +
       Number(order.subtotal) -
-      Number(order.discount) +
+      Number(order.discount) -
+      Number(order.taxIncluded) +
       Number(order.deliveryFee) -
       refundTotal(order),
     0,

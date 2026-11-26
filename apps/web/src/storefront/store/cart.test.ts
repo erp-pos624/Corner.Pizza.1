@@ -101,6 +101,7 @@ function order(patch: Partial<PublicOrderDto>): PublicOrderDto {
     currency: 'EGP',
     subtotal: '100.00',
     tax: '14.00',
+    taxIncluded: '0.00',
     deliveryFee: '20.00',
     total: '134.00',
     customerName: 'Test',

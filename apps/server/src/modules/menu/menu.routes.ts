@@ -360,6 +360,7 @@ menuRouter.post(
           prepMinutes: input.prepMinutes,
           isAvailable: input.isAvailable,
           isFeatured: input.isFeatured,
+          taxInclusive: input.taxInclusive,
           hasSizes,
           sizes: hasSizes
             ? {
@@ -440,6 +441,7 @@ menuRouter.patch(
           ...(input.prepMinutes !== undefined ? { prepMinutes: input.prepMinutes } : {}),
           ...(input.isAvailable !== undefined ? { isAvailable: input.isAvailable } : {}),
           ...(input.isFeatured !== undefined ? { isFeatured: input.isFeatured } : {}),
+          ...(input.taxInclusive !== undefined ? { taxInclusive: input.taxInclusive } : {}),
           ...(input.hasSizes !== undefined || input.sizes !== undefined
             ? { hasSizes: nextHasSizes }
             : {}),

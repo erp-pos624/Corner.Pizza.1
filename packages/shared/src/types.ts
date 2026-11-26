@@ -29,6 +29,7 @@ import type {
   TableStatus,
   TransferStatus,
 } from './constants.js';
+import type { WeeklyHours } from './hours.js';
 import type { Role } from './permissions.js';
 import type { Paginated } from './schemas/common.js';
 
@@ -125,6 +126,8 @@ export interface MenuItemDto {
   soldOutReason: string | null;
   isFeatured: boolean;
   hasSizes: boolean;
+  /** True when basePrice and size prices already include VAT. */
+  taxInclusive: boolean;
   sizes: MenuItemSizeDto[];
   /** Base recipe (sizeId null), kept for the existing editor. */
   recipe: RecipeDto | null;
@@ -279,6 +282,8 @@ export interface OrderItemDto {
   unitPrice: string;
   toppingsTotal: string;
   lineTotal: string;
+  /** Pricing mode captured at sale time. */
+  taxInclusive: boolean;
   unitCost: string;
   specialInstructions: string | null;
   toppings: OrderItemToppingDto[];
@@ -352,7 +357,10 @@ export interface OrderDto {
   discountLabel: string | null;
   discountLabelEn: string | null;
   discountLabelAr: string | null;
+  /** Total VAT on the order (included + added). */
   tax: string;
+  /** Part of `tax` already contained in tax-inclusive prices; not added to the total. */
+  taxIncluded: string;
   deliveryFee: string;
   total: string;
   amountPaid: string;
@@ -362,6 +370,8 @@ export interface OrderDto {
   isCod: boolean;
   refundedTotal: string;
   notes: string | null;
+  /** Aggregator order number (e.g. Talabat); null for in-store and website orders. */
+  externalRef: string | null;
   items: OrderItemDto[];
   payments: PaymentDto[];
   refunds: RefundDto[];
@@ -376,6 +386,8 @@ export interface OrderDto {
 
 export interface KitchenOrderItemDto {
   id: string;
+  /** Used to route lines to category-specific kitchen printers. */
+  categoryId: string;
   name: string;
   quantity: number;
   sizeName: string | null;
@@ -393,6 +405,8 @@ export interface KitchenOrderDto {
   status: OrderStatus;
   tableNumber: string | null;
   notes: string | null;
+  /** Aggregator order number (e.g. Talabat). */
+  externalRef: string | null;
   items: KitchenOrderItemDto[];
   createdAt: string;
   updatedAt: string;
@@ -636,6 +650,8 @@ export interface OnlineStoreSettingsDto {
   enabled: boolean;
   openTime: string | null;
   closeTime: string | null;
+  /** Per-weekday hours (sun..sat); null when a single daily window is used. */
+  weeklyHours: WeeklyHours | null;
   timezone: string;
   isOpenNow: boolean;
   acceptingOrders: boolean;
@@ -666,11 +682,21 @@ export interface PublicBranchDto {
   latitude: number | null;
   longitude: number | null;
   onlineOrderingEnabled: boolean;
+  /** Today's online window (the one in progress after midnight, if any). */
   onlineOpenTime: string | null;
   onlineCloseTime: string | null;
+  onlineWeeklyHours: WeeklyHours | null;
   isOpenNow: boolean;
   acceptingOrders: boolean;
   closedReason: OnlineClosedReason | null;
+}
+
+/** Latest Windows POS installer, configured on the server (DESKTOP_* env). */
+export interface DesktopReleaseDto {
+  available: boolean;
+  url: string | null;
+  version: string | null;
+  sha256: string | null;
 }
 
 /** Restaurant identity from dashboard Settings, localized for the storefront. */
@@ -722,6 +748,7 @@ export interface PublicMenuItemDto {
   prepMinutes: number;
   isFeatured: boolean;
   hasSizes: boolean;
+  taxInclusive: boolean;
   sizes: PublicMenuSizeDto[];
   isSoldOut: boolean;
   soldOutReason: string | null;
@@ -804,6 +831,7 @@ export interface PublicOrderDto {
   currency: string;
   subtotal: string;
   tax: string;
+  taxIncluded: string;
   deliveryFee: string;
   total: string;
   customerName: string;

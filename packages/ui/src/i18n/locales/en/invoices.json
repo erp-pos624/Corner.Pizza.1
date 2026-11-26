@@ -14,6 +14,7 @@
     "subtotal": "Subtotal",
     "discount": "Discount",
     "tax": "Tax ({rate}%)",
+    "taxIncluded": "Incl. VAT ({rate}%)",
     "delivery": "Delivery",
     "total": "TOTAL",
     "change": "Change",
@@ -84,5 +85,13 @@
       "total": "Total",
       "issued": "Issued"
     }
+  },
+  "receipt": {
+    "customer": "RECEIPT",
+    "dispatch": "DELIVERY / DISPATCH",
+    "channel": "Source",
+    "table": "Table",
+    "cod": "CASH ON DELIVERY — collect at the door",
+    "zReport": "Z-REPORT (SHIFT CLOSE)"
   }
 }

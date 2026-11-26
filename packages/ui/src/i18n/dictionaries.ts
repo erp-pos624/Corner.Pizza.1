@@ -20,6 +20,8 @@ import enSettings from './locales/en/settings.json';
 import enShifts from './locales/en/shifts.json';
 import enStorefront from './locales/en/storefront.json';
 import enTables from './locales/en/tables.json';
+import enPrinters from './locales/en/printers.json';
+import enDevice from './locales/en/device.json';
 import enUsers from './locales/en/users.json';
 import arAuth from './locales/ar/auth.json';
 import arBranches from './locales/ar/branches.json';
@@ -42,6 +44,8 @@ import arSettings from './locales/ar/settings.json';
 import arShifts from './locales/ar/shifts.json';
 import arStorefront from './locales/ar/storefront.json';
 import arTables from './locales/ar/tables.json';
+import arPrinters from './locales/ar/printers.json';
+import arDevice from './locales/ar/device.json';
 import arUsers from './locales/ar/users.json';
 
 /**
@@ -67,6 +71,8 @@ const en = {
   settings: enSettings,
   shifts: enShifts,
   tables: enTables,
+  printers: enPrinters,
+  device: enDevice,
   branches: enBranches,
   hr: enHr,
   expenses: enExpenses,
@@ -91,6 +97,8 @@ const ar = {
   settings: arSettings,
   shifts: arShifts,
   tables: arTables,
+  printers: arPrinters,
+  device: arDevice,
   branches: arBranches,
   hr: arHr,
   expenses: arExpenses,

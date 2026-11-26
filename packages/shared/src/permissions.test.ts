@@ -19,10 +19,11 @@ describe('permission matrix', () => {
     expect(hasPermission('CASHIER', 'delivery:zones')).toBe(false);
   });
 
-  it('gives kitchen staff only the kitchen board', () => {
+  it('gives kitchen staff only the kitchen board (plus read-only printer routing)', () => {
     for (const permission of permissionsForRole('KITCHEN_STAFF')) {
-      expect(permission === 'kitchen:view' || permission === 'kitchen:update').toBe(true);
+      expect(['kitchen:view', 'kitchen:update', 'printers:view']).toContain(permission);
     }
+    expect(hasPermission('KITCHEN_STAFF', 'settings:manage')).toBe(false);
     expect(hasPermission('KITCHEN_STAFF', 'kitchen:view')).toBe(true);
     expect(hasPermission('KITCHEN_STAFF', 'kitchen:update')).toBe(true);
     expect(hasPermission('KITCHEN_STAFF', 'orders:create')).toBe(false);

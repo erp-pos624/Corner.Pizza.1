@@ -1,4 +1,8 @@
+import { Prisma } from '@prisma/client';
 import {
+  activeWindow,
+  hoursForDay,
+  parseWeeklyHours,
   type OnlineClosedReason,
   type OnlineStoreOverviewDto,
   type OnlineStoreSettingsDto,
@@ -19,6 +23,7 @@ export interface BranchOnlineState {
   onlineOrderingEnabled: boolean;
   onlineOpenTime: string | null;
   onlineCloseTime: string | null;
+  onlineWeeklyHours?: Prisma.JsonValue | null;
 }
 
 export interface OnlineStatus {
@@ -40,6 +45,22 @@ export function timeInTimezone(date: Date, timeZone = env.BUSINESS_TIMEZONE): st
   return `${hour === '24' ? '00' : hour}:${minute}`;
 }
 
+const WEEKDAY_INDEX: Record<string, number> = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+};
+
+/** Local weekday (0 = Sunday) in the branch timezone. */
+export function weekdayInTimezone(date: Date, timeZone = env.BUSINESS_TIMEZONE): number {
+  const name = new Intl.DateTimeFormat('en-US', { timeZone, weekday: 'short' }).format(date);
+  return WEEKDAY_INDEX[name] ?? date.getUTCDay();
+}
+
 /** Supports windows that cross midnight (e.g. 18:00–02:00). */
 export function isWithinOnlineHours(
   openTime: string | null,
@@ -53,11 +74,45 @@ export function isWithinOnlineHours(
   return current >= openTime || current < closeTime;
 }
 
+/**
+ * The window to show for "today": the one still running after midnight if
+ * there is one, otherwise today's calendar-day window.
+ */
+export function resolveOnlineHours(
+  branch: BranchOnlineState,
+  now = new Date(),
+  timeZone = env.BUSINESS_TIMEZONE,
+): { isOpenNow: boolean; openTime: string | null; closeTime: string | null } {
+  const weekly = parseWeeklyHours(branch.onlineWeeklyHours ?? null);
+  if (!weekly) {
+    return {
+      isOpenNow: isWithinOnlineHours(branch.onlineOpenTime, branch.onlineCloseTime, now, timeZone),
+      openTime: branch.onlineOpenTime,
+      closeTime: branch.onlineCloseTime,
+    };
+  }
+  const weekday = weekdayInTimezone(now, timeZone);
+  const state = activeWindow(
+    weekly,
+    branch.onlineOpenTime,
+    branch.onlineCloseTime,
+    weekday,
+    timeInTimezone(now, timeZone),
+  );
+  const shown =
+    state.window ?? hoursForDay(weekly, weekday, branch.onlineOpenTime, branch.onlineCloseTime);
+  return {
+    isOpenNow: state.open,
+    openTime: shown?.open ?? null,
+    closeTime: shown?.close ?? null,
+  };
+}
+
 export function evaluateOnlineStatus(branch: BranchOnlineState, now = new Date()): OnlineStatus {
   if (!branch.isActive) {
     return { isOpenNow: false, acceptingOrders: false, closedReason: 'BRANCH_INACTIVE' };
   }
-  const isOpenNow = isWithinOnlineHours(branch.onlineOpenTime, branch.onlineCloseTime, now);
+  const { isOpenNow } = resolveOnlineHours(branch, now);
   if (!branch.onlineOrderingEnabled) {
     return { isOpenNow, acceptingOrders: false, closedReason: 'DISABLED' };
   }
@@ -77,6 +132,7 @@ export function toOnlineStoreSettingsDto(
     enabled: branch.onlineOrderingEnabled,
     openTime: branch.onlineOpenTime,
     closeTime: branch.onlineCloseTime,
+    weeklyHours: parseWeeklyHours(branch.onlineWeeklyHours ?? null),
     timezone: env.BUSINESS_TIMEZONE,
     ...evaluateOnlineStatus(branch, now),
     updatedAt: branch.updatedAt.toISOString(),
@@ -144,6 +200,14 @@ export async function updateOnlineStoreSettings(
         ...(input.enabled !== undefined ? { onlineOrderingEnabled: input.enabled } : {}),
         ...(input.openTime !== undefined ? { onlineOpenTime: input.openTime } : {}),
         ...(input.closeTime !== undefined ? { onlineCloseTime: input.closeTime } : {}),
+        ...(input.weeklyHours !== undefined
+          ? {
+              onlineWeeklyHours:
+                input.weeklyHours === null
+                  ? Prisma.DbNull
+                  : (input.weeklyHours as Prisma.InputJsonValue),
+            }
+          : {}),
       },
     });
     await recordAudit(
@@ -155,11 +219,13 @@ export async function updateOnlineStoreSettings(
           enabled: branch.onlineOrderingEnabled,
           openTime: branch.onlineOpenTime,
           closeTime: branch.onlineCloseTime,
+          weeklyHours: branch.onlineWeeklyHours,
         },
         after: {
           enabled: row.onlineOrderingEnabled,
           openTime: row.onlineOpenTime,
           closeTime: row.onlineCloseTime,
+          weeklyHours: row.onlineWeeklyHours,
         },
         userId: actorId,
       },

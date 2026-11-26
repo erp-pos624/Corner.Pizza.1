@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from 'react';
 import {
   DEFAULT_BRANCH_ID,
   PAYMENT_METHODS,
+  computeOrderTax,
   type CustomerDto,
   type DiningTableDto,
   type DiscountDto,
@@ -32,6 +33,7 @@ import {
 import { useAuthStore } from '../store/auth';
 import { useBranchScopeStore } from '../store/branch';
 import { createIdempotencyKey } from '../lib/utils';
+import { readDeviceConfig } from '../lib/device';
 
 interface UsePosCartOptions {
   items: MenuItemDto[];
@@ -58,7 +60,11 @@ export function usePosCart({
   const scope = useBranchScopeStore((state) => state.scope);
 
   const [cart, setCart] = useState<CartLine[]>([]);
-  const [orderType, setOrderTypeState] = useState<OrderType>('DINE_IN');
+  // This terminal's setup decides what a fresh ticket starts as.
+  const defaultChannelRef = useRef<'POS' | 'TALABAT'>(readDeviceConfig()?.defaultChannel ?? 'POS');
+  const [orderType, setOrderTypeState] = useState<OrderType>(
+    () => readDeviceConfig()?.defaultOrderType ?? 'DINE_IN',
+  );
   const [tableId, setTableId] = useState<string | null>(null);
   const [tableNumber, setTableNumber] = useState('');
   const [payLater, setPayLater] = useState(false);
@@ -67,7 +73,14 @@ export function usePosCart({
   const [customer, setCustomer] = useState<CustomerForm>(EMPTY_CUSTOMER);
   const [discountId, setDiscountId] = useState('');
   const [notes, setNotes] = useState('');
-  const [paymentLines, setPaymentLines] = useState<PaymentLine[]>(() => [newPaymentLine('CASH')]);
+  /** POS for walk-in/phone orders, TALABAT for orders keyed in from the Talabat tablet. */
+  const [channel, setChannelState] = useState<'POS' | 'TALABAT'>(defaultChannelRef.current);
+  const [externalRef, setExternalRef] = useState('');
+  const defaultPaymentMethod = (): PaymentMethod =>
+    defaultChannelRef.current === 'TALABAT' ? 'WALLET' : 'CASH';
+  const [paymentLines, setPaymentLines] = useState<PaymentLine[]>(() => [
+    newPaymentLine(defaultPaymentMethod()),
+  ]);
   const [deliveryPoint, setDeliveryPointState] = useState<GeoPoint | null>(null);
 
   const subtotalMinor = cart.reduce((sum, line) => sum + money(lineTotal(line)), 0);
@@ -78,8 +91,6 @@ export function usePosCart({
       : Math.min(money(Number(selectedDiscount.value)), subtotalMinor)
     : 0;
   const taxRate = Number(settings?.taxRate ?? 14);
-  const taxableMinor = Math.max(subtotalMinor - discountMinor, 0);
-  const taxMinor = Math.round((taxableMinor * taxRate) / 100);
   const branchesQuery = useQuery({
     queryKey: ['branches'],
     queryFn: () => api.branches.list(),
@@ -129,7 +140,20 @@ export function usePosCart({
       zonesQuery.isLoading ||
       (Boolean(deliveryPoint) && zoneCheckQuery.isFetching));
   const deliveryMinor = orderType === 'DELIVERY' ? deliveryPreview.deliveryFeeMinor : 0;
-  const totalMinor = taxableMinor + taxMinor + deliveryMinor;
+  // Same calculator as the server, so the register shows what will be charged.
+  const taxBreakdown = computeOrderTax({
+    lines: cart.map((line) => ({
+      amountMinor: money(lineTotal(line)),
+      taxInclusive: line.taxInclusive,
+    })),
+    discountMinor,
+    taxRate,
+    deliveryFeeMinor: deliveryMinor,
+  });
+  const taxMinor = taxBreakdown.taxMinor;
+  const includedTaxMinor = taxBreakdown.includedTaxMinor;
+  const addedTaxMinor = taxBreakdown.addedTaxMinor;
+  const totalMinor = taxBreakdown.totalMinor;
   const paymentSummary = useMemo(() => {
     const amounts = paymentLines.map((line) => money(Number(line.amount || '0')));
     const tenderedMinor = amounts.reduce((sum, amount) => sum + amount, 0);
@@ -298,6 +322,8 @@ export function usePosCart({
         items,
         discountId: discountId || undefined,
         notes: notes.trim() || undefined,
+        channel,
+        externalRef: channel === 'TALABAT' ? externalRef.trim() || undefined : undefined,
         payLater: orderType === 'DINE_IN' && payLater,
         isCod: orderType === 'DELIVERY' && isCod,
         payments:
@@ -327,7 +353,9 @@ export function usePosCart({
       setCustomer(EMPTY_CUSTOMER);
       setNotes('');
       setDiscountId('');
-      setPaymentLines([newPaymentLine('CASH')]);
+      setPaymentLines([newPaymentLine(defaultPaymentMethod())]);
+      setChannelState(defaultChannelRef.current);
+      setExternalRef('');
       if (tab) {
         setTab(order);
       } else {
@@ -395,6 +423,21 @@ export function usePosCart({
     t,
   ]);
 
+  /**
+   * Talabat orders are collected by Talabat, so default the payment to
+   * Wallet (kept out of the cash drawer) and the order to Takeaway.
+   */
+  const setChannel = (next: 'POS' | 'TALABAT'): void => {
+    setChannelState(next);
+    if (next === 'TALABAT') {
+      if (orderType === 'DINE_IN') setOrderType('TAKEAWAY');
+      setPaymentLines([newPaymentLine('WALLET')]);
+    } else {
+      setExternalRef('');
+      setPaymentLines([newPaymentLine('CASH')]);
+    }
+  };
+
   const placeOrder = (): void => {
     if (validationError) {
       toast.error(validationError);
@@ -435,12 +478,18 @@ export function usePosCart({
     setDiscountId,
     notes,
     setNotes,
+    channel,
+    setChannel,
+    externalRef,
+    setExternalRef,
     paymentLines,
     subtotalMinor,
     selectedDiscount,
     discountMinor,
     taxRate,
     taxMinor,
+    includedTaxMinor,
+    addedTaxMinor,
     deliveryMinor,
     totalMinor,
     paymentSummary,

@@ -1,4 +1,4 @@
-import type { PublicQuoteDto } from '@posshope/shared';
+import { fromMinorUnits, toMinorUnits, type PublicQuoteDto } from '@posshope/shared';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
 import { useI18n } from '../i18n';
@@ -64,6 +64,11 @@ export function FulfillmentToggle(): ReactElement {
   );
 }
 
+/** VAT added on top of tax-exclusive items (the included part is already in the prices). */
+function addedTax(tax: string, taxIncluded: string | undefined): number {
+  return Number(fromMinorUnits(toMinorUnits(tax) - toMinorUnits(taxIncluded ?? '0')));
+}
+
 function Row({
   label,
   value,
@@ -108,10 +113,18 @@ export function Totals({
   return (
     <dl className={`space-y-2.5 transition-opacity duration-200 ${loading ? 'opacity-60' : ''}`}>
       <Row label={t('totals.subtotal')} value={money(quote.subtotal)} />
-      <Row
-        label={t('totals.tax', { rate: Number(quote.taxRate) })}
-        value={money(quote.tax)}
-      />
+      {addedTax(quote.tax, quote.taxIncluded) > 0 || Number(quote.taxIncluded) === 0 ? (
+        <Row
+          label={t('totals.tax', { rate: Number(quote.taxRate) })}
+          value={money(addedTax(quote.tax, quote.taxIncluded).toFixed(2))}
+        />
+      ) : null}
+      {Number(quote.taxIncluded) > 0 ? (
+        <Row
+          label={t('totals.taxIncluded', { rate: Number(quote.taxRate) })}
+          value={money(quote.taxIncluded)}
+        />
+      ) : null}
       {fulfillment === 'DELIVERY' ? (
         <Row
           label={t('totals.delivery')}

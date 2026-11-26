@@ -1,5 +1,11 @@
 import { z } from 'zod';
-import { ORDER_CHANNELS, ORDER_STATUSES, ORDER_TYPES, PAYMENT_METHODS } from '../constants.js';
+import {
+  ORDER_CHANNELS,
+  ORDER_STATUSES,
+  ORDER_TYPES,
+  PAYMENT_METHODS,
+  STAFF_ORDER_CHANNELS,
+} from '../constants.js';
 import { optionalTrimmedString, paginationSchema } from './common.js';
 import { moneyString } from './menu.js';
 
@@ -43,6 +49,10 @@ export const orderCreateSchema = z
     items: z.array(orderItemInputSchema).min(1, 'Add at least one item').max(80),
     discountId: z.string().trim().min(1).nullable().optional(),
     notes: optionalTrimmedString(600),
+    /** Where the order came from; website orders use the public API instead. */
+    channel: z.enum(STAFF_ORDER_CHANNELS).optional(),
+    /** Aggregator order number, e.g. the Talabat order id. */
+    externalRef: optionalTrimmedString(60),
     /** Dine-in tabs are opened before the guests pay at the end of the meal. */
     payLater: z.boolean().default(false),
     /** Delivery orders paid in cash to the driver at the door. */

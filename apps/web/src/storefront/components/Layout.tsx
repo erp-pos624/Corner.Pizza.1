@@ -265,9 +265,14 @@ function Footer(): ReactElement {
       <div className="border-t border-line">
         <div className="page flex flex-wrap items-center justify-between gap-3 py-5 text-sm text-cream-faint">
           <p>{t('footer.legal', { year: new Date().getFullYear() })}</p>
-          <Link to="/dashboard" className="transition duration-200 ease-out hover:text-cream">
-            {t('footer.staff')}
-          </Link>
+          <span className="flex flex-wrap items-center gap-4">
+            <Link to="/download" className="transition duration-200 ease-out hover:text-cream">
+              {t('footer.download')}
+            </Link>
+            <Link to="/dashboard" className="transition duration-200 ease-out hover:text-cream">
+              {t('footer.staff')}
+            </Link>
+          </span>
         </div>
       </div>
     </footer>

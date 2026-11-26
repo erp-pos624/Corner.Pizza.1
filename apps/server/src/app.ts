@@ -31,6 +31,7 @@ import { suppliersRouter } from './modules/suppliers/suppliers.routes.js';
 import { storefrontRouter } from './modules/storefront/storefront.routes.js';
 import { tablesRouter } from './modules/tables/tables.routes.js';
 import { uploadsRouter } from './modules/uploads/uploads.routes.js';
+import { printersRouter } from './modules/printers/printers.routes.js';
 import { buildOpenApiDocument, renderDocsPage } from './openapi.js';
 
 const EXPOSED_HEADERS = ['x-request-id', 'x-ratelimit-remaining', 'retry-after'];
@@ -136,6 +137,7 @@ export function createApp(): Express {
   v1.use('/audit', auditRouter);
   v1.use('/online-store', onlineStoreRouter);
   v1.use('/uploads', uploadsRouter);
+  v1.use('/printers', printersRouter);
 
   app.use('/api/v1', v1);
 

@@ -1,0 +1,587 @@
+{
+  "store_info": {
+    "name_en": "Corner Pizza",
+    "name_ar": "كورنر بيتزا",
+    "tagline_en": "Authentic American Pizza, Calzones, Hoagies & More",
+    "tagline_ar": "بيتزا أمريكية أصلية، كالزوني، هوجي وأكثر",
+    "phone": "01557075252",
+    "email": "order@eatcornerpizza.com",
+    "short_address": "EASTERN COURT, REHAB 2",
+    "full_address": "Eastern Court G63, Second New Cairo, Cairo Governorate 4752280",
+    "coordinates": {
+      "lat": 30.070328,
+      "lng": 31.517899
+    },
+    "operating_hours": {
+      "Sunday": {
+        "open": "10:00",
+        "close": "00:00"
+      },
+      "Monday": {
+        "open": "10:00",
+        "close": "00:00"
+      },
+      "Tuesday": {
+        "open": "10:00",
+        "close": "00:00"
+      },
+      "Wednesday": {
+        "open": "10:00",
+        "close": "00:00"
+      },
+      "Thursday": {
+        "open": "10:00",
+        "close": "00:00"
+      },
+      "Friday": {
+        "open": "10:00",
+        "close": "01:00"
+      },
+      "Saturday": {
+        "open": "10:00",
+        "close": "01:00"
+      }
+    },
+    "delivery_zone_note": "Start delivery only in Al Rehab (Rehab 1 & Rehab 2) around Eastern Court G63; client asked us to configure the initial zone on the map.",
+    "pricing_note": "All prices are in EGP and already include VAT/tax (taxInclusive = true)."
+  },
+  "categories": [
+    {
+      "name_en": "Classic Pizzas",
+      "name_ar": "البيتزا الكلاسيكية",
+      "items": [
+        {
+          "name_en": "Margherita",
+          "name_ar": "مارجريتا",
+          "description_en": "Tomato sauce with mozzarella",
+          "description_ar": "صوص طماطم مع جبنة موتزاريلا",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "S",
+              "price": 130
+            },
+            {
+              "name": "M",
+              "price": 210
+            },
+            {
+              "name": "L",
+              "price": 280
+            }
+          ]
+        },
+        {
+          "name_en": "Pepperoni",
+          "name_ar": "بيبروني",
+          "description_en": "Tomato sauce, pepperoni & mozzarella",
+          "description_ar": "صوص طماطم، بيبروني وموتزاريلا",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "S",
+              "price": 165
+            },
+            {
+              "name": "M",
+              "price": 245
+            },
+            {
+              "name": "L",
+              "price": 300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name_en": "Gourmet Pizzas",
+      "name_ar": "بيتزا جورميه",
+      "items": [
+        {
+          "name_en": "Ranchero Chicken",
+          "name_ar": "دجاج رانشيرو",
+          "description_en": "Ranch sauce, chicken, bacon, tomato, mozzarella & cheddar",
+          "description_ar": "صوص رانش، دجاج، بيكون، طماطم، موتزاريلا وشيدر",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "S",
+              "price": 175
+            },
+            {
+              "name": "M",
+              "price": 255
+            },
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        },
+        {
+          "name_en": "BBQ Chicken",
+          "name_ar": "دجاج باربيكيو",
+          "description_en": "BBQ sauce, chicken, pineapple, mozzarella & cheddar",
+          "description_ar": "صوص باربيكيو، دجاج، أناناس، موتزاريلا وشيدر",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "S",
+              "price": 175
+            },
+            {
+              "name": "M",
+              "price": 255
+            },
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        },
+        {
+          "name_en": "Buffalo Chicken",
+          "name_ar": "دجاج بافلو",
+          "description_en": "Corner's Buffalo sauce, breaded chicken, buffalo fries, mozzarella & cheddar",
+          "description_ar": "صوص بافلو كورنر، دجاج مقرمش، بطاطس بافلو، موتزاريلا وشيدر",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "S",
+              "price": 175
+            },
+            {
+              "name": "M",
+              "price": 255
+            },
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        },
+        {
+          "name_en": "Ultimate Meat",
+          "name_ar": "اللحوم المشكلة",
+          "description_en": "Tomato sauce, pepperoni, Italian sausage, smoked roast beef, salami, bacon & mozzarella",
+          "description_ar": "صوص طماطم، بيبروني، سجق إيطالي، روست بيف مدخن، سلامي، بيكون وموتزاريلا",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "S",
+              "price": 175
+            },
+            {
+              "name": "M",
+              "price": 255
+            },
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        },
+        {
+          "name_en": "Cheese Lovers",
+          "name_ar": "عشاق الجبن",
+          "description_en": "Tomato sauce, mozzarella, creamy cheddar & parmesan",
+          "description_ar": "صوص طماطم، موتزاريلا، شيدر كريمي وجبنة بارميزان",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "S",
+              "price": 175
+            },
+            {
+              "name": "M",
+              "price": 255
+            },
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        },
+        {
+          "name_en": "Vegetable Pizza",
+          "name_ar": "بيتزا خضروات",
+          "description_en": "Tomato sauce, spinach, mushrooms, red onions, green peppers, tomatoes, garlic & mozzarella",
+          "description_ar": "صوص طماطم، سبانخ، مشروم، بصل أحمر، فلفل أخضر، طماطم، ثوم وموتزاريلا",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "S",
+              "price": 175
+            },
+            {
+              "name": "M",
+              "price": 255
+            },
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        },
+        {
+          "name_en": "Corner Pizza Special",
+          "name_ar": "كورنر بيتزا سبيشال",
+          "description_en": "Pepperoni, Italian sausage, bacon, mushrooms, tomatoes, green peppers, red onions, black olives & garlic",
+          "description_ar": "بيبروني، سجق إيطالي، بيكون، مشروم، طماطم، فلفل أخضر، بصل أحمر، زيتون أسود وثوم",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "S",
+              "price": 175
+            },
+            {
+              "name": "M",
+              "price": 255
+            },
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name_en": "Half & Half Pizzas",
+      "name_ar": "بيتزا نصفين (حجم لارج فقط)",
+      "items": [
+        {
+          "name_en": "Pepperoni / BBQ Chicken",
+          "name_ar": "نصف بيبروني / نصف باربيكيو",
+          "description_en": "Half Pepperoni, Half BBQ Chicken",
+          "description_ar": "نصف بيبروني، نصف باربيكيو",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        },
+        {
+          "name_en": "Cheese / Ranchero Chicken",
+          "name_ar": "نصف جبن / نصف رانشيرو",
+          "description_en": "Half Cheese, Half Ranchero Chicken",
+          "description_ar": "نصف جبن، نصف دجاج رانشيرو",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        },
+        {
+          "name_en": "Pepperoni / Vegetable",
+          "name_ar": "نصف بيبروني / نصف خضروات",
+          "description_en": "Half Pepperoni, Half Vegetable",
+          "description_ar": "نصف بيبروني، نصف خضروات",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        },
+        {
+          "name_en": "Cheese / Buffalo Chicken",
+          "name_ar": "نصف جبن / نصف بافلو",
+          "description_en": "Half Cheese, Half Buffalo Chicken",
+          "description_ar": "نصف جبن، نصف دجاج بافلو",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "L",
+              "price": 340
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name_en": "Calzones",
+      "name_ar": "كالزوني",
+      "items": [
+        {
+          "name_en": "Italian Calzone",
+          "name_ar": "كالزوني إيطالي",
+          "description_en": "Smoked roast beef, salami, pepperoni, mozzarella, marinara sauce on the side",
+          "description_ar": "روست بيف مدخن، سلامي، بيبروني، موتزاريلا مع صوص مارينارا جانبي",
+          "taxInclusive": true,
+          "price": 165
+        },
+        {
+          "name_en": "Steak Calzone",
+          "name_ar": "كالزوني ستيك",
+          "description_en": "Steak, mushrooms, cheese, green peppers & onion, marinara on the side",
+          "description_ar": "ستيك، مشروم، جبنة، فلفل أخضر وبصل مع صوص مارينارا جانبي",
+          "taxInclusive": true,
+          "price": 165
+        },
+        {
+          "name_en": "Buffalo Chicken Calzone",
+          "name_ar": "كالزوني دجاج بافلو",
+          "description_en": "Breaded chicken, buffalo fries, cheddar & mozzarella, ranch on the side",
+          "description_ar": "دجاج مقرمش، بطاطس بافلو، شيدر وموتزاريلا مع صوص رانش جانبي",
+          "taxInclusive": true,
+          "price": 165
+        }
+      ]
+    },
+    {
+      "name_en": "Hoagie Sandwiches",
+      "name_ar": "ساندوتشات هوجي",
+      "items": [
+        {
+          "name_en": "Italian Hoagie",
+          "name_ar": "هوجي إيطالي",
+          "description_en": "Smoked roast beef, salami, pepperoni + lettuce, tomato, onions & Italian dressing",
+          "description_ar": "روست بيف مدخن، سلامي، بيبروني + خس، طماطم، بصل وصوص إيطالي",
+          "taxInclusive": true,
+          "price": 220
+        },
+        {
+          "name_en": "Steak & Cheese Hoagie",
+          "name_ar": "هوجي ستيك وجبن",
+          "description_en": "Steak, mushrooms, cheese, green peppers + lettuce, tomato, onions & dressing",
+          "description_ar": "ستيك، مشروم، جبنة، فلفل أخضر + خس، طماطم، بصل وصوص",
+          "taxInclusive": true,
+          "price": 220
+        },
+        {
+          "name_en": "Smoked Turkey Hoagie",
+          "name_ar": "هوجي تركي مدخن",
+          "description_en": "Smoked turkey, cheddar cheese + lettuce, tomato, onions & dressing",
+          "description_ar": "تركي مدخن، جبنة شيدر + خس، طماطم، بصل وصوص",
+          "taxInclusive": true,
+          "price": 220
+        },
+        {
+          "name_en": "Buffalo Chicken Hoagie",
+          "name_ar": "هوجي دجاج بافلو",
+          "description_en": "Breaded chicken, buffalo fries, cheddar cheese & buffalo sauce",
+          "description_ar": "دجاج مقرمش، بطاطس بافلو، جبنة شيدر وصوص بافلو",
+          "taxInclusive": true,
+          "price": 220
+        },
+        {
+          "name_en": "Vegetable Hoagie",
+          "name_ar": "هوجي خضروات",
+          "description_en": "Spinach, mushrooms, eggplant & green peppers + lettuce, tomato, onions & dressing",
+          "description_ar": "سبانخ، مشروم، باذنجان وفلفل أخضر + خس، طماطم، بصل وصوص",
+          "taxInclusive": true,
+          "price": 185
+        }
+      ]
+    },
+    {
+      "name_en": "Tasty Wings",
+      "name_ar": "أجنحة الدجاج",
+      "items": [
+        {
+          "name_en": "BBQ Wings",
+          "name_ar": "أجنحة باربيكيو",
+          "description_en": "Crispy wings glazed in smoky BBQ sauce",
+          "description_ar": "أجنحة دجاج مقرمشة مغطاة بصوص الباربيكيو",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "6pc",
+              "price": 140
+            },
+            {
+              "name": "12pc",
+              "price": 255
+            }
+          ]
+        },
+        {
+          "name_en": "Buffalo Wings",
+          "name_ar": "أجنحة بافلو",
+          "description_en": "Crispy wings tossed in spicy Corner Buffalo sauce",
+          "description_ar": "أجنحة دجاج مقرمشة بصوص بافلو الحار",
+          "taxInclusive": true,
+          "sizes": [
+            {
+              "name": "6pc",
+              "price": 140
+            },
+            {
+              "name": "12pc",
+              "price": 255
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name_en": "Crispy Appetizers",
+      "name_ar": "المقبلات المقرمشة",
+      "items": [
+        {
+          "name_en": "Potato Wedges",
+          "name_ar": "بطاطس ودجز",
+          "description_en": "Seasoned crispy potato wedges",
+          "description_ar": "بطاطس ودجز متبلة ومقرمشة",
+          "taxInclusive": true,
+          "price": 85
+        },
+        {
+          "name_en": "French Fries",
+          "name_ar": "بطاطس مقلية",
+          "description_en": "Golden crispy French fries",
+          "description_ar": "بطاطس مقلية ذهبية ومقرمشة",
+          "taxInclusive": true,
+          "price": 60
+        },
+        {
+          "name_en": "Buffalo Fries",
+          "name_ar": "بطاطس بافلو",
+          "description_en": "Fries topped with Corner's Buffalo sauce",
+          "description_ar": "بطاطس مقلية مغطاة بصوص بافلو الخاص",
+          "taxInclusive": true,
+          "price": 80
+        },
+        {
+          "name_en": "Onion Rings (5-6 pcs)",
+          "name_ar": "حلقات بصل (5-6 قطع)",
+          "description_en": "5-6 pieces golden crispy onion rings",
+          "description_ar": "5-6 قطع حلقات بصل مقرمشة",
+          "taxInclusive": true,
+          "price": 60
+        },
+        {
+          "name_en": "Chicken Tenders (5 pcs)",
+          "name_ar": "تشيكن تندرز (5 قطع)",
+          "description_en": "5 pieces crispy breaded chicken breast tenders",
+          "description_ar": "5 قطع صدور دجاج مقرمشة ومقليه",
+          "taxInclusive": true,
+          "price": 120
+        },
+        {
+          "name_en": "Pepperoni Rolls (8 pcs)",
+          "name_ar": "رولز بيبروني (8 قطع)",
+          "description_en": "8 pieces baked rolls stuffed with pepperoni & mozzarella",
+          "description_ar": "8 قطع رولز مخبوزة محشوة بيبروني وموتزاريلا",
+          "taxInclusive": true,
+          "price": 145
+        },
+        {
+          "name_en": "Chicken Rolls (8 pcs)",
+          "name_ar": "رولز دجاج (8 قطع)",
+          "description_en": "8 pieces baked rolls stuffed with chicken & cheese",
+          "description_ar": "8 قطع رولز مخبوزة محشوة دجاج وجبن",
+          "taxInclusive": true,
+          "price": 165
+        },
+        {
+          "name_en": "Buffalo Chicken Rolls (8 pcs)",
+          "name_ar": "رولز دجاج بافلو (8 قطع)",
+          "description_en": "8 pieces baked rolls stuffed with spicy buffalo chicken",
+          "description_ar": "8 قطع رولز محشوة دجاج بافلو الحار",
+          "taxInclusive": true,
+          "price": 165
+        },
+        {
+          "name_en": "Cheesy Breadsticks (8 pcs)",
+          "name_ar": "أصابع خبز بالجبن (8 قطع)",
+          "description_en": "8 pieces freshly baked cheesy garlic breadsticks",
+          "description_ar": "8 قطع أصابع خبز بالجبن والثوم",
+          "taxInclusive": true,
+          "price": 110
+        },
+        {
+          "name_en": "Mozzarella Sticks (4 pcs)",
+          "name_ar": "أصابع موتزاريلا (4 قطع)",
+          "description_en": "4 pieces crispy breaded mozzarella sticks",
+          "description_ar": "4 قطع أصابع جبنة موتزاريلا مقرمشة",
+          "taxInclusive": true,
+          "price": 90
+        }
+      ]
+    },
+    {
+      "name_en": "Sweet Desserts",
+      "name_ar": "الحلويات",
+      "items": [
+        {
+          "name_en": "Tiramisu",
+          "name_ar": "تيراميسو",
+          "description_en": "Classic Italian coffee-flavored layered dessert",
+          "description_ar": "حلوى التيراميسو الإيطالية الكلاسيكية",
+          "taxInclusive": true,
+          "price": 100
+        },
+        {
+          "name_en": "Cheese Cake",
+          "name_ar": "تشيز كيك",
+          "description_en": "Classic rich and creamy New York cheesecake",
+          "description_ar": "تشيز كيك كلاسيك غني وكريمي",
+          "taxInclusive": true,
+          "price": 80
+        },
+        {
+          "name_en": "Blueberry Cheese Cake",
+          "name_ar": "تشيز كيك بلوبيري",
+          "description_en": "Creamy cheesecake topped with blueberry sauce",
+          "description_ar": "تشيز كيك كريمي بصوص التوت الأزرق",
+          "taxInclusive": true,
+          "price": 90
+        },
+        {
+          "name_en": "Strawberry Cheese Cake",
+          "name_ar": "تشيز كيك فراولة",
+          "description_en": "Creamy cheesecake topped with strawberry sauce",
+          "description_ar": "تشيز كيك كريمي بصوص الفراولة",
+          "taxInclusive": true,
+          "price": 90
+        }
+      ]
+    },
+    {
+      "name_en": "Refreshing Beverages",
+      "name_ar": "المشروبات المنعشة",
+      "items": [
+        {
+          "name_en": "V-Cola / V-Cola Diet",
+          "name_ar": "في كولا / في كولا دايت",
+          "description_en": "Chilled V-Cola regular or diet can",
+          "description_ar": "مشروب في كولا عادي أو دايت بارد",
+          "taxInclusive": true,
+          "price": 40
+        },
+        {
+          "name_en": "V-Cola Lemon / Orange",
+          "name_ar": "في كولا ليمون / برتقال",
+          "description_en": "Chilled V-Cola lemon or orange flavor",
+          "description_ar": "في كولا بنكهة الليمون أو البرتقال",
+          "taxInclusive": true,
+          "price": 40
+        },
+        {
+          "name_en": "Apple Juice",
+          "name_ar": "عصير تفاح",
+          "description_en": "Refreshing natural apple juice bottle",
+          "description_ar": "عصير تفاح طبيعي منعش",
+          "taxInclusive": true,
+          "price": 20
+        },
+        {
+          "name_en": "Bottled Water",
+          "name_ar": "مياه معدنية",
+          "description_en": "Pure mineral bottled water",
+          "description_ar": "زجاجة مياه معدنية نقية",
+          "taxInclusive": true,
+          "price": 15
+        }
+      ]
+    }
+  ]
+}

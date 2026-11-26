@@ -5,6 +5,7 @@ import {
   publicMenuQuerySchema,
   publicOrderCreateSchema,
   publicQuoteSchema,
+  type DesktopReleaseDto,
 } from '@posshope/shared';
 import { asyncHandler } from '../../lib/asyncHandler.js';
 import { AppError, ValidationError } from '../../lib/errors.js';
@@ -51,6 +52,20 @@ publicRouter.get(
   '/settings',
   asyncHandler(async (_req, res) => {
     res.status(200).json(await getPublicSettings());
+  }),
+);
+
+/** Where the website's "Download Windows POS" button points. */
+publicRouter.get(
+  '/desktop-release',
+  asyncHandler(async (_req, res) => {
+    const release: DesktopReleaseDto = {
+      available: Boolean(env.DESKTOP_DOWNLOAD_URL),
+      url: env.DESKTOP_DOWNLOAD_URL ?? null,
+      version: env.DESKTOP_VERSION ?? null,
+      sha256: env.DESKTOP_SHA256?.toLowerCase() ?? null,
+    };
+    res.status(200).setHeader('cache-control', 'public, max-age=300').json(release);
   }),
 );
 

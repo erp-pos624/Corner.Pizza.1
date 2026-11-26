@@ -37,7 +37,8 @@
     "payroll": "Payroll",
     "salaryHistory": "Salary history",
     "hrSettings": "HR settings",
-    "expenses": "Expenses"
+    "expenses": "Expenses",
+    "printers": "Printers & receipts"
   },
   "subtitles": {
     "dashboard": "Live restaurant performance and floor activity",
@@ -70,7 +71,8 @@
     "payroll": "Monthly salary calculation, closing and payment status",
     "salaryHistory": "Closed payroll months and printable payslips",
     "hrSettings": "Working hours, grace period and deduction rules",
-    "expenses": "Rent, utilities and running costs deducted from net profit"
+    "expenses": "Rent, utilities and running costs deducted from net profit",
+    "printers": "Station printers, routing rules and receipt templates"
   },
   "aria": {
     "expandNavigation": "Expand navigation",

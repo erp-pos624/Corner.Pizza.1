@@ -94,6 +94,7 @@
     "subtotal": "Subtotal",
     "discount": "Discount",
     "tax": "Tax ({rate}%)",
+    "taxIncluded": "VAT included in prices ({rate}%)",
     "delivery": "Delivery",
     "total": "Total"
   },
@@ -165,5 +166,11 @@
     "featured": "Featured",
     "soldOut": "Sold out",
     "from": "from {price}"
+  },
+  "talabat": {
+    "toggle": "Talabat order",
+    "ref": "Talabat order number",
+    "refPlaceholder": "Talabat order # (e.g. 123456789)",
+    "hint": "Tracked as Talabat in orders and reports. Payment defaults to Wallet so it stays out of the cash drawer."
   }
 }

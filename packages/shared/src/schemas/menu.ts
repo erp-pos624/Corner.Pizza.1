@@ -64,6 +64,8 @@ export const menuItemCreateSchema = z
     isAvailable: z.boolean().default(true),
     isFeatured: z.boolean().default(false),
     hasSizes: z.boolean().default(false),
+    /** True when the entered prices already include VAT. */
+    taxInclusive: z.boolean().default(true),
     sizes: z.array(menuItemSizeInputSchema).max(8).default([]),
   })
   .strict()
@@ -89,6 +91,7 @@ export const menuItemUpdateSchema = z
     isAvailable: z.boolean().optional(),
     isFeatured: z.boolean().optional(),
     hasSizes: z.boolean().optional(),
+    taxInclusive: z.boolean().optional(),
     sizes: z.array(menuItemSizeInputSchema).max(8).optional(),
   })
   .strict()

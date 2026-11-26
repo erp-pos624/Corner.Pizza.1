@@ -8,12 +8,38 @@ const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/u;
 
 const onlineTime = z.string().trim().regex(HHMM, 'Use 24-hour HH:mm format').nullable();
 
+const dayHoursSchema = z
+  .object({
+    open: z.string().trim().regex(HHMM, 'Use 24-hour HH:mm format'),
+    close: z.string().trim().regex(HHMM, 'Use 24-hour HH:mm format'),
+  })
+  .strict()
+  .refine((day) => day.open !== day.close, {
+    message: 'Opening and closing times must differ',
+    path: ['close'],
+  });
+
+/** Per-weekday hours; a null day is closed. A close at or before the open runs past midnight. */
+export const weeklyHoursSchema = z
+  .object({
+    sun: dayHoursSchema.nullable().optional(),
+    mon: dayHoursSchema.nullable().optional(),
+    tue: dayHoursSchema.nullable().optional(),
+    wed: dayHoursSchema.nullable().optional(),
+    thu: dayHoursSchema.nullable().optional(),
+    fri: dayHoursSchema.nullable().optional(),
+    sat: dayHoursSchema.nullable().optional(),
+  })
+  .strict();
+
 /** Per-branch storefront switch and online-only opening window. */
 export const onlineStoreSettingsUpdateSchema = z
   .object({
     enabled: z.boolean().optional(),
     openTime: onlineTime.optional(),
     closeTime: onlineTime.optional(),
+    /** Per-weekday hours; null clears them and falls back to openTime/closeTime. */
+    weeklyHours: weeklyHoursSchema.nullable().optional(),
   })
   .strict()
   .superRefine((value, ctx) => {
